@@ -3,6 +3,7 @@ import { auth, db } from "../firebase";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from "firebase/firestore";
+import Button from '@mui/material/Button';
 
 const Login = () => {
     const [user, setUser] = useState(null);
@@ -56,10 +57,10 @@ const Login = () => {
     return (
         <>
           <form onSubmit={performLogin}>
-            <input type="text" name="email" onChange={(e)=>{
+            <TextField id="outlined-basic" label="Outlined" variant="outlined"  type="text" name="email" onChange={(e)=>{
                  setEmail(e.target.value)
             }}/>
-            <input type="password" name="current_password"/>
+            <TextField id="outlined-basic" label="Outlined" variant="outlined"  type="password" name="current_password"/>
             <input type="submit" value="login"/>
             <input type="button" value="forgot password?" onClick={handleForgotPassword} />
         </form>
