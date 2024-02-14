@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from "firebase/firestore";
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 
 const Login = () => {
     const [user, setUser] = useState(null);
@@ -57,11 +58,11 @@ const Login = () => {
     return (
         <>
           <form onSubmit={performLogin}>
-            <TextField id="outlined-basic" label="Outlined" variant="outlined"  type="text" name="email" onChange={(e)=>{
+            <TextField id="outlined-basic" label="Username" variant="outlined"  type="text" name="email" onChange={(e)=>{
                  setEmail(e.target.value)
             }}/>
-            <TextField id="outlined-basic" label="Outlined" variant="outlined"  type="password" name="current_password"/>
-            <input type="submit" value="login"/>
+            <TextField id="outlined-basic" label="Password" variant="outlined"  type="password" name="current_password"/>
+            <Button variant="contained" type="submit" value="login">Log in</Button>
             <input type="button" value="forgot password?" onClick={handleForgotPassword} />
         </form>
         </>
