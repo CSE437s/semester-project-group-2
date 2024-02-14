@@ -1,0 +1,25 @@
+{
+  "name": "officehourproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sammya24/OfficeHourProject.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sammya24/OfficeHourProject/issues"
+  },
+  "homepage": "https://github.com/sammya24/OfficeHourProject#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "firebase": "^10.8.0",
+    "npm": "^10.4.0"
+  }
+}
