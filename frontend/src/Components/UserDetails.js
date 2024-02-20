@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { doc, setDoc, getDoc } from "firebase/firestore"; 
 import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import axios from "axios"
+
 const UserDetails = () => {
     const [user, setUser] = useState();
     const [role, setRole] = useState();
@@ -23,31 +24,18 @@ const UserDetails = () => {
         const data = new FormData()
         data.append("myFile", photo);
         axios.post("http://localhost:3001/api/fileUpload", data, {
-        headers: {
-            "content-type": "multipart/form-data",
-        },
-        }); //I ne
-        // const data = new FormData()
-        // data.append("newFile", photo)
-        // fetch("api/fileUpload", data, {
-        //     headers: {
-        //         "content-type": "multipart/form-data"
-        //     }
-        // }).then(()=>{
-        //     console.log("success")
-        // }).catch((e)=> {
-        //     console.log(e)
-        // });
-
-        // })
-        // console.log(JhotoPath))
-        // const url =  URL.createObjectURL(photoPath)
-        // updateProfile(user, {
-        //     "photoURL": url
-        // }).then(()=>{
-        //     alert("Photo has been updated!")
-        //     navigate("/me")
-        // }).catch(e=> console.log(e));
+            headers: {
+                "content-type": "multipart/form-data",
+            },
+        });
+        console.log(photo)
+        const url =  "backend/uploadedFiles/" + photo.name
+        updateProfile(user, {
+            "photoURL": url
+        }).then(()=>{
+            alert("Photo has been updated!")
+            navigate("/me")
+        }).catch(e=> console.log(e));
     }
     useEffect(()=>{
         const currentUser = auth.currentUser
@@ -85,7 +73,8 @@ const UserDetails = () => {
     console.log(user.photoURL)
 
     return (<>
-        { user ? <img width="100px" src={user.photoURL} /> : <></>}
+
+        {/* { user ? <img width="100px" src={require("/backend/uploadedFiles/me.jpg")} /> : <></>} */}
         <h1> {"Welcome " + user.email + "!"} </h1>
         <p> Email: {user.email} </p>
         <p> Role: {role} </p>
