@@ -169,6 +169,9 @@ const Dashboard = () => {
                     ))}
                 </ul>
             </div>
+            <button onClick={()=>{
+                navigate("/me")
+            }} > My Profile </button>
             <LogoutButton />
         </>
     );
