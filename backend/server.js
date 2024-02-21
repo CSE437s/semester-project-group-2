@@ -21,21 +21,7 @@ app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.h
     next();
   });
 app.use(express.json());
-// serving front end build files
-// app.post("/api/getPhoto", (req, res, next)=> {
-//     console.log(req.body)
-//     const pictureName = req.body.photoURL
-//     if(pictureName) {
-//         console.log("sending ", __dirname, "uploadedFiles/", pictureName)
-//         return res.sendFile(path.join(__dirname.replace("backend", "/") + pictureName))
-//     }
-//     else {
-//         console.log("error! no url")
-//         res.sendStatus(500);
-//         return;
-//     }
-    
-// })
+// serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
 
 

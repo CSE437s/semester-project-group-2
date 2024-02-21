@@ -5,6 +5,17 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import axios from "axios"
 
+const cleanFileName = (fileName) => {
+    var newFileName = ""
+    for (var i = 0; i < fileName.length; i++) {
+        const char = fileName.charAt(i)
+        if(char !== ' ' && char != ' ' && char !== "(" && char !== ")") {
+            newFileName += char
+        }
+    }
+    return newFileName
+}
+
 const UserDetails = () => {
     const [user, setUser] = useState();
     const [role, setRole] = useState();
@@ -21,15 +32,16 @@ const UserDetails = () => {
     }
     const uploadProfilePicture = (e) => {
         const photo = e.target.files[0] 
+        const renamedPhoto = new File([photo], cleanFileName(photo.name), {type: photo.type});
         const data = new FormData()
-        data.append("myFile", photo);
+        data.append("myFile", renamedPhoto);
         axios.post("http://localhost:3001/api/fileUpload", data, {
             headers: {
                 "content-type": "multipart/form-data",
             },
         });
         console.log(photo)
-        const url =  "backend/uploadedFiles/" + photo.name
+        const url =  "backend/uploadedFiles/" + cleanFileName(photo.name)
         updateProfile(user, {
             "photoURL": url
         }).then(()=>{
@@ -72,7 +84,7 @@ const UserDetails = () => {
     }
     console.log(user.photoURL)
     const data = new FormData()
-    console.log("photoURL",user.photoURL.replace("backend/", "http://localhost:3001/uploadedFiles/"))
+    console.log("photoURL",user.photoURL.replace("backend/", "http://localhost:3001/"))
     // const file = axios.post("http://localhost:3001/api/getPhoto", {"photoURL": user.photoURL}).then((res)=>{
     //     console.log("success")
     //     console.log(res)
