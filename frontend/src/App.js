@@ -7,6 +7,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Routes, Route } from 'react-router-dom';
 import Home from "./Components/Home"
 import Dashboard from './Components/Dashboard';
+import UserDetails from './Components/UserDetails';
 import ClassDetails from './Components/ClassDetails';
 import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -32,6 +33,7 @@ const App = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/class/:classId" element={<ClassDetails />} />
+        <Route path="/me" element={<UserDetails />} />
 
       </Routes>
     </Router>
