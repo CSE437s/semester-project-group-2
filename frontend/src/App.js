@@ -12,6 +12,7 @@ import ClassDetails from './Components/ClassDetails';
 import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
+import NewRoom from './Components/NewRoom';
 
 
 const App = () => {
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/class/:classId" element={<ClassDetails />} />
         <Route path="/me" element={<UserDetails />} />
+        <Route path="/test" element={<NewRoom />} />
 
       </Routes>
     </Router>

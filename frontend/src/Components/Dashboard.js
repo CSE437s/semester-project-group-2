@@ -5,6 +5,7 @@ import { collection, addDoc, doc, updateDoc, arrayUnion, query, where, getDocs, 
 import { Link } from 'react-router-dom';
 import { onAuthStateChanged } from "firebase/auth";
 import LogoutButton from "./LogoutButton";
+import NewRoom from "./NewRoom";
 
 const Dashboard = () => {
     const [userEmail, setUserEmail] = useState(null);
