@@ -20,6 +20,3 @@ const NewRoom = () => {
 
 export default NewRoom
 
-
-// // ssh -i "Desktop/victoriaprisco.pem" ubuntu@18.217.200.153
-// //18.217.200.153
