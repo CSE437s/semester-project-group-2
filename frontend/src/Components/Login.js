@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from "firebase/firestore";
 
+
 const Login = () => {
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState("")
@@ -36,16 +37,18 @@ const Login = () => {
         signInWithEmailAndPassword(auth, email, pass)
             .then((credentials) => {
                 console.log("Success!");
+                localStorage.setItem("userID", credentials.user.uid)
                 setUser(credentials.user);
                 navigate('/dashboard'); // Navigate to the dashboard route
             })
             .catch((error) => {
                 if (error.code === "auth/invalid-credential") {
-                    console.log("User with that email was not found, creating new account with these credentials.");
-                    const rerouteToNewAccount = window.confirm("You don't seem to have an account. Would you like to Sign Up?")
-                    if(rerouteToNewAccount === true) {
-                        navigate("/signup")
-                    }
+                    alert("incorrect password")
+                    // console.log("User with that email was not found, creating new account with these credentials.");
+                    // const rerouteToNewAccount = window.confirm("You don't seem to have an account. Would you like to Sign Up?")
+                    // if(rerouteToNewAccount === true) {
+                    //     navigate("/signup")
+                    // }
                     
                 } else if (error.code === "auth/invalid-email") {
                     console.log("Invalid Email");

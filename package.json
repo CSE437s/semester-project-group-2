@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/sammya24/OfficeHourProject#readme",
   "dependencies": {
+    "@jitsi/react-sdk": "^1.4.0",
     "concurrently": "^8.2.2",
     "express": "^4.18.2",
     "firebase": "^10.8.0",

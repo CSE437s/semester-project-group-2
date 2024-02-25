@@ -22,6 +22,7 @@ const Signup = () => {
                 email: email,
                 role: role,
                 status: role === "instructor" ? "pending" : "approved",
+                id: userCredential.user.uid
             });
 
             // For instructors, check the status

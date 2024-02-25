@@ -24,7 +24,26 @@ app.use(express.json());
 // serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
 
+const URLs = new Map()
+app.post("/api/sendVideoURL", (req, res) => {
+    console.log(req.body)
+    const callCreatedBy = req.body.creator
+    const url = req.body.url
+    URLs.set(callCreatedBy, url)
+    console.log(URLs)
+    res.sendStatus(201)
+})
 
+app.post("/api/getVideoURL", (req, res) => {
+    const user = req.body.creator
+    if(URLs.has(user) == true) {
+        console.log("returning the URL")
+        res.json({"url": URLs.get(user)})
+    }
+    else {
+        res.json({"error": "couldn't find a URL associated with user:"+user})
+    }
+})
 
 
 // route for file upload
