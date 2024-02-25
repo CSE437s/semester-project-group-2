@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
@@ -8,9 +8,9 @@ const ClassDetails = ({}) => {
     const [classDetails, setClassDetails] = useState(null);
     const [students, setStudents] = useState([]);
     const [teachingAssistants, setTeachingAssistants] = useState([]);
-    const [instructor, setInstructor] = useState(null);
+    const navigate = useNavigate();
     const [instructorId, setInstructorId] = useState(null);
-
+  
     useEffect(() => {
         const fetchClassDetailsAndStudents = async () => {
             const classRef = doc(db, 'classes', classId);
@@ -43,6 +43,7 @@ const ClassDetails = ({}) => {
         // Check if the current user is the instructor
         if (instructorId && auth.currentUser.uid !== instructorId) {
             alert("instructorId should be " + instructorId);
+
             alert('Only instructors can promote students to TAs.');
             alert(auth.currentUser.uid);
             return;
@@ -66,9 +67,15 @@ const ClassDetails = ({}) => {
                 // Update the local state
                 setStudents(studentList.filter(id => id !== studentId));
                 setClassDetails({ ...classDetails, TAs: [...taList, studentId] });
+                window.location.reload() // force reload to show new TA
             }
         }
     };
+
+    const rerouteToClassroom = (e) => {
+        const TAid = e.target.value
+        navigate("/classrooms/"+ TAid)
+    }
 
     return (
         <div>
@@ -83,9 +90,14 @@ const ClassDetails = ({}) => {
                     <ul>
                         {students.map(studentId => (
                             <li key={studentId}>
-                                Student ID: {studentId}{' '}
+                                {auth.currentUser && instructor ? 
+                                <>Student ID: {studentId}{' '}
                                 {/* Button to promote student to TA */}
-                                <button onClick={() => promoteToTA(studentId)}>Promote to TA</button>
+                                {auth.currentUser.uid === instructor.id ?  <button onClick={() => promoteToTA(studentId)}>Promote to TA</button> : <></>}
+                                </>
+                                :
+                                <></>
+                                }
                             </li>
                         ))}
                     </ul>
@@ -94,6 +106,7 @@ const ClassDetails = ({}) => {
                         {teachingAssistants.map(taId => (
                             <li key={taId}>
                                 TA ID: {taId}
+                                <button value={taId} onClick={rerouteToClassroom}>View classroom</button>
                             </li>
                         ))}
                     </ul>
