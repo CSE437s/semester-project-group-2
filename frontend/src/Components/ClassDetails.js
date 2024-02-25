@@ -3,35 +3,38 @@ import { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
 
-const ClassDetails = ({ instructorId }) => {
+const ClassDetails = ({}) => {
     const { classId } = useParams();
     const [classDetails, setClassDetails] = useState(null);
     const [students, setStudents] = useState([]);
     const [teachingAssistants, setTeachingAssistants] = useState([]);
     const [instructor, setInstructor] = useState(null);
+    const [instructorId, setInstructorId] = useState(null);
 
     useEffect(() => {
         const fetchClassDetailsAndStudents = async () => {
             const classRef = doc(db, 'classes', classId);
             const classSnapshot = await getDoc(classRef);
-
+    
             if (classSnapshot.exists()) {
-                setClassDetails(classSnapshot.data());
-                setStudents(classSnapshot.data().students);
-                setTeachingAssistants(classSnapshot.data().TAs || []); // Initialize TAs with existing data or empty array
-            
-                // Fetch instructor details
-                const instructorRef = doc(db, 'users', classSnapshot.data().instructor);
+                const classData = classSnapshot.data(); // Declaring classData here
+                setClassDetails(classData);
+                setStudents(classData.students);
+                setTeachingAssistants(classData.TAs || []);
+    
+                // Set instructor ID
+                setInstructorId(classData.instructor);
+    
+                // Fetch instructor details if needed
+                const instructorRef = doc(db, 'users', classData.instructor);
                 const instructorSnapshot = await getDoc(instructorRef);
-
+    
                 if (instructorSnapshot.exists()) {
                     setInstructor(instructorSnapshot.data());
                 }
-            
             }
-
         };
-
+    
         fetchClassDetailsAndStudents();
     }, [classId]);
 
@@ -39,7 +42,9 @@ const ClassDetails = ({ instructorId }) => {
     const promoteToTA = async (studentId) => {
         // Check if the current user is the instructor
         if (auth.currentUser.uid !== instructorId) {
+            alert("instructorId should be " + instructorId);
             alert('Only instructors can promote students to TAs.');
+            alert(auth.currentUser.uid);
             return;
         }
 
