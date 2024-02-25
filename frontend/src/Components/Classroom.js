@@ -1,87 +1,77 @@
 import { useState, useEffect } from "react"
-import {auth, db} from "../firebase"
+import { auth, db } from "../firebase"
 import { doc, getDoc } from "firebase/firestore"
 import NewRoom from "./NewRoom"
 import { useParams } from "react-router-dom"
 import axios from "axios"
-
 
 const Classroom = () => {
     const [room, createRoom] = useState(undefined)
     const [name, setName] = useState("")
     const [roomURL, setRoomURL] = useState("")
 
-    // const waitForCurrentUser = () => {
-    //     if(auth.currentUser === null || auth.currentUser === undefined) {
-    //         console.log("! not loaded yet")
-    //         console.log(auth.currentUser)
-    //         setTimeout(waitForCurrentUser, 10)
-    //     }
-    //     else {
-    //         return auth.currentUser
-    //     }
-    // }
-    // const currentUser = waitForCurrentUser()
     const currentUser = localStorage.getItem("userID")
-    console.log("current user", currentUser)
-    useEffect(()=>{
-        if(currentUser) {
+
+    useEffect(() => {
+        if (currentUser) {
             const userDocRef = doc(db, "users", currentUser);
-            if(userDocRef) {
-                getDoc(userDocRef).then((d)=>{
+            if (userDocRef) {
+                getDoc(userDocRef).then((d) => {
                     const docData = d.data()
-                    console.log(docData)
                     setName(docData.email)
-                }).catch((error)=> {
+                }).catch((error) => {
                     console.log(error)
                 })
             }
         }
-    })
+    }, [currentUser])
+
     const instructor = useParams("TAid")
     const isOwner = currentUser === instructor.TAid
-    console.log(isOwner)
+
     const handleSubmit = (e) => {
-        const newRoomName = Math.random() * 1000 + "."+ Date.now()
-        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value}/>)
+        const newRoomName = Math.random() * 1000 + "." + Date.now()
+        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />)
     }
+
     const getNewUrl = (roomOwner) => {
-        axios.post("http://localhost:3001/api/getVideoURL", {"creator": roomOwner}, {
+        axios.post("http://localhost:3001/api/getVideoURL", { "creator": roomOwner }, {
             headers: {
                 "content-type": "application/json",
             },
-        }).then((res)=>{
-            console.log("setting the room url", res.data)
+        }).then((res) => {
             setRoomURL(res.data.url)
         }).catch(e => {
             console.log(e)
         })
     }
-    var render;
-    if(isOwner === false) {
-        if(roomURL) {
-            const roomToJoin = <NewRoom roomName="asdf" type="asdf" URL={roomURL}/>
-            // roomToJoin..setAttribute("src", roomURL)
-            console.log(roomToJoin)
+
+    let render;
+    if (isOwner === false) {
+        if (roomURL) {
+            const roomToJoin = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />
             render = roomToJoin
-    
         }
         else {
             getNewUrl(instructor.TAid)
-            console.log(roomURL)
         }
-      
     }
     else {
-        render = room ? room : <form onSubmit={handleSubmit}>
-                                    What would you like to name your room?
-                                    <input id="roomtype" type="text"/>
-                                </form>
+        render = room ? room : (
+            <form onSubmit={handleSubmit} className="text-center">
+                <label htmlFor="roomtype" className="block">What would you like to name your room?</label>
+                <input id="roomtype" type="text" className="border border-gray-300 rounded px-4 py-2 mt-2" />
+                <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
+            </form>
+        )
     }
-    return (<>
-        {isOwner === true ? <h1> Welcome to your Classroom</h1> : <h1> Welcome to {name}'s Classroom!</h1>}
-        {render}
-        
-    </>)
+
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Welcome to your Classroom" : `Welcome to ${name}'s Classroom!`}</h1>
+            {render}
+        </div>
+    )
 }
+
 export default Classroom

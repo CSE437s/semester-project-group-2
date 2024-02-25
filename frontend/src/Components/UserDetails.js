@@ -3,7 +3,7 @@ import { auth, db, storage } from "../firebase";
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc, getDoc } from "firebase/firestore"; 
 import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
-import axios from "axios"
+import axios from "axios";
 
 const cleanFileName = (fileName) => {
     var newFileName = ""
@@ -30,17 +30,16 @@ const UserDetails = () => {
             console.log(e)
         })
     }
-    const uploadProfilePicture = (e) => {
+    const uploadProfilePicture = async (e) => {
         const photo = e.target.files[0] 
         const renamedPhoto = new File([photo], cleanFileName(photo.name), {type: photo.type});
         const data = new FormData()
         data.append("myFile", renamedPhoto);
-        axios.post("http://localhost:3001/api/fileUpload", data, {
+        await axios.post("http://localhost:3001/api/fileUpload", data, {
             headers: {
                 "content-type": "multipart/form-data",
             },
         });
-        console.log(photo)
         const url =  "backend/uploadedFiles/" + cleanFileName(photo.name)
         updateProfile(user, {
             "photoURL": url
@@ -52,7 +51,6 @@ const UserDetails = () => {
     useEffect(()=>{
         const currentUser = auth.currentUser
         if(currentUser) {
-            console.log("User currently logged in:", currentUser.displayName)
             setUser(currentUser)
             const userDocRef = doc(db, "users", currentUser.uid);
             if(!userDocRef) {
@@ -68,48 +66,29 @@ const UserDetails = () => {
                 })
             }
         }
-        else {
-            console.log("No one is logged in right now")
-        }
-        console.log("Current user is ", user)
-    })
+    }, [user])
 
     if(!user) {
-        return (<> 
-            <h1> Please sign in to view this page. </h1>
-            <button onClick={()=>{
-                navigate("/login")
-            }}> Go to login </button>
-        </>)
-    }
-    console.log(user.photoURL)
-    const data = new FormData()
-    if(user && user.photoURL) {
-        console.log("photoURL", user.photoURL.replace("backend/", "http://localhost:3001/"));
+        return (
+            <div className="container mx-auto text-center mt-10">
+                <h1>Please sign in to view this page.</h1>
+                <button onClick={() => navigate("/login")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Go to login</button>
+            </div>
+        );
     }
     
-    // const file = axios.post("http://localhost:3001/api/getPhoto", {"photoURL": user.photoURL}).then((res)=>{
-    //     console.log("success")
-    //     console.log(res)
-    // }).catch((e)=> {
-    //     console.log(e)
-    // })
-    
-    return (<>
-        { user && user.photoURL ? <img width="100px" src={user.photoURL.replace("backend/", "http://localhost:3001/")} /> : <></>}
-
-        <h1> {"Welcome " + user.email + "!"} </h1>
-        <p> Email: {user.email} </p>
-        <p> Role: {role} </p>
-        <p> Status: {status} </p>
-        <input type="file" name="newFile" accept="image/*" onChange={uploadProfilePicture}/>
-        <button onClick={performReset} > Reset Password</button>
-        <button onClick={()=>{
-            navigate("/home")
-        }} > Go back home </button>
-    </>)
-
-
+    return (
+        <div className="container mx-auto px-4 py-8">
+            {user && user.photoURL ? <img src={user.photoURL.replace("backend/", "http://localhost:3001/")} className="rounded-full mx-auto mb-4" alt="Profile" width="100px" /> : null}
+            <h1 className="text-2xl font-bold text-center mb-4">Welcome, {user.email}!</h1>
+            <p>Email: {user.email}</p>
+            <p>Role: {role}</p>
+            <p>Status: {status}</p>
+            <input type="file" name="newFile" accept="image/*" onChange={uploadProfilePicture} className="mt-4"/>
+            <button onClick={performReset} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 mr-2">Reset Password</button>
+            <button onClick={() => navigate("/home")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Go back home</button>
+        </div>
+    );
 };
 
 export default UserDetails;

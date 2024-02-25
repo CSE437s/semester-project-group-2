@@ -1,5 +1,4 @@
-import { auth, db } from "../firebase";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   collection,
@@ -12,6 +11,7 @@ import {
   getDocs,
   getDoc,
 } from "firebase/firestore"; // Importing doc function
+import { auth, db } from "../firebase";
 import { Link } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import LogoutButton from "./LogoutButton";
@@ -169,83 +169,96 @@ const Dashboard = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  console.log(auth.currentUser.uid)
+
   return (
-    <>
-      <div>
-        <h1>Welcome to the Dashboard, {userEmail || "Guest"}!</h1>
-        {userRole === "instructor" && userStatus === "approved" ? (
-          <form onSubmit={handleCreateClassSubmit}>
-            <input
-              type="text"
-              placeholder="Class Name"
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Class Description"
-              value={classDescription}
-              onChange={(e) => setClassDescription(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Class Code"
-              value={classCode}
-              onChange={(e) => setClassCode(e.target.value)}
-            />
-            <button type="submit">Create Class</button>
-          </form>
-        ) : userRole === "instructor" && userStatus === "pending" ? (
-          <div>
-            <p>
-              Your instructor account is currently pending approval. You will be
-              notified once your account has been reviewed.
-            </p>
-          </div>
-        ) : null}
-        <form onSubmit={handleJoinClassSubmit}>
+    <div className="p-6 bg-gray-100">
+      <h1 className="text-3xl font-bold mb-6">Welcome to the Dashboard, {userEmail || "Guest"}!</h1>
+      {userRole === "instructor" && userStatus === "approved" ? (
+        <form onSubmit={handleCreateClassSubmit} className="mb-6">
           <input
+            className="border border-gray-300 p-2 rounded mb-2 block"
             type="text"
-            placeholder="Enter Class Code to Join"
-            value={joinClassCode}
-            onChange={(e) => setJoinClassCode(e.target.value)}
+            placeholder="Class Name"
+            value={className}
+            onChange={(e) => setClassName(e.target.value)}
           />
-          <button type="submit">Join Class</button>
+          <input
+            className="border border-gray-300 p-2 rounded mb-2 block"
+            type="text"
+            placeholder="Class Description"
+            value={classDescription}
+            onChange={(e) => setClassDescription(e.target.value)}
+          />
+          <input
+            className="border border-gray-300 p-2 rounded mb-2 block"
+            type="text"
+            placeholder="Class Code"
+            value={classCode}
+            onChange={(e) => setClassCode(e.target.value)}
+          />
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            type="submit"
+          >
+            Create Class
+          </button>
         </form>
-      </div>
+      ) : userRole === "instructor" && userStatus === "pending" ? (
+        <div className="mb-6">
+          <p>
+            Your instructor account is currently pending approval. You will be
+            notified once your account has been reviewed.
+          </p>
+        </div>
+      ) : null}
+      <form onSubmit={handleJoinClassSubmit} className="mb-6">
+        <input
+          className="border border-gray-300 p-2 rounded mb-2 block"
+          type="text"
+          placeholder="Enter Class Code to Join"
+          value={joinClassCode}
+          onChange={(e) => setJoinClassCode(e.target.value)}
+        />
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          type="submit"
+        >
+          Join Class
+        </button>
+      </form>
       {/* Display user's classes */}
-      <div>
-        <h2>Your Classes</h2>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-2">Your Classes</h2>
         <ul>
           {userClasses.map((userClass) => (
-            <li key={userClass.id}>
-              <Link to={`/class/${userClass.id}`}>
-                <strong>Class Name:</strong> {userClass.className},
+            <li key={userClass.id} className="mb-2">
+              <Link
+                to={`/class/${userClass.id}`}
+                className="text-blue-500 hover:underline"
+              >
+                <strong>Class Name:</strong> {userClass.className},{" "}
                 <strong>Class Description:</strong> {userClass.classDescription}
               </Link>
             </li>
           ))}
         </ul>
       </div>
-      <button
-        onClick={() => {
-          navigate("/me");
-        }}
-      >
-        {" "}
-        My Profile{" "}
-      </button>
-      <button
-        onClick={() => {
-          navigate("/my-room");
-        }}
-      >
-        {" "}
-        Go to classroom{" "}
-      </button>
+      <div className="flex justify-between items-center mb-6">
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={() => navigate("/me")}
+        >
+          My Profile
+        </button>
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={() => navigate("/my-room")}
+        >
+          Go to Classroom
+        </button>
+      </div>
       <LogoutButton />
-    </>
+    </div>
   );
 };
 

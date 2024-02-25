@@ -44,20 +44,58 @@ const Signup = () => {
     };
 
     return (
-        <>
-            <form onSubmit={handleSignup}>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+        <div className="flex justify-center items-center h-screen">
+            <form onSubmit={handleSignup} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
+                <input
+                    className="mb-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email"
+                />
+                <input
+                    className="mb-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                />
                 
                 {/* Role Selection */}
-                <div onChange={(e) => setRole(e.target.value)}>
-                    <input type="radio" value="student" name="role" defaultChecked /> Student
-                    <input type="radio" value="instructor" name="role" /> Instructor
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Role</label>
+                    <div className="flex items-center">
+                        <input
+                            className="mr-2 leading-tight"
+                            type="radio"
+                            value="student"
+                            name="role"
+                            checked={role === "student"}
+                            onChange={(e) => setRole(e.target.value)}
+                        />
+                        <label className="text-sm" htmlFor="student">Student</label>
+                    </div>
+                    <div className="flex items-center">
+                        <input
+                            className="mr-2 leading-tight"
+                            type="radio"
+                            value="instructor"
+                            name="role"
+                            checked={role === "instructor"}
+                            onChange={(e) => setRole(e.target.value)}
+                        />
+                        <label className="text-sm" htmlFor="instructor">Instructor</label>
+                    </div>
                 </div>
 
-                <button type="submit">Sign Up</button>
+                <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="submit"
+                >
+                    Sign Up
+                </button>
             </form>
-        </>
+        </div>
     );
 };
 
