@@ -173,6 +173,9 @@ const Dashboard = () => {
             <button onClick={()=>{
                 navigate("/me")
             }} > My Profile </button>
+            <button onClick={()=> {
+                navigate("/my-room")
+            }}> Go to classroom </button>
             <LogoutButton />
         </>
     );

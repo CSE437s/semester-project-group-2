@@ -1,20 +1,18 @@
 import { JitsiMeeting } from '@jitsi/react-sdk';
 import { useEffect, useRef} from 'react'
 
-const NewRoom = () => {
+const NewRoom = (props) => {
     // const api = useRef();
     return (<>
     <JitsiMeeting
-                roomName = { "vickh" }
+                roomName = { props.roomName }
                 configOverwrite = {{
-                    subject: 'lalalala',
+                    subject: props.type,
                     hideConferenceSubject: false
                 }}
                 lang = 'en'
-                getIFrameRef = { (iframeRef) => { iframeRef.style.height = '500px'; } }
-
-
-                     />
+                getIFrameRef = { (iframeRef) => { iframeRef.style.height = '500px'; iframeRef.style.width = '70%'; } }
+        />
     </>)
 }
 

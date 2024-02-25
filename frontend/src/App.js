@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
 import NewRoom from './Components/NewRoom';
+import Classroom from "./Components/Classroom"
 
 
 const App = () => {
@@ -35,7 +36,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/class/:classId" element={<ClassDetails />} />
         <Route path="/me" element={<UserDetails />} />
-        <Route path="/test" element={<NewRoom />} />
+        <Route path="/my-room" element={<Classroom />} />
 
       </Routes>
     </Router>
