@@ -10,6 +10,7 @@ const ClassDetails = ({}) => {
     const [teachingAssistants, setTeachingAssistants] = useState([]);
     const navigate = useNavigate();
     const [instructorId, setInstructorId] = useState(null);
+    const [instructor, setInstructor] = useState(null);
   
     useEffect(() => {
         const fetchClassDetailsAndStudents = async () => {
