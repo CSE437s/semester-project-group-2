@@ -78,9 +78,14 @@ const ClassDetails = ({ instructorId }) => {
                     <ul>
                         {students.map(studentId => (
                             <li key={studentId}>
-                                Student ID: {studentId}{' '}
+                                {auth.currentUser && instructor ? 
+                                <>Student ID: {studentId}{' '}
                                 {/* Button to promote student to TA */}
-                                <button onClick={() => promoteToTA(studentId)}>Promote to TA</button>
+                                {auth.currentUser.uid === instructor.id ?  <button onClick={() => promoteToTA(studentId)}>Promote to TA</button> : <></>}
+                                </>
+                                :
+                                <></>
+                                }
                             </li>
                         ))}
                     </ul>
