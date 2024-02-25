@@ -169,7 +169,7 @@ const Dashboard = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
+  console.log(auth.currentUser.uid)
   return (
     <>
       <div>

@@ -36,7 +36,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/class/:classId" element={<ClassDetails />} />
         <Route path="/me" element={<UserDetails />} />
-        <Route path="/my-room" element={<Classroom />} />
+        <Route path="/classrooms/:TAid" element={<Classroom />} />
 
       </Routes>
     </Router>
