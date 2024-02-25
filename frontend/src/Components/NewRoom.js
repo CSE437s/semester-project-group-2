@@ -4,9 +4,9 @@ import axios from "axios";
 
 const NewRoom = (props) => {
     // const api = useRef();
+    console.log(props)
     return (<>
     <JitsiMeeting
-                id="hello"
                 roomName = { props.roomName }
                 configOverwrite = {{
                     subject: props.type,
@@ -15,9 +15,11 @@ const NewRoom = (props) => {
                 lang = 'en'
                 getIFrameRef = { (iframeRef) => { 
                     if(props.URL) {
+                        console.log("not creating a new room")
                         iframeRef.children[0].setAttribute("src", props.URL)
                     }
                     else {
+                        console.log("creating a new room")
                         const data = {
                             "creator": localStorage.getItem("userID"),
                             "url": iframeRef.childNodes[0].getAttribute("src")

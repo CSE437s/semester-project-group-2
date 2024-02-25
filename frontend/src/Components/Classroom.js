@@ -51,6 +51,7 @@ const Classroom = () => {
                 "content-type": "application/json",
             },
         }).then((res)=>{
+            console.log("setting the room url", res.data)
             setRoomURL(res.data.url)
         }).catch(e => {
             console.log(e)
@@ -58,13 +59,18 @@ const Classroom = () => {
     }
     var render;
     if(isOwner === false) {
-        console.log("hello")
-        getNewUrl(instructor.TAid)
-        const roomToJoin = <NewRoom roomName="asdf" type="asdf" URL={roomURL}/>
-        // roomToJoin..setAttribute("src", roomURL)
-        console.log(roomToJoin)
-        render = roomToJoin
-
+        if(roomURL) {
+            const roomToJoin = <NewRoom roomName="asdf" type="asdf" URL={roomURL}/>
+            // roomToJoin..setAttribute("src", roomURL)
+            console.log(roomToJoin)
+            render = roomToJoin
+    
+        }
+        else {
+            getNewUrl(instructor.TAid)
+            console.log(roomURL)
+        }
+      
     }
     else {
         render = room ? room : <form onSubmit={handleSubmit}>
