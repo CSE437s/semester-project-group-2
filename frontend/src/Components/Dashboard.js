@@ -142,6 +142,7 @@ const Dashboard = () => {
           const classData = classDoc.data();
 
           // Update user document with the class joined
+          //uwu
           const userRef = doc(db, "users", auth.currentUser.uid);
           await updateDoc(userRef, {
             classes: arrayUnion(classDoc.id),
