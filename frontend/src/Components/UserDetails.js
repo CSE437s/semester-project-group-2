@@ -84,7 +84,10 @@ const UserDetails = () => {
     }
     console.log(user.photoURL)
     const data = new FormData()
-    console.log("photoURL",user.photoURL.replace("backend/", "http://localhost:3001/"))
+    if(user && user.photoURL) {
+        console.log("photoURL", user.photoURL.replace("backend/", "http://localhost:3001/"));
+    }
+    
     // const file = axios.post("http://localhost:3001/api/getPhoto", {"photoURL": user.photoURL}).then((res)=>{
     //     console.log("success")
     //     console.log(res)
@@ -93,7 +96,8 @@ const UserDetails = () => {
     // })
     
     return (<>
-        { user ? <img width="100px" src={user.photoURL.replace("backend/", "http://localhost:3001/")} /> : <></>}
+        { user && user.photoURL ? <img width="100px" src={user.photoURL.replace("backend/", "http://localhost:3001/")} /> : <></>}
+
         <h1> {"Welcome " + user.email + "!"} </h1>
         <p> Email: {user.email} </p>
         <p> Role: {role} </p>

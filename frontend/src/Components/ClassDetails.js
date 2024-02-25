@@ -41,7 +41,7 @@ const ClassDetails = ({}) => {
     // Function to promote a student to a TA
     const promoteToTA = async (studentId) => {
         // Check if the current user is the instructor
-        if (auth.currentUser.uid !== instructorId) {
+        if (instructorId && auth.currentUser.uid !== instructorId) {
             alert("instructorId should be " + instructorId);
             alert('Only instructors can promote students to TAs.');
             alert(auth.currentUser.uid);
