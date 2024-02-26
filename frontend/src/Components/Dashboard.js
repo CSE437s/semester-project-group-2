@@ -32,8 +32,8 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userClasses, setUserClasses] = useState([]);
   const [userRoleInClasses, setUserRoleInClasses] = useState({});
-  
-  useEffect(() => { 
+
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userRef = doc(db, "users", auth.currentUser.uid);
@@ -76,18 +76,18 @@ const Dashboard = () => {
             ...doc.data(),
           }));
           const rolesInClasses = {};
-      for (const userClass of instructorClasses) {
-        rolesInClasses[userClass.id] = 'Instructor';
-      }
-      for (const userClass of taClasses) {
-        rolesInClasses[userClass.id] = 'TA';
-      }
-      for (const userClass of studentClasses) {
-        if (!rolesInClasses[userClass.id]) { // Avoid overwriting if already set as 'Instructor' or 'TA'
-          rolesInClasses[userClass.id] = 'Student';
-        }
-      }
-      setUserRoleInClasses(rolesInClasses);
+          for (const userClass of instructorClasses) {
+            rolesInClasses[userClass.id] = 'Instructor';
+          }
+          for (const userClass of taClasses) {
+            rolesInClasses[userClass.id] = 'TA';
+          }
+          for (const userClass of studentClasses) {
+            if (!rolesInClasses[userClass.id]) { // Avoid overwriting if already set as 'Instructor' or 'TA'
+              rolesInClasses[userClass.id] = 'Student';
+            }
+          }
+          setUserRoleInClasses(rolesInClasses);
           // Combine all classes...
           const classes = [
             ...instructorClasses,
@@ -197,95 +197,102 @@ const Dashboard = () => {
           </div></Link>
 
           <div>
-          <button
+            <button
               className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
               onClick={() => navigate("/me")}
             >
               My Profile
             </button>
             <LogoutButton />
-            
+
           </div>
         </div>
       </header>
-      <div className="p-6 bg-gray-100">
+      <div className="font-mono container mx-auto mt-6 p-10 ">
+
+
+
+        {/* Display user's classes */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-4 ">Your Classes</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {userClasses.map((userClass) => (
+              <div key={userClass.id} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48">
+                <Link to={`/class/${userClass.id}`} className="hover:underline">
+                  <h3 className="font-bold text-lg mb-2">{userClass.className}</h3>
+                  <p className="text-gray-700 flex-grow">{userClass.classDescription}</p>
+                </Link>
+                <span className="inline-block bg-indigo-100 text-indigo-800 py-1 px-3 rounded-full text-sm font-semibold mt-4 self-start">
+                  {userRoleInClasses[userClass.id]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {userRole === "instructor" && userStatus === "approved" ? (
-          <form onSubmit={handleCreateClassSubmit} className="mb-6">
+          <form onSubmit={handleCreateClassSubmit} className="mb-6 flex items-center font-mono mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
+            <label htmlFor="classCode" className="mr-2 font-bold">
+              Create A Class:
+            </label>
             <input
-              className="border border-gray-300 p-2 rounded mb-2 block"
+              className="border border-gray-300 p-2 rounded block mr-2"
               type="text"
               placeholder="Class Name"
               value={className}
               onChange={(e) => setClassName(e.target.value)}
             />
+            <label htmlFor="classCode" className="mr-2">
+
+            </label>
             <input
-              className="border border-gray-300 p-2 rounded mb-2 block"
+              className="border border-gray-300 p-2 rounded block mr-2"
               type="text"
               placeholder="Class Description"
               value={classDescription}
               onChange={(e) => setClassDescription(e.target.value)}
             />
-          
+            <label htmlFor="classCode" className="mr-2">
+
+            </label>
             <input
-              className="border border-gray-300 p-2 rounded mb-2 block"
+              id="classCode"
+              className="border border-gray-300 p-2 rounded block mr-2"
               type="text"
               placeholder="Class Code"
               value={classCode}
               onChange={(e) => setClassCode(e.target.value)}
             />
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
               type="submit"
             >
               Create Class
             </button>
           </form>
-        ) : userRole === "instructor" && userStatus === "pending" ? (
-          <div className="mb-6">
-            <p>
-              Your instructor account is currently pending approval. You will be
-              notified once your account has been reviewed.
-            </p>
-          </div>
         ) : null}
-       
-        {/* Display user's classes */}
-        <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4">Your Classes</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {userClasses.map((userClass) => (
-            <div key={userClass.id} className="bg-white rounded-lg shadow-lg p-4 flex flex-col justify-between h-48">
-              <Link to={`/class/${userClass.id}`} className="hover:underline">
-                <h3 className="font-bold text-lg mb-2">{userClass.className}</h3>
-                <p className="text-gray-700 flex-grow">{userClass.classDescription}</p>
-              </Link>
-              <span className="inline-block bg-indigo-100 text-indigo-800 py-1 px-3 rounded-full text-sm font-semibold mt-4 self-start">
-                {userRoleInClasses[userClass.id]}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-        <form onSubmit={handleJoinClassSubmit} className="mb-6 flex items-center">
-  <label htmlFor="joinClassCode" className="mr-2">
-    Join a Class:
-  </label>
-  <input
-    id="joinClassCode"
-    className="border border-gray-300 p-2 rounded mb-2 block mr-2"
-    type="text"
-    placeholder="Enter Class Code to Join"
-    value={joinClassCode}
-    onChange={(e) => setJoinClassCode(e.target.value)}
-  />
-  <button
-    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-    type="submit"
-  >
-    Join Class
-  </button>
-</form>
+
+
+
+        <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200 ">
+          <label htmlFor="joinClassCode" className="mr-2 font-bold ">
+            Join a Class:
+          </label>
+          <input
+            id="joinClassCode"
+            className="border border-gray-300 p-2 rounded block mr-2"
+            type="text"
+            placeholder="Class Code"
+            value={joinClassCode}
+            onChange={(e) => setJoinClassCode(e.target.value)}
+          />
+          <button
+            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+            type="submit"
+          >
+            Join Class
+          </button>
+        </form>
         {/* <div className="flex justify-between items-center mb-6">
 
           <button
