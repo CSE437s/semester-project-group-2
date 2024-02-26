@@ -31,7 +31,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [userClasses, setUserClasses] = useState([]);
-
+  const [userRoleInClasses, setUserRoleInClasses] = useState({});
+  
   useEffect(() => { 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -74,7 +75,19 @@ const Dashboard = () => {
             id: doc.id,
             ...doc.data(),
           }));
-
+          const rolesInClasses = {};
+      for (const userClass of instructorClasses) {
+        rolesInClasses[userClass.id] = 'Instructor';
+      }
+      for (const userClass of taClasses) {
+        rolesInClasses[userClass.id] = 'TA';
+      }
+      for (const userClass of studentClasses) {
+        if (!rolesInClasses[userClass.id]) { // Avoid overwriting if already set as 'Instructor' or 'TA'
+          rolesInClasses[userClass.id] = 'Student';
+        }
+      }
+      setUserRoleInClasses(rolesInClasses);
           // Combine all classes...
           const classes = [
             ...instructorClasses,
@@ -239,21 +252,21 @@ const Dashboard = () => {
        
         {/* Display user's classes */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-2">Your Classes</h2>
-          <ul>
-            {userClasses.map((userClass) => (
-              <li key={userClass.id} className="mb-2">
-                <Link
-                  to={`/class/${userClass.id}`}
-                  className="text-blue-500 hover:underline"
-                >
-                  <strong>Class Name:</strong> {userClass.className},{" "}
-                  <strong>Class Description:</strong> {userClass.classDescription}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <h2 className="text-2xl font-bold mb-4">Your Classes</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {userClasses.map((userClass) => (
+            <div key={userClass.id} className="bg-white rounded-lg shadow-lg p-4 flex flex-col justify-between h-48">
+              <Link to={`/class/${userClass.id}`} className="hover:underline">
+                <h3 className="font-bold text-lg mb-2">{userClass.className}</h3>
+                <p className="text-gray-700 flex-grow">{userClass.classDescription}</p>
+              </Link>
+              <span className="inline-block bg-indigo-100 text-indigo-800 py-1 px-3 rounded-full text-sm font-semibold mt-4 self-start">
+                {userRoleInClasses[userClass.id]}
+              </span>
+            </div>
+          ))}
         </div>
+      </div>
         <form onSubmit={handleJoinClassSubmit} className="mb-6 flex items-center">
   <label htmlFor="joinClassCode" className="mr-2">
     Join a Class:
