@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
 
-const ClassDetails = ({ }) => {
+const ClassDetails = () => {
     const { classId } = useParams();
     const [classDetails, setClassDetails] = useState(null);
     const [students, setStudents] = useState([]);

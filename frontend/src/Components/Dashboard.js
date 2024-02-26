@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   collection,
-  addDoc,
   doc,
   updateDoc,
   arrayUnion,
@@ -12,19 +11,12 @@ import {
   getDoc,
 } from "firebase/firestore"; // Importing doc function
 import { auth, db } from "../firebase";
-import { Link } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import LogoutButton from "./LogoutButton";
-import NewRoom from "./NewRoom";
-import UserDetails from "./UserDetails";
 
 const Dashboard = () => {
   const [userEmail, setUserEmail] = useState(null);
   const [userName, setUserName] = useState("");
-  const [className, setClassName] = useState("");
-  const [classDescription, setClassDescription] = useState("");
-  const [classCode, setClassCode] = useState("");
-  const [instructorId, setInstructorId] = useState("");
   const [joinClassCode, setJoinClassCode] = useState("");
   const [userRole, setUserRole] = useState(null);
   const [userStatus, setUserStatus] = useState(null);
@@ -32,14 +24,13 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userClasses, setUserClasses] = useState([]);
 
-  useEffect(() => {
+  useEffect(() => { 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userRef = doc(db, "users", auth.currentUser.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          setInstructorId(auth.currentUser.uid);
           setUserEmail(auth.currentUser.email);
           setUserName(`${userData.firstName} ${userData.lastName}`);
           setUserRole(userData.role);
@@ -96,38 +87,38 @@ const Dashboard = () => {
     return () => unsubscribe(); // Clean up the subscription
   }, [navigate]);
 
-  const handleCreateClassSubmit = async (e) => {
-    e.preventDefault();
+  // const handleCreateClassSubmit = async (e) => {
+  //   e.preventDefault();
 
-    // Check if the user has the 'instructor' role before proceeding
-    if (userRole !== "instructor") {
-      alert("Only instructors can create classes.");
-      return;
-    }
+  //   // Check if the user has the 'instructor' role before proceeding
+  //   if (userRole !== "instructor") {
+  //     alert("Only instructors can create classes.");
+  //     return;
+  //   }
 
-    try {
-      const classesCollection = collection(db, "classes");
-      await addDoc(classesCollection, {
-        className: className,
-        classDescription: classDescription,
-        createdBy: userEmail,
-        classCode: classCode,
-        instructor: instructorId,
-        students: [],
-        TAs: [],
-      });
+  //   try {
+  //     const classesCollection = collection(db, "classes");
+  //     await addDoc(classesCollection, {
+  //       className: className,
+  //       classDescription: classDescription,
+  //       createdBy: userEmail,
+  //       classCode: classCode,
+  //       instructor: instructorId,
+  //       students: [],
+  //       TAs: [],
+  //     });
 
-      // Reset input fields after successful submission
-      setClassName("");
-      setClassDescription("");
-      setClassCode("");
-      alert("Class created successfully! Refreshing...");
-      window.location.reload(); // force automatic reload
-    } catch (error) {
-      console.error("Error creating class:", error);
-      alert("Failed to create class. Please try again.");
-    }
-  };
+  //     // Reset input fields after successful submission
+  //     setClassName("");
+  //     setClassDescription("");
+  //     setClassCode("");
+  //     alert("Class created successfully! Refreshing...");
+  //     window.location.reload(); // force automatic reload
+  //   } catch (error) {
+  //     console.error("Error creating class:", error);
+  //     alert("Failed to create class. Please try again.");
+  //   }
+  // };
 
   const handleJoinClassSubmit = async (e) => {
     e.preventDefault();
@@ -142,7 +133,7 @@ const Dashboard = () => {
 
       if (!querySnapshot.empty) {
         querySnapshot.forEach(async (classDoc) => {
-          const classData = classDoc.data();
+          // const classData = classDoc.data();
 
           // Update user document with the class joined
           const userRef = doc(db, "users", auth.currentUser.uid);
