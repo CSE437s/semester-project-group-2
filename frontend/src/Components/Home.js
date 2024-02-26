@@ -1,10 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { auth } from '../firebase'; 
+import { auth } from '../firebase';
 import React, { useEffect, useState } from 'react';
 
 const Home = () => {
     const navigate = useNavigate();
-    const [checkingAuth, setCheckingAuth] = useState(true); 
+    const [checkingAuth, setCheckingAuth] = useState(true);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
@@ -22,21 +22,21 @@ const Home = () => {
 
     return (
         <div className="font-mono home-container ">
-            <header className="bg-slate-300 p-0 py-5">
-            <div className="container flex justify-between items-center max-w-full">
-                
-            <Link to="/home"><div className="flex items-center">
-                    <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
+            <header className="bg-indigo-300 p-0 py-5">
+                <div className="container flex justify-between items-center max-w-full">
+
+                    <Link to="/home"><div className="flex items-center">
+                        <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
                         <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
                     </div></Link>
-                    
+
                     <div>
                         <Link to="/login" className="font-semibold text-black text-lg hover:underline mr-4">Log in</Link>
                         <Link to="/signup" className="font-semibold text-black text-lg hover:underline pr-10">Sign up</Link>
                     </div>
                 </div>
             </header>
-            <div className="container mx-auto mt-6 bg-slate-200 p-10">
+            <div className="container mx-auto mt-6 bg-indigo-200 p-10">
                 <h1 className="text-3xl font-bold mb-4">Welcome to Online Office Hours!</h1>
                 <p className="text-lg text-gray-800 mb-6">
                     Our platform provides a seamless solution for organizing and attending office hours
@@ -59,7 +59,7 @@ const Home = () => {
                 <h2 className="text-2xl font-bold mb-2">Get Started</h2>
                 <p className="text-lg text-gray-800 mb-6">
                     Ready to enhance your learning experience?
-                    <Link to="/login" className="ml-2 font-semibold text-blue-600 hover:underline">Log in</Link> now or 
+                    <Link to="/login" className="ml-2 font-semibold text-blue-600 hover:underline">Log in</Link> now or
                     <Link to="/signup" className="font-semibold text-blue-600 hover:underline ml-2">sign up</Link> to get started!
                 </p>
             </div>
