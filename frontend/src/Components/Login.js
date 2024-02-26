@@ -1,8 +1,9 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { doc, setDoc } from "firebase/firestore";
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [user, setUser] = useState(null);
@@ -49,8 +50,22 @@ const Login = () => {
         });
     };
 
-    return (
-        <div className="flex justify-center items-center h-screen">
+    return (<div className = "font-mono">
+        <header className="bg-slate-300 p-0 py-5">
+            <div className="container flex justify-between items-center max-w-full">
+                
+            <Link to="/home"><div className="flex items-center">
+                    <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
+                        <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
+                    </div></Link>
+                    
+                    <div>
+                        <Link to="/login" className="font-semibold text-black text-lg hover:underline mr-4">Log in</Link>
+                        <Link to="/signup" className="font-semibold text-black text-lg hover:underline pr-10">Sign up</Link>
+                    </div>
+                </div>
+            </header>
+            <div className="flex justify-center items-center h-screen">
             <form onSubmit={performLogin} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg">
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -92,6 +107,8 @@ const Login = () => {
                 </div>
             </form>
         </div>
+    </div>
+        
     );
 };
 
