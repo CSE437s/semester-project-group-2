@@ -21,7 +21,7 @@ const Home = () => {
     }
 
     return (
-        <div className="font-mono home-container ">
+        <div className="font-mono home-container  ">
             <header className="bg-indigo-300 p-0 py-5">
                 <div className="container flex justify-between items-center max-w-full">
 
@@ -36,7 +36,7 @@ const Home = () => {
                     </div>
                 </div>
             </header>
-            <div className="container mx-auto mt-6 bg-indigo-200 p-10">
+            <div className="container mx-auto mt-6 bg-indigo-200 p-10 rounded-lg shadow-lg">
                 <h1 className="text-3xl font-bold mb-4">Welcome to Online Office Hours!</h1>
                 <p className="text-lg text-gray-800 mb-6">
                     Our platform provides a seamless solution for organizing and attending office hours

@@ -1,7 +1,8 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
+import LogoutButton from './LogoutButton';
 
 const ClassDetails = () => {
     const { classId } = useParams();
@@ -90,60 +91,94 @@ const ClassDetails = () => {
     }, [classDetails]);
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            {classDetails && (
-                <>
-                    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div className="px-4 py-5 sm:px-6">
-                            <h1 className="text-3xl leading-6 font-bold text-gray-900">{classDetails.className}</h1>
-                            <p className="mt-1 max-w-2xl text-sm text-gray-500">{classDetails.classDescription}</p>
+        <div className="font-mono">
+            <header className="bg-indigo-300 p-0 py-5">
+                <div className="container flex justify-between items-center max-w-full">
+                    <Link to="/home">
+                        <div className="flex items-center">
+                            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
+                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
                         </div>
-                        <div className="border-t border-gray-200">
-                            <dl>
-                                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt className="text-sm font-medium text-gray-500">Professor</dt>
-                                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{user?.email}</dd>
-                                </div>
-                                <div className="mt-8">
-                                    <h2 className="text-xl font-bold mb-2">Students</h2>
-                                    <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
-                                        {students.map((student) => (
-                                            <li key={student.id} className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-                                                <span className="flex-1 w-0 truncate">{student.firstName} {student.lastName}</span>
-                                                {auth.currentUser?.uid === instructorId && (
-                                                    <button
-                                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                                        onClick={() => promoteToTA(student.id)}
-                                                    >
-                                                        Promote to TA
-                                                    </button>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div className="mt-8">
-                                    <h2 className="text-xl font-bold mb-2">Teaching Assistants</h2>
-                                    <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
-                                        {teachingAssistants.map((ta) => (
-                                            <li key={ta.id} className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-                                                <span className="ml-2 flex-1 w-0 truncate">{ta.firstName} {ta.lastName}</span>
-                                                <button
-                                                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                                                    value={ta.id}
-                                                    onClick={rerouteToClassroom}
-                                                >
-                                                    View Classroom
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </dl>
-                        </div>
+                    </Link>
+                    <div>
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/me")}
+                        >
+                            My Profile
+                        </button>
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/dashboard")}
+                        >
+                            Back to Dashboard
+                        </button>
+                        <LogoutButton />
                     </div>
-                </>
-            )}
+                </div>
+            </header>
+
+            <div className="container mx-auto px-4 py-8">
+
+                {classDetails && (
+                    <>
+                        <div className="font-mono home-container">
+                            {/* class name and prof */}
+                            <div className="container mx-auto mt-6 bg-indigo-200 p-10 mb-6 rounded-lg shadow-lg">
+                                <h1 className="text-3xl font-bold mb-4">{classDetails.className}</h1>
+                                <p className="text-lg mb-4 text-gray-700">{classDetails.classDescription}</p>
+                                <div className="border-t border-gray-300 pt-4">
+                                    <p className="text-black font-semibold">Professor:</p>
+                                    <p className="text-gray-700">{user?.email}</p>
+                                </div>
+                            </div>
+
+
+                            {/* TAs */}
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-bold mb-4">Teaching Assistants</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                    {teachingAssistants.map((ta) => (
+                                        <div key={ta.id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center h-48 font-bold">
+                                            <h2 className="text-center text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h2>
+                                            <button
+                                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+                                                value={ta.id}
+                                                onClick={rerouteToClassroom}
+                                            >
+                                                View Classroom
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* students */}
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-bold mb-4">Students</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                    {students.map((student) => (
+                                        <div key={student.id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center">
+                                            <span className="text-center text-xl font-bold mb-4">{student.firstName} {student.lastName}</span>
+                                            {auth.currentUser?.uid === instructorId && (
+                                                <button
+                                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+                                                    onClick={() => promoteToTA(student.id)}
+                                                >
+                                                    Promote to TA
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </>
+                )}
+            </div>
         </div>
     );
 };

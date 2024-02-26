@@ -217,15 +217,17 @@ const Dashboard = () => {
           <h2 className="text-2xl font-bold mb-4 ">Your Classes</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {userClasses.map((userClass) => (
-              <div key={userClass.id} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48">
-                <Link to={`/class/${userClass.id}`} className="hover:underline">
-                  <h3 className="font-bold text-lg mb-2">{userClass.className}</h3>
-                  <p className="text-gray-700 flex-grow">{userClass.classDescription}</p>
-                </Link>
-                <span className="inline-block bg-indigo-100 text-indigo-800 py-1 px-3 rounded-full text-sm font-semibold mt-4 self-start">
-                  {userRoleInClasses[userClass.id]}
-                </span>
-              </div>
+              <Link key={userClass.id} to={`/class/${userClass.id}`} className="">
+                <div className="p-4 bg-indigo-200 mb-6 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48 hover:bg-indigo-300">
+                  <div>
+                    <h3 className="font-bold text-lg mb-2">{userClass.className}</h3>
+                    <p className="text-gray-700 flex-grow">{userClass.classDescription}</p>
+                  </div>
+                  <span className="inline-block bg-indigo-100 text-indigo-800 py-1 px-3 rounded-full text-sm font-semibold mt-4 self-start">
+                    {userRoleInClasses[userClass.id]}
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -236,7 +238,7 @@ const Dashboard = () => {
               Create A Class:
             </label>
             <input
-              className="border border-gray-300 p-2 rounded block mr-2"
+              className="border border-gray-300 p-2 rounded block"
               type="text"
               placeholder="Class Name"
               value={className}
@@ -246,7 +248,7 @@ const Dashboard = () => {
 
             </label>
             <input
-              className="border border-gray-300 p-2 rounded block mr-2"
+              className="border border-gray-300 p-2 rounded block"
               type="text"
               placeholder="Class Description"
               value={classDescription}
