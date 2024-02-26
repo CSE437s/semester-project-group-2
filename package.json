@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "concurrently \"cd frontend && npm start \" \"cd backend && node server.js \"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "concurrently \"cd frontend && npm build \" \"cd backend && node server.js \"",
+    "test": "concurrently \"cd frontend && npm start \" \"cd backend && node server.js \""
   },
   "repository": {
     "type": "git",
