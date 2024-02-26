@@ -1,14 +1,22 @@
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase";
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    // eslint-disable-next-line
-    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+    const [checkingAuth, setCheckingAuth] = useState(true);
     const [email, setEmail] = useState("");
-    const navigate = useNavigate(); // Initialize useNavigate hook
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            setCheckingAuth(false);
+            if (user) {
+                navigate('/dashboard');
+            }
+        });
+        return unsubscribe;
+    }, [navigate]);
 
     const performLogin = (e) => {
         e.preventDefault();
@@ -27,7 +35,6 @@ const Login = () => {
             .then((credentials) => {
                 console.log("Success!");
                 localStorage.setItem("userID", credentials.user.uid);
-                setUser(credentials.user);
                 navigate('/dashboard'); // Navigate to the dashboard route
             })
             .catch((error) => {
@@ -49,6 +56,10 @@ const Login = () => {
             }
         });
     };
+
+    if (checkingAuth) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="font-mono">
