@@ -110,13 +110,13 @@ const Dashboard = () => {
 
   const handleCreateClassSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Check if the user has the 'instructor' role before proceeding
     if (userRole !== "instructor") {
       alert("Only instructors can create classes.");
       return;
     }
-
+  
     try {
       const classesCollection = collection(db, "classes");
       await addDoc(classesCollection, {
@@ -124,11 +124,11 @@ const Dashboard = () => {
         classDescription: classDescription,
         createdBy: userEmail,
         classCode: classCode,
-        instructor: instructorId,
+        instructor: auth.currentUser.uid, // Set the instructor field to the current user's ID
         students: [],
         TAs: [],
       });
-
+  
       // Reset input fields after successful submission
       setClassName("");
       setClassDescription("");
@@ -232,7 +232,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {userRole === "instructor" && userStatus === "approved" ? (
+        {userRole === "instructor" ? (
           <form onSubmit={handleCreateClassSubmit} className="mb-6 flex items-center font-mono mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
             <label htmlFor="classCode" className="mr-2 font-bold">
               Create A Class:
@@ -275,7 +275,7 @@ const Dashboard = () => {
         ) : null}
 
 
-
+      {userRole === "student" ? (
         <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200 ">
           <label htmlFor="joinClassCode" className="mr-2 font-bold ">
             Join a Class:
@@ -295,6 +295,7 @@ const Dashboard = () => {
             Join Class
           </button>
         </form>
+        ) : null}
         {/* <div className="flex justify-between items-center mb-6">
 
           <button
