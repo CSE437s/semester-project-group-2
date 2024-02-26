@@ -10,7 +10,7 @@ const Classroom = () => {
     const [room, createRoom] = useState(undefined)
     const [name, setName] = useState("")
     const [roomURL, setRoomURL] = useState("")
-    const [schedule, setOHSchedule] = useState({})
+    const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
 
     const currentUser = localStorage.getItem("userID")
    
