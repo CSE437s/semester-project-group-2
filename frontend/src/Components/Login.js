@@ -1,11 +1,11 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
-import { auth, db } from "../firebase";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../firebase";
 import { useState } from 'react';
 
-import { doc, setDoc } from "firebase/firestore";
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
+    // eslint-disable-next-line
     const [user, setUser] = useState(null);
     const [email, setEmail] = useState("");
     const navigate = useNavigate(); // Initialize useNavigate hook

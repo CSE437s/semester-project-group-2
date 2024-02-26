@@ -1,5 +1,5 @@
 import { JitsiMeeting } from '@jitsi/react-sdk';
-import { useEffect, useRef} from 'react'
+
 import axios from "axios";
 
 const NewRoom = (props) => {
