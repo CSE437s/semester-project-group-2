@@ -19,6 +19,7 @@ import NewRoom from "./NewRoom";
 
 const Dashboard = () => {
   const [userEmail, setUserEmail] = useState(null);
+  const [userName, setUserName] = useState("");
   const [className, setClassName] = useState("");
   const [classDescription, setClassDescription] = useState("");
   const [classCode, setClassCode] = useState("");
@@ -39,6 +40,7 @@ const Dashboard = () => {
           const userData = userSnap.data();
           setInstructorId(auth.currentUser.uid);
           setUserEmail(auth.currentUser.email);
+          setUserName(`${userData.firstName} ${userData.lastName}`);
           setUserRole(userData.role);
           setUserStatus(userData.status);
 
@@ -175,7 +177,7 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-center mb-10">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Welcome to the Dashboard, {userEmail}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Welcome to the Dashboard, {userName || userEmail}</h1>
             <div className="mt-2">
               <button
                 className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
@@ -192,33 +194,38 @@ const Dashboard = () => {
             </div>
           </div>
           <div>
+          {userRole === "instructor" && userStatus === "approved" && (
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
               onClick={() => navigate("/create-class")}
             >
               Create Class
             </button>
+          )}
+          {userRole === "instructor" && userStatus === "pending" && (
+            <p className="text-red-500 font-bold">Your instructor account is pending approval.</p>
+          )}
             <LogoutButton />
           </div>
         </header>
 
         <div className="mb-6">
-        <div className="flex gap-4">
-          <input
-            className="flex-grow shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-            type="text"
-            placeholder="Enter Class Code to Join"
-            value={joinClassCode}
-            onChange={(e) => setJoinClassCode(e.target.value)}
-          />
-          <button
-            className="flex-shrink-0 px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-700"
-            type="submit"
-            onClick={handleJoinClassSubmit}
-          >
-            Join Class
-          </button>
-      </div>
+          <div className="flex gap-4">
+            <input
+              className="flex-grow shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              type="text"
+              placeholder="Enter Class Code to Join"
+              value={joinClassCode}
+              onChange={(e) => setJoinClassCode(e.target.value)}
+            />
+            <button
+              className="flex-shrink-0 px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-700"
+              type="submit"
+              onClick={handleJoinClassSubmit}
+            >
+              Join Class
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
