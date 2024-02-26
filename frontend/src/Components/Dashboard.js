@@ -19,6 +19,7 @@ import NewRoom from "./NewRoom";
 
 const Dashboard = () => {
   const [userEmail, setUserEmail] = useState(null);
+  const [userName, setUserName] = useState("");
   const [className, setClassName] = useState("");
   const [classDescription, setClassDescription] = useState("");
   const [classCode, setClassCode] = useState("");
@@ -39,6 +40,7 @@ const Dashboard = () => {
           const userData = userSnap.data();
           setInstructorId(auth.currentUser.uid);
           setUserEmail(auth.currentUser.email);
+          setUserName(`${userData.firstName} ${userData.lastName}`);
           setUserRole(userData.role);
           setUserStatus(userData.status);
 
@@ -171,93 +173,74 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-100">
-      <h1 className="text-3xl font-bold mb-6">Welcome to the Dashboard, {userEmail || "Guest"}!</h1>
-      {userRole === "instructor" && userStatus === "approved" ? (
-        <form onSubmit={handleCreateClassSubmit} className="mb-6">
-          <input
-            className="border border-gray-300 p-2 rounded mb-2 block"
-            type="text"
-            placeholder="Class Name"
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-          />
-          <input
-            className="border border-gray-300 p-2 rounded mb-2 block"
-            type="text"
-            placeholder="Class Description"
-            value={classDescription}
-            onChange={(e) => setClassDescription(e.target.value)}
-          />
-          <input
-            className="border border-gray-300 p-2 rounded mb-2 block"
-            type="text"
-            placeholder="Class Code"
-            value={classCode}
-            onChange={(e) => setClassCode(e.target.value)}
-          />
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            type="submit"
-          >
-            Create Class
-          </button>
-        </form>
-      ) : userRole === "instructor" && userStatus === "pending" ? (
-        <div className="mb-6">
-          <p>
-            Your instructor account is currently pending approval. You will be
-            notified once your account has been reviewed.
-          </p>
-        </div>
-      ) : null}
-      <form onSubmit={handleJoinClassSubmit} className="mb-6">
-        <input
-          className="border border-gray-300 p-2 rounded mb-2 block"
-          type="text"
-          placeholder="Enter Class Code to Join"
-          value={joinClassCode}
-          onChange={(e) => setJoinClassCode(e.target.value)}
-        />
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          type="submit"
-        >
-          Join Class
-        </button>
-      </form>
-      {/* Display user's classes */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Your Classes</h2>
-        <ul>
-          {userClasses.map((userClass) => (
-            <li key={userClass.id} className="mb-2">
-              <Link
-                to={`/class/${userClass.id}`}
-                className="text-blue-500 hover:underline"
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="flex justify-between items-center mb-10">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Welcome to the Dashboard, {userName || userEmail}</h1>
+            <div className="mt-2">
+              <button
+                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => navigate("/me")}
               >
-                <strong>Class Name:</strong> {userClass.className},{" "}
-                <strong>Class Description:</strong> {userClass.classDescription}
-              </Link>
-            </li>
+                My Profile
+              </button>
+              <button
+                className="ml-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => navigate("/my-room")}
+              >
+                Go to Classroom
+              </button>
+            </div>
+          </div>
+          <div>
+          {userRole === "instructor" && userStatus === "approved" && (
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+              onClick={() => navigate("/create-class")}
+            >
+              Create Class
+            </button>
+          )}
+          {userRole === "instructor" && userStatus === "pending" && (
+            <p className="text-red-500 font-bold">Your instructor account is pending approval.</p>
+          )}
+            <LogoutButton />
+          </div>
+        </header>
+
+        <div className="mb-6">
+          <div className="flex gap-4">
+            <input
+              className="flex-grow shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              type="text"
+              placeholder="Enter Class Code to Join"
+              value={joinClassCode}
+              onChange={(e) => setJoinClassCode(e.target.value)}
+            />
+            <button
+              className="flex-shrink-0 px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-700"
+              type="submit"
+              onClick={handleJoinClassSubmit}
+            >
+              Join Class
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {userClasses.map((userClass) => (
+            <div
+              key={userClass.id}
+              className="bg-white rounded shadow p-4 hover:shadow-md transition cursor-pointer"
+              onClick={() => navigate(`/class/${userClass.id}`)}
+            >
+              <h3 className="font-semibold">{userClass.className}</h3>
+              <p>{userClass.classDescription}</p>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
-      <div className="flex justify-between items-center mb-6">
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => navigate("/me")}
-        >
-          My Profile
-        </button>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => navigate("/my-room")}
-        >
-          Go to Classroom
-        </button>
-      </div>
-      <LogoutButton />
     </div>
   );
 };
