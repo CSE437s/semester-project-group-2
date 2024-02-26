@@ -122,12 +122,12 @@ const Classroom = () => {
     if(!schedule.days) {
         getOHTimes()
     }
+
     let render;
 
     if (isOwner === false) {
         if (roomURL) {
-            const roomToJoin = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />
-            render += <div>{roomToJoin} </div>
+            render  = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />
         }
         else {
             getNewUrl(instructor.TAid)
