@@ -103,16 +103,17 @@ const ClassDetails = () => {
                     <div>
                         <button
                             className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/me")}
-                        >
-                            My Profile
-                        </button>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
                             onClick={() => navigate("/dashboard")}
                         >
                             Back to Dashboard
                         </button>
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/me")}
+                        >
+                            My Profile
+                        </button>
+
                         <LogoutButton />
                     </div>
                 </div>
@@ -162,7 +163,7 @@ const ClassDetails = () => {
                                             <span className="text-center text-xl font-bold mb-4">{student.firstName} {student.lastName}</span>
                                             {auth.currentUser?.uid === instructorId && (
                                                 <button
-                                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+                                                    className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
                                                     onClick={() => promoteToTA(student.id)}
                                                 >
                                                     Promote to TA
