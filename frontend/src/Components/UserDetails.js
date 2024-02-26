@@ -22,12 +22,13 @@ const UserDetails = () => {
     const debugging_url ="http://localhost:3001/"
     const api_url = DEBUGGING ? debugging_url : base_url
 
+    const navigate = useNavigate();
     const [user, setUser] = useState();
     const [role, setRole] = useState();
     const [status, setStatus] = useState();
-    const navigate = useNavigate();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    
 
     const performReset = () => {
         sendPasswordResetEmail(auth, user.email).then(() => {
@@ -55,25 +56,28 @@ const UserDetails = () => {
             navigate("/me")
         }).catch(e => console.log(e));
     }
+    
     useEffect(() => {
-        const currentUser = auth.currentUser
-        if (currentUser) {
-            setUser(currentUser)
-            const userDocRef = doc(db, "users", currentUser.uid);
-            if (!userDocRef) {
-                alert("couldn't find your information")
-            }
-            else {
+        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+                const userDocRef = doc(db, "users", currentUser.uid);
                 getDoc(userDocRef).then((d) => {
-                    const docData = d.data()
-                    setRole(docData.role)
-                    setStatus(docData.status)
+                    const docData = d.data();
+                    setRole(docData.role);
+                    setStatus(docData.status);
                 }).catch((error) => {
-                    console.log(error)
-                })
+                    console.log(error);
+                });
+            } else {
+                // If no user is signed in, navigate to the login page
+                navigate("/login");
             }
-        }
-    }, [user])
+        });
+
+        return () => unsubscribe();
+    }, [navigate]); 
+    
 
     if (!user) {
         return (
