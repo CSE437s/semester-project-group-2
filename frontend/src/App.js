@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+
 import './App.css';
 import Login from "./Components/Login"
 import Signup from './Components/Signup';
@@ -11,14 +11,14 @@ import ClassDetails from './Components/ClassDetails';
 import React, { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
-import NewRoom from './Components/NewRoom';
 import Classroom from "./Components/Classroom"
 import CreateClassForm from "./Components/CreateClassForm";
 
 
 
 const App = () => {
-  const [currentUser, setCurrentUser] = useState(null);
+  // eslint-disable-next-line
+  const [_, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { auth, db, storage } from "../firebase";
+import { auth, db } from "../firebase";
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import axios from "axios";
 
@@ -9,7 +9,7 @@ const cleanFileName = (fileName) => {
     var newFileName = ""
     for (var i = 0; i < fileName.length; i++) {
         const char = fileName.charAt(i)
-        if (char !== ' ' && char != ' ' && char !== "(" && char !== ")") {
+        if (char !== ' ' && char !== ' ' && char !== "(" && char !== ")") {
             newFileName += char
         }
     }
