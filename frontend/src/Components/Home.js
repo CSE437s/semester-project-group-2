@@ -44,7 +44,7 @@ const Home = () => {
             <h2 className="text-2xl font-bold mb-2">Get Started</h2>
             <p className="text-lg text-gray-800 mb-6">
                 Ready to enhance your learning experience? 
-                <a href="/login" className="text-blue-600 hover:underline">Log in</a> now or 
+                <a href="/login" className="text-blue-600 hover:underline"> Log in</a> now or 
                 <Link to="/signup" className="text-blue-600 hover:underline ml-1">sign up</Link> to get started!
             </p>
         </div>

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore"; 
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const Signup = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [role, setRole] = useState("student");
     const navigate = useNavigate();
 
@@ -17,9 +19,11 @@ const Signup = () => {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             console.log("Signup Success:", userCredential.user);
             const userDocRef = doc(db, "users", userCredential.user.uid);
-            
+
             await setDoc(userDocRef, {
                 email: email,
+                firstName: firstName,
+                lastName: lastName,
                 role: role,
                 status: role === "instructor" ? "pending" : "approved",
                 id: userCredential.user.uid
@@ -46,6 +50,25 @@ const Signup = () => {
     return (
         <div className="flex justify-center items-center h-screen">
             <form onSubmit={handleSignup} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
+                {/* Name Inputs */}
+                <div className="mb-4">
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="First Name"
+                    />
+                </div>
+                <div className="mb-4">
+                    <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Last Name"
+                    />
+                </div>
                 <input
                     className="mb-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     type="email"
@@ -60,7 +83,7 @@ const Signup = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
                 />
-                
+
                 {/* Role Selection */}
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Role</label>
