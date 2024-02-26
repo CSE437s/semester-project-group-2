@@ -208,9 +208,8 @@ const Dashboard = () => {
           </div>
         </div>
       </header>
+     
       <div className="font-mono container mx-auto mt-6 p-10 ">
-
-
 
         {/* Display user's classes */}
         <div className="mb-6">

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
-import { useNavigate } from 'react-router-dom';
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import axios from "axios";
+import { useNavigate, Link } from 'react-router-dom';
+import LogoutButton from './LogoutButton';
 
 const cleanFileName = (fileName) => {
     var newFileName = ""
@@ -19,7 +20,7 @@ const cleanFileName = (fileName) => {
 const UserDetails = () => {
     const DEBUGGING = false
     const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com/"
-    const debugging_url ="http://localhost:3001/"
+    const debugging_url = "http://localhost:3001/"
     const api_url = DEBUGGING ? debugging_url : base_url
 
     const navigate = useNavigate();
@@ -28,6 +29,8 @@ const UserDetails = () => {
     const [status, setStatus] = useState();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const [editingFirstName, setEditingFirstName] = useState(false);
+    const [editingLastName, setEditingLastName] = useState(false);
     
 
     const performReset = () => {
@@ -38,6 +41,17 @@ const UserDetails = () => {
             console.log(e)
         })
     }
+
+    const handleFirstNameBlur = () => {
+        setEditingFirstName(false);
+        updateUserInfo();
+    };
+
+    const handleLastNameBlur = () => {
+        setEditingLastName(false);
+        updateUserInfo();
+    };
+
     const uploadProfilePicture = async (e) => {
         const photo = e.target.files[0]
         const renamedPhoto = new File([photo], cleanFileName(photo.name), { type: photo.type });
@@ -56,7 +70,7 @@ const UserDetails = () => {
             navigate("/me")
         }).catch(e => console.log(e));
     }
-    
+
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
             if (currentUser) {
@@ -66,6 +80,8 @@ const UserDetails = () => {
                     const docData = d.data();
                     setRole(docData.role);
                     setStatus(docData.status);
+                    setFirstName(docData.firstName); // Set first name from database
+                    setLastName(docData.lastName); // Set last name from database
                 }).catch((error) => {
                     console.log(error);
                 });
@@ -76,13 +92,13 @@ const UserDetails = () => {
         });
 
         return () => unsubscribe();
-    }, [navigate]); 
-    
+    }, [navigate]);
+
 
     if (!user) {
         return (
-                <button onClick={() => navigate("/login")} className="hidden bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Go to login</button>
-        
+            <button onClick={() => navigate("/login")} className="hidden bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Go to login</button>
+
         );
     }
 
@@ -103,7 +119,7 @@ const UserDetails = () => {
                 lastName: lastName,
             });
 
-            alert("User information updated successfully.");
+            // alert("User information updated successfully.");
             navigate("/me");
         } catch (error) {
             console.error("Error updating user information:", error);
@@ -112,43 +128,105 @@ const UserDetails = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            {user && user.photoURL ? <img src={user.photoURL.replace("backend/", "http://localhost:3001/")} className="rounded-full mx-auto mb-4" alt="Profile" width="100px" /> : null}
-            <h1 className="text-2xl font-bold text-center mb-4">Welcome, {user.email}!</h1>
-            <p>Email: {user.email}</p>
-            <p>Role: {role}</p>
-            <p>Status: {status}</p>
-            <input type="file" name="newFile" accept="image/*" onChange={uploadProfilePicture} className="mt-4" />
-            <button onClick={performReset} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 mr-2">Reset Password</button>
-            <button onClick={() => navigate("/home")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Go back home</button>
-            <div className="mt-4">
-                <label htmlFor="firstName" className="block">First Name:</label>
-                <input
-                    id="firstName"
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="input"
-                />
+        <div className="font-mono">
+            {/* header */}
+            <header className="bg-indigo-300 p-0 py-5">
+                <div className="container flex justify-between items-center max-w-full">
+                    <Link to="/home">
+                        <div className="flex items-center">
+                            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
+                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
+                        </div>
+                    </Link>
+                    <div>
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/dashboard")}
+                        >
+                            Back to Dashboard
+                        </button>
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/me")}
+                        >
+                            My Profile
+                        </button>
+
+                        <LogoutButton />
+                    </div>
+                </div>
+            </header>
+
+
+            <div classsName="">
+                {user && user.photoURL ? <img src={user.photoURL.replace("backend/", "http://localhost:3001/")} className="rounded-full mx-auto mb-4" alt="Profile" width="100px" /> : null}
+
+                <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
+                    <h1 className="text-3xl font-bold text-center mb-4 ">
+                        {editingFirstName ? (
+                            <input
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                onBlur={handleFirstNameBlur}
+                                autoFocus
+                                className="text-3xl font-bold text-center mb-4 bg-indigo-100 divide-none outline: none border-indigo-500 "
+                                style={{ width: `${(firstName.length) * 20}px` }}
+                            />
+                        ) : (
+                            <span
+                                onClick={() => setEditingFirstName(true)}
+                                className="text-3xl font-bold text-center mb-4 hover:border hover:border-indigo-500 hover:bg-indigo-100 px-2 cursor-pointer"
+                            >
+                                {firstName}
+                            </span>
+                        )}{" "}
+                        {editingLastName ? (
+                            <input
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                onBlur={handleLastNameBlur}
+                                autoFocus
+                                className="text-3xl font-bold text-center mb-4 bg-indigo-200 divide-none outline-none"
+                                style={{ border: 'none', width: `${(lastName.length) * 18}px` }}
+                            />
+                        ) : (
+                            <span 
+                                onClick={() => setEditingLastName(true)} 
+                                className="text-3xl font-bold text-center mb-4 hover:border hover:border-indigo-500 hover:bg-indigo-100 px-2 cursor-pointer"
+                            >
+                                {lastName}</span>
+                        )}
+                    </h1>
+
+
+                    <div className="flex">
+                        <div className="mr-4">
+                            <p className="text-black font-semibold">Email:</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-700">{user.email}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex">
+                        <div className="mr-4">
+                            <p className="text-black font-semibold">Role:</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-700">{role}</p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <input type="file" name="newFile" accept="image/*" onChange={uploadProfilePicture} className="mt-4" />
+                <button onClick={performReset} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 mr-2">Reset Password</button>
+                <button onClick={() => navigate("/home")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Go back home</button>
             </div>
-            <div className="mt-4">
-                <label htmlFor="lastName" className="block">Last Name:</label>
-                <input
-                    id="lastName"
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="input"
-                />
-            </div>
-            <button
-                onClick={updateUserInfo}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-            >
-                Update Information
-            </button>
         </div>
     );
 };
 
 export default UserDetails;
+ 

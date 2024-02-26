@@ -1,8 +1,9 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
-import LogoutButton from './LogoutButton';
+
 
 const ClassDetails = () => {
     const { classId } = useParams();
@@ -124,6 +125,7 @@ const ClassDetails = () => {
                 {classDetails && (
                     <>
                         <div className="font-mono home-container">
+                            
                             {/* class name and prof */}
                             <div className="container mx-auto mt-6 bg-indigo-200 p-10 mb-6 rounded-lg shadow-lg">
                                 <h1 className="text-3xl font-bold mb-4">{classDetails.className}</h1>
