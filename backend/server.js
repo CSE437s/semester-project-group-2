@@ -4,7 +4,7 @@ const multer  = require('multer')
 const path = require("path")
 
 // setup multer for file upload
-var storage = multer.diskStorage(
+var store = multer.diskStorage(
     {
         destination: './uploadedFiles',
         filename: function (req, file, cb ) {
@@ -13,7 +13,7 @@ var storage = multer.diskStorage(
     }
 );
 
-const upload = multer({ storage: storage } )
+const upload = multer({ store: store } )
 
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
     res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
@@ -25,6 +25,7 @@ app.use(express.json());
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
 
 const URLs = new Map()
+
 app.post("/api/sendVideoURL", (req, res) => {
     console.log(req.body)
     const callCreatedBy = req.body.creator
@@ -44,6 +45,33 @@ app.post("/api/getVideoURL", (req, res) => {
         res.json({"error": "couldn't find a URL associated with user:"+user})
     }
 })
+
+app.post("/api/updateOHTime", (req, res)=> {
+    // TODO after MVP, move API requests to database to the backend
+    // const user = req.body.user
+    // const days = req.body.days
+    // const start = req.body.start
+    // const end = req.body.end
+    // console.log(user)
+    // const userRef = doc(db, "users", user);
+    // if(!userRef) {
+    //     res.json({"error": "cannot find user document with that user ID"})
+    //     res.sendStatus(404)
+    // }
+    // setDoc(userRef, {
+    //     OHtimes: {
+    //         days: days,
+    //         start: start,
+    //         end: end
+    //     }
+    // }, { merge: true }).then(()=>{
+    //     res.sendStatus(201)
+    // }).catch((e) => {
+    //     res.json({"systemerror": e})
+    //     res.sendStatus(400)
+    // })
+})
+
 
 
 // route for file upload
