@@ -4,14 +4,16 @@ import { doc, getDoc, setDoc } from "firebase/firestore"
 import NewRoom from "./NewRoom"
 import { useParams } from "react-router-dom"
 import axios from "axios"
+import OHschedule from "./OHSchedule"
 
 const Classroom = () => {
     const [room, createRoom] = useState(undefined)
     const [name, setName] = useState("")
     const [roomURL, setRoomURL] = useState("")
+    const [schedule, setOHSchedule] = useState({})
 
     const currentUser = localStorage.getItem("userID")
-
+   
     useEffect(() => {
         if (currentUser) {
             const userDocRef = doc(db, "users", currentUser);
@@ -23,6 +25,7 @@ const Classroom = () => {
                     console.log(error)
                 })
             }
+            
         }
     }, [currentUser])
 
@@ -85,6 +88,7 @@ const Classroom = () => {
             }
         }, { merge: true }).then(()=>{
             console.log("successfully updated office hours schedule")
+            window.location.reload()
         }).catch(e => console.log(e))
         // TODO after MVP, move API requests to backend/
         // axios.post("/api/updateOHTime", officeHours, {
@@ -104,11 +108,26 @@ const Classroom = () => {
         // })
         dates = []
     }
+    const getOHTimes = () => {
+        const userRef = doc(db, "users", instructor.TAid);
+        if(!userRef) {
+            console.log("cannot find user document with that user ID")
+        }
+        getDoc(userRef).then((u)=>{
+            console.log("got:", u.data())
+            const info = u.data().OHtimes
+            setOHSchedule(info)
+        }).catch(e => console.log(e))
+    }
+    if(!schedule.days) {
+        getOHTimes()
+    }
     let render;
+
     if (isOwner === false) {
         if (roomURL) {
             const roomToJoin = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />
-            render = roomToJoin
+            render += <div>{roomToJoin} </div>
         }
         else {
             getNewUrl(instructor.TAid)
@@ -145,6 +164,7 @@ const Classroom = () => {
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Welcome to your Classroom" : `Welcome to ${name}'s Classroom!`}</h1>
             {render}
+            {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></> }
         </div>
     )
 }
