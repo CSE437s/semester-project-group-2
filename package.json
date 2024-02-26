@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "concurrently \"cd frontend && npm start \" \"cd backend && node server.js \"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "concurrently \"cd frontend && npm run build \" \"cd backend && node server.js \"",
+    "test": "concurrently \"cd frontend && npm start \" \"cd backend && node server.js \""
   },
   "repository": {
     "type": "git",
@@ -21,10 +21,15 @@
   "dependencies": {
     "@jitsi/react-sdk": "^1.4.0",
     "concurrently": "^8.2.2",
+    "dotenv": "^16.4.5",
     "express": "^4.18.2",
     "firebase": "^10.8.0",
     "multer": "^1.4.5-lts.1",
     "npm": "^10.4.0",
-    "symlink-dir": "^5.2.1"
+    "react-scripts": "^5.0.1",
+    "symlink-dir": "^5.2.1",
+    "axios": "^1.6.7",
+    "web-vitals": "^2.1.4",
+    "react-router-dom": "^6.22.0"
   }
 }

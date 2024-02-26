@@ -20,6 +20,7 @@ import UserDetails from "./UserDetails";
 
 const Dashboard = () => {
   const [userEmail, setUserEmail] = useState(null);
+  const [userName, setUserName] = useState("");
   const [className, setClassName] = useState("");
   const [classDescription, setClassDescription] = useState("");
   const [classCode, setClassCode] = useState("");
@@ -40,6 +41,7 @@ const Dashboard = () => {
           const userData = userSnap.data();
           setInstructorId(auth.currentUser.uid);
           setUserEmail(auth.currentUser.email);
+          setUserName(`${userData.firstName} ${userData.lastName}`);
           setUserRole(userData.role);
           setUserStatus(userData.status);
 
@@ -281,7 +283,6 @@ const Dashboard = () => {
             Go to Classroom
           </button>
         </div> */}
-
       </div>
     </div>
   );
