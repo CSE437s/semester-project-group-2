@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const Signup = () => {
@@ -11,6 +11,17 @@ const Signup = () => {
     const [lastName, setLastName] = useState("");
     const [role, setRole] = useState("student");
     const navigate = useNavigate();
+    const [checkingAuth, setCheckingAuth] = useState(true);
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            setCheckingAuth(false);
+            if (user) {
+                navigate('/dashboard');
+            }
+        });
+        return unsubscribe;
+    }, [navigate]);
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -31,13 +42,7 @@ const Signup = () => {
 
             // For instructors, check the status
             if (role === "instructor") {
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists() && docSnap.data().status === "pending") {
-                    alert("Your sign up as an instructor is pending approval. You will be notified once your account has been reviewed.");
-                    navigate('/pending-approval');
-                } else {
-                    navigate('/dashboard');
-                }
+                navigate('/pending-approval');
             } else {
                 navigate('/dashboard');
             }
@@ -46,6 +51,11 @@ const Signup = () => {
             alert(error.message); // Show error message to the user
         }
     };
+
+    if (checkingAuth) {
+        return <div>Loading...</div>;
+    }
+
 
     return (
         <div className="font-mono">
