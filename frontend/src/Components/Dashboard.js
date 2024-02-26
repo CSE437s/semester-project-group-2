@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   collection,
   doc,
+  addDoc,
   updateDoc,
   arrayUnion,
   query,
@@ -13,11 +14,18 @@ import {
 import { auth, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import LogoutButton from "./LogoutButton";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [userEmail, setUserEmail] = useState(null);
+  // eslint-disable-next-line
   const [userName, setUserName] = useState("");
+  const [className, setClassName] = useState("");
+  const [classDescription, setClassDescription] = useState("");
+  const [classCode, setClassCode] = useState("");
   const [joinClassCode, setJoinClassCode] = useState("");
+  // eslint-disable-next-line
+  const [instructorId, setInstructorId] = useState("");
   const [userRole, setUserRole] = useState(null);
   const [userStatus, setUserStatus] = useState(null);
   const navigate = useNavigate();
@@ -87,38 +95,38 @@ const Dashboard = () => {
     return () => unsubscribe(); // Clean up the subscription
   }, [navigate]);
 
-  // const handleCreateClassSubmit = async (e) => {
-  //   e.preventDefault();
+  const handleCreateClassSubmit = async (e) => {
+    e.preventDefault();
 
-  //   // Check if the user has the 'instructor' role before proceeding
-  //   if (userRole !== "instructor") {
-  //     alert("Only instructors can create classes.");
-  //     return;
-  //   }
+    // Check if the user has the 'instructor' role before proceeding
+    if (userRole !== "instructor") {
+      alert("Only instructors can create classes.");
+      return;
+    }
 
-  //   try {
-  //     const classesCollection = collection(db, "classes");
-  //     await addDoc(classesCollection, {
-  //       className: className,
-  //       classDescription: classDescription,
-  //       createdBy: userEmail,
-  //       classCode: classCode,
-  //       instructor: instructorId,
-  //       students: [],
-  //       TAs: [],
-  //     });
+    try {
+      const classesCollection = collection(db, "classes");
+      await addDoc(classesCollection, {
+        className: className,
+        classDescription: classDescription,
+        createdBy: userEmail,
+        classCode: classCode,
+        instructor: instructorId,
+        students: [],
+        TAs: [],
+      });
 
-  //     // Reset input fields after successful submission
-  //     setClassName("");
-  //     setClassDescription("");
-  //     setClassCode("");
-  //     alert("Class created successfully! Refreshing...");
-  //     window.location.reload(); // force automatic reload
-  //   } catch (error) {
-  //     console.error("Error creating class:", error);
-  //     alert("Failed to create class. Please try again.");
-  //   }
-  // };
+      // Reset input fields after successful submission
+      setClassName("");
+      setClassDescription("");
+      setClassCode("");
+      alert("Class created successfully! Refreshing...");
+      window.location.reload(); // force automatic reload
+    } catch (error) {
+      console.error("Error creating class:", error);
+      alert("Failed to create class. Please try again.");
+    }
+  };
 
   const handleJoinClassSubmit = async (e) => {
     e.preventDefault();
