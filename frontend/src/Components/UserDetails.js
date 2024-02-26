@@ -17,6 +17,11 @@ const cleanFileName = (fileName) => {
 }
 
 const UserDetails = () => {
+    const DEBUGGING = false
+    const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com/"
+    const debugging_url ="http://localhost:3001/"
+    const api_url = DEBUGGING ? debugging_url : base_url
+
     const [user, setUser] = useState();
     const [role, setRole] = useState();
     const [status, setStatus] = useState();
@@ -37,7 +42,7 @@ const UserDetails = () => {
         const renamedPhoto = new File([photo], cleanFileName(photo.name), { type: photo.type });
         const data = new FormData()
         data.append("myFile", renamedPhoto);
-        await axios.post("http://localhost:3001/api/fileUpload", data, {
+        await axios.post(api_url + "/api/fileUpload", data, {
             headers: {
                 "content-type": "multipart/form-data",
             },

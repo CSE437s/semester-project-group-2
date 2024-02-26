@@ -5,6 +5,10 @@ import axios from "axios";
 const NewRoom = (props) => {
     // const api = useRef();
     console.log(props)
+    const DEBUGGING = false
+    const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com"
+    const debugging_url ="http://localhost:3001"
+    const api_url = DEBUGGING ? debugging_url : base_url
     return (<>
     <JitsiMeeting
                 roomName = { props.roomName }
@@ -25,7 +29,7 @@ const NewRoom = (props) => {
                             "url": iframeRef.childNodes[0].getAttribute("src")
                         }
                         console.log(data)
-                        axios.post("http://localhost:3001/api/sendVideoURL", data, {
+                        axios.post(api_url + "/api/sendVideoURL", data, {
                             headers: {
                                 "content-type": "application/json",
                             },

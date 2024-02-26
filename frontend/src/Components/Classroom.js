@@ -7,6 +7,10 @@ import axios from "axios"
 import OHschedule from "./OHSchedule"
 
 const Classroom = () => {
+    const DEBUGGING = false
+    const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com"
+    const debugging_url ="http://localhost:3001"
+    const api_url = DEBUGGING ? debugging_url : base_url
     const [room, createRoom] = useState(undefined)
     const [name, setName] = useState("")
     const [roomURL, setRoomURL] = useState("")
@@ -38,7 +42,7 @@ const Classroom = () => {
     }
 
     const getNewUrl = (roomOwner) => {
-        axios.post("http://localhost:3001/api/getVideoURL", { "creator": roomOwner }, {
+        axios.post(api_url+"/api/getVideoURL", { "creator": roomOwner }, {
             headers: {
                 "content-type": "application/json",
             },
