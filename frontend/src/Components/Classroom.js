@@ -192,9 +192,9 @@ const Classroom = () => {
         }
         else {
             getNewUrl(TAid);
-            if(!roomURL) {
-                render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
-            }
+            // if(!roomURL) {
+            //     render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
+            // }
         
         }
     }
