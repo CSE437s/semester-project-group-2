@@ -60,6 +60,7 @@ const ClassDetails = () => {
             setIsLoading(false);
         }
         fetchClassDetailsAndUsers();
+        // eslint-disable-next-line
     }, [classId]);
 
     const fetchTASchedules = async (taIds) => {
