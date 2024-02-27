@@ -22,7 +22,7 @@ const OHschedule = (props) => {
                     <div key={index} className="bg-indigo-500 text-white font-bold py-1 px-2 rounded mr-2 mb-2">{convertToName(d)}</div>
                 ))}
             </div>
-            <h3 className="text-base">From {props.start} to {props.end}</h3>
+            <h3 className="text-base">From {props.start} {props.start.endsWith("AM") || props.start.endsWith("PM") ? "" : "AM"} to {props.end} {props.end.endsWith("AM") || props.end.endsWith("PM") ? "" : "PM"}</h3>
         </div>
     );
 };
