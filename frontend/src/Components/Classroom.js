@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react"
+import LogoutButton from './LogoutButton';
 import { db } from "../firebase"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import NewRoom from "./NewRoom"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from "axios"
 import OHschedule from "./OHSchedule"
 
@@ -18,6 +19,8 @@ const Classroom = () => {
     const { classId, TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
     const currentUser = localStorage.getItem("userID")
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (currentUser) {
@@ -201,10 +204,39 @@ const Classroom = () => {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Welcome to your Classroom" : `Welcome to ${taName}'s Classroom!`}</h1>
-            {render}
-            {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
+        <div className="font-mono">
+            <header className="bg-indigo-300 p-0 py-5">
+                <div className="container flex justify-between items-center max-w-full">
+                    <Link to="/home">
+                        <div className="flex items-center">
+                            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
+                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
+                        </div>
+                    </Link>
+                    <div>
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/dashboard")}
+                        >
+                            Back to Dashboard
+                        </button>
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/me")}
+                        >
+                            My Profile
+                        </button>
+
+                        <LogoutButton />
+                    </div>
+                </div>
+            </header>
+
+            <div className="container mx-auto px-4 py-8">
+                <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Welcome to your Classroom" : `Welcome to ${taName}'s Classroom!`}</h1>
+                {render}
+                {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
+            </div>
         </div>
     )
 }
