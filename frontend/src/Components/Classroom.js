@@ -22,7 +22,7 @@ const Classroom = () => {
     const currentUser = localStorage.getItem("userID");
     const isOwner = currentUser === TAid; // Determine if current user is the owner of the classroom
     const [isLoading, setIsLoading] = useState(true);
-    const [roomOnline, setOnline] = useState(false)
+    // const [roomOnline, setOnline] = useState(false)
 
     const navigate = useNavigate();
 
@@ -90,7 +90,6 @@ const Classroom = () => {
     }, [classId, TAid]); // Dependencies: classId and TAid
 
     const handleSubmit = (e) => {
-        setOnline(true)
         const newRoomName = Math.random() * 1000 + "." + Date.now();
         createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />);
     };
@@ -188,16 +187,15 @@ const Classroom = () => {
     let render;
 
     if (isOwner === false) {
-        if(roomOnline === false) {
-            render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
+        if (roomURL) {
+            render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />;
         }
         else {
-            if (roomURL) {
-                render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />;
+            getNewUrl(TAid);
+            if(!roomURL) {
+                render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
             }
-            else {
-                getNewUrl(TAid);
-            }
+        
         }
     }
     else {
