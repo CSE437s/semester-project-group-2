@@ -4,14 +4,14 @@ const multer  = require('multer')
 const path = require("path")
 
 // setup multer for file upload
-var store = multer.diskStorage(
-    {
-        destination: './uploadedFiles',
-        filename: function (req, file, cb ) {
-            cb( null, file.originalname);
-        }
-    }
-);
+// var store = multer.diskStorage(
+//     {
+//         destination: './uploadedFiles',
+//         filename: function (req, file, cb ) {
+//             cb( null, file.originalname);
+//         }
+//     }
+// );
 
 const upload = multer({ store: store } )
 
@@ -22,7 +22,7 @@ app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.h
   });
 app.use(express.json());
 // serve profile pictures statically 
-app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
+// app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
 
 const URLs = new Map()
 
@@ -75,10 +75,10 @@ app.post("/api/updateOHTime", (req, res)=> {
 
 
 // route for file upload
-app.post("/api/fileUpload", upload.single('myFile'), (req, res, next) => {
-    console.log(req.file.originalname + " file successfully uploaded !!");
-    res.sendStatus(200);
-});
+// app.post("/api/fileUpload", upload.single('myFile'), (req, res, next) => {
+//     console.log(req.file.originalname + " file successfully uploaded !!");
+//     res.sendStatus(200);
+// });
 
 const port = process.env.PORT || 3001
 app.listen(port, () => console.log("Listening on port " + port));
