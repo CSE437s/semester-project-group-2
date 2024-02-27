@@ -52,24 +52,24 @@ const UserDetails = () => {
         updateUserInfo();
     };
 
-    const uploadProfilePicture = async (e) => {
-        const photo = e.target.files[0]
-        const renamedPhoto = new File([photo], cleanFileName(photo.name), { type: photo.type });
-        const data = new FormData()
-        data.append("myFile", renamedPhoto);
-        await axios.post(api_url + "/api/fileUpload", data, {
-            headers: {
-                "content-type": "multipart/form-data",
-            },
-        });
-        const url = "backend/uploadedFiles/" + cleanFileName(photo.name)
-        updateProfile(user, {
-            "photoURL": url
-        }).then(() => {
-            alert("Photo has been updated!")
-            navigate("/me")
-        }).catch(e => console.log(e));
-    }
+    // const uploadProfilePicture = async (e) => {
+    //     const photo = e.target.files[0]
+    //     const renamedPhoto = new File([photo], cleanFileName(photo.name), { type: photo.type });
+    //     const data = new FormData()
+    //     data.append("myFile", renamedPhoto);
+    //     await axios.post(api_url + "/api/fileUpload", data, {
+    //         headers: {
+    //             "content-type": "multipart/form-data",
+    //         },
+    //     });
+    //     const url = "backend/uploadedFiles/" + cleanFileName(photo.name)
+    //     updateProfile(user, {
+    //         "photoURL": url
+    //     }).then(() => {
+    //         alert("Photo has been updated!")
+    //         navigate("/me")
+    //     }).catch(e => console.log(e));
+    // }
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
