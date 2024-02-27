@@ -31,7 +31,9 @@ const UserDetails = () => {
     const [lastName, setLastName] = useState("");
     const [editingFirstName, setEditingFirstName] = useState(false);
     const [editingLastName, setEditingLastName] = useState(false);
-    
+
+
+
 
     const performReset = () => {
         sendPasswordResetEmail(auth, user.email).then(() => {
@@ -162,7 +164,10 @@ const UserDetails = () => {
                 {user && user.photoURL ? <img src={user.photoURL.replace("backend/", "http://localhost:3001/")} className="rounded-full mx-auto mb-4" alt="Profile" width="100px" /> : null}
 
                 <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
-                    <h1 className="text-3xl font-bold text-center mb-4 ">
+                    <h1 className="text-3xl font-bold text-center mb-4 flex justify-center items-center gap-3">
+
+                        <img src="/edit_icon.png" alt="Logo" className="h-5 w-auto" />
+
                         {editingFirstName ? (
                             <input
                                 value={firstName}
@@ -173,14 +178,17 @@ const UserDetails = () => {
                                 style={{ border: 'none', width: `${(firstName.length) * 20}px` }}
                             />
                         ) : (
+
                             <span
+
                                 onClick={() => setEditingFirstName(true)}
-                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 px-2 cursor-pointer"
+                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 cursor-pointer"
                             >
                                 {firstName}
+
                             </span>
                         )}{" "}
-                        
+
                         {editingLastName ? (
                             <input
                                 value={lastName}
@@ -191,9 +199,9 @@ const UserDetails = () => {
                                 style={{ border: 'none', width: `${(lastName.length) * 20}px` }}
                             />
                         ) : (
-                            <span 
-                                onClick={() => setEditingLastName(true)} 
-                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 px-2 cursor-pointer"
+                            <span
+                                onClick={() => setEditingLastName(true)}
+                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 cursor-pointer"
                             >
                                 {lastName}</span>
                         )}
@@ -220,14 +228,33 @@ const UserDetails = () => {
 
                 </div>
 
+                <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
+                    <div className="flex items-center">
+                        <label htmlFor="profilePicture" className="cursor-pointer bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                            Change Photo
+                        </label>
+                        <input
+                            id="profilePicture"
+                            type="file"
+                            name="newFile"
+                            accept="image/*"
+                            onChange={uploadProfilePicture}
+                            className="hidden"
+                        />
+                    </div>
+                    <div className="flex mt-4">
+                        <button onClick={performReset} className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2">
+                            Reset Password
+                        </button>
+                       
+                    </div>
+                </div>
 
-                <input type="file" name="newFile" accept="image/*" onChange={uploadProfilePicture} className="mt-4" />
-                <button onClick={performReset} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 mr-2">Reset Password</button>
-                <button onClick={() => navigate("/home")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Go back home</button>
+
+
             </div>
         </div>
     );
 };
 
 export default UserDetails;
- 
