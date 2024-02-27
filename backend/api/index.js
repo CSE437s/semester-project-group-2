@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-const multer  = require('multer')
-const path = require("path")
+// const multer  = require('multer')
+// const path = require("path")
 
 // // setup multer for file upload
 // var store = multer.diskStorage(
@@ -26,7 +26,7 @@ app.use(express.json());
 
 const URLs = new Map()
 
-app.post("/sendVideoURL", (req, res) => {
+app.post("/api/sendVideoURL", (req, res) => {
     console.log(req.body)
     const callCreatedBy = req.body.creator
     const url = req.body.url
@@ -35,7 +35,7 @@ app.post("/sendVideoURL", (req, res) => {
     res.sendStatus(201)
 })
 
-app.post("/getVideoURL", (req, res) => {
+app.post("/api/getVideoURL", (req, res) => {
     const user = req.body.creator
     if(URLs.has(user) == true) {
         console.log("returning the URL")
