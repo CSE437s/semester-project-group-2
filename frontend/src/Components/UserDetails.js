@@ -169,30 +169,31 @@ const UserDetails = () => {
                                 onChange={(e) => setFirstName(e.target.value)}
                                 onBlur={handleFirstNameBlur}
                                 autoFocus
-                                className="text-3xl font-bold text-center mb-4 bg-indigo-100 divide-none outline: none border-indigo-500 "
-                                style={{ width: `${(firstName.length) * 20}px` }}
+                                className="text-3xl font-bold text-center bg-indigo-200 divide-none outline-none"
+                                style={{ border: 'none', width: `${(firstName.length) * 20}px` }}
                             />
                         ) : (
                             <span
                                 onClick={() => setEditingFirstName(true)}
-                                className="text-3xl font-bold text-center mb-4 hover:border hover:border-indigo-500 hover:bg-indigo-100 px-2 cursor-pointer"
+                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 px-2 cursor-pointer"
                             >
                                 {firstName}
                             </span>
                         )}{" "}
+                        
                         {editingLastName ? (
                             <input
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 onBlur={handleLastNameBlur}
                                 autoFocus
-                                className="text-3xl font-bold text-center mb-4 bg-indigo-200 divide-none outline-none"
-                                style={{ border: 'none', width: `${(lastName.length) * 18}px` }}
+                                className="text-3xl font-bold text-center bg-indigo-200 divide-none outline-none"
+                                style={{ border: 'none', width: `${(lastName.length) * 20}px` }}
                             />
                         ) : (
                             <span 
                                 onClick={() => setEditingLastName(true)} 
-                                className="text-3xl font-bold text-center mb-4 hover:border hover:border-indigo-500 hover:bg-indigo-100 px-2 cursor-pointer"
+                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 px-2 cursor-pointer"
                             >
                                 {lastName}</span>
                         )}
