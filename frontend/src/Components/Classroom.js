@@ -16,6 +16,7 @@ const Classroom = () => {
     const [roomURL, setRoomURL] = useState("")
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
     const { classId } = useParams();
+    const { TAid } = useParams();
 
     const currentUser = localStorage.getItem("userID")
 
@@ -37,6 +38,33 @@ const Classroom = () => {
     const instructor = useParams("TAid")
     const isOwner = currentUser === instructor.TAid
 
+    useEffect(() => {
+        console.log("looking for hours...");
+        const taRef = doc(db, "classes", classId, "TAs", instructor.TAid);
+
+        if (!taRef) {
+            console.log("Cannot find TA document with that TA ID");
+            return;
+        }
+
+        getDoc(taRef)
+            .then((taDoc) => {
+                if (taDoc.exists()) {
+                    const taData = taDoc.data();
+                    if (taData.OHtimes) {
+                        setOHSchedule(taData.OHtimes);
+                    } else {
+                        console.log("TA's office hours data is missing");
+                    }
+                } else {
+                    console.log("TA document does not exist");
+                }
+            })
+            .catch((error) => {
+                console.log("Error getting TA document:", error);
+            });
+    }, [classId, instructor.TAid]); // Dependencies: classId and instructor.TAid
+
     const handleSubmit = (e) => {
         const newRoomName = Math.random() * 1000 + "." + Date.now()
         createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />)
@@ -53,6 +81,7 @@ const Classroom = () => {
             console.log(e)
         })
     }
+
     var dates = []
     const removeElement = (element) => {
         const newDates = []
@@ -63,6 +92,7 @@ const Classroom = () => {
         }
         dates = newDates
     }
+
     const handleDayPicker = (e) => {
         e.preventDefault()
         const day = e.target.value
@@ -82,8 +112,6 @@ const Classroom = () => {
         e.preventDefault()
         const start_time = e.target.start_time.value
         const end_time = e.target.end_time.value
-
-
 
         const userRef = doc(db, "classes", classId, "TAs", currentUser);
 
@@ -119,32 +147,6 @@ const Classroom = () => {
         // })
         dates = []
     }
-    useEffect(() => {
-        console.log("looking for hours...");
-        const taRef = doc(db, "classes", classId, "TAs", instructor.TAid);
-
-        if (!taRef) {
-            console.log("Cannot find TA document with that TA ID");
-            return;
-        }
-
-        getDoc(taRef)
-            .then((taDoc) => {
-                if (taDoc.exists()) {
-                    const taData = taDoc.data();
-                    if (taData.OHtimes) {
-                        setOHSchedule(taData.OHtimes);
-                    } else {
-                        console.log("TA's office hours data is missing");
-                    }
-                } else {
-                    console.log("TA document does not exist");
-                }
-            })
-            .catch((error) => {
-                console.log("Error getting TA document:", error);
-            });
-    }, []); // Empty dependency array to run effect only once
 
     let render;
 
