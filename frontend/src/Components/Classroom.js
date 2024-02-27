@@ -16,7 +16,7 @@ const Classroom = () => {
     const [roomURL, setRoomURL] = useState("")
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
     const { classId } = useParams();
-    const { TAid } = useParams();
+    // const { TAid } = useParams();
 
     const currentUser = localStorage.getItem("userID")
 

@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayRemove, arrayUnion, collection, addDoc , setDoc} from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayRemove, arrayUnion, collection , setDoc} from 'firebase/firestore';
 
 
 const ClassDetails = () => {

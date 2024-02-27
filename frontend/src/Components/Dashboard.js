@@ -27,6 +27,7 @@ const Dashboard = () => {
   // eslint-disable-next-line
   const [instructorId, setInstructorId] = useState("");
   const [userRole, setUserRole] = useState(null);
+  // eslint-disable-next-line
   const [userStatus, setUserStatus] = useState(null);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);

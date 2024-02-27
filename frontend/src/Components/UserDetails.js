@@ -26,6 +26,7 @@ const UserDetails = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState();
     const [role, setRole] = useState();
+    // eslint-disable-next-line
     const [status, setStatus] = useState();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
