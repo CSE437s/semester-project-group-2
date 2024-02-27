@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayRemove, arrayUnion, collection, addDoc , setDoc} from 'firebase/firestore';
 
 
 const ClassDetails = () => {
@@ -59,30 +59,40 @@ const ClassDetails = () => {
             alert('Only instructors can promote students to TAs.');
             return;
         }
-
+    
         const classRef = doc(db, 'classes', classId);
         const classSnapshot = await getDoc(classRef);
-
+    
         if (classSnapshot.exists()) {
             const studentList = classSnapshot.data().students;
             const taList = classSnapshot.data().TAs;
-
+    
             if (studentList.includes(studentId) && !taList.includes(studentId)) {
+                // Promote the student to TA by removing them from the students list and adding them to the TAs list.
                 await updateDoc(classRef, {
                     students: arrayRemove(studentId),
                     TAs: arrayUnion(studentId)
                 });
-
+    
+                // Add the student to the TAs subcollection within the class document.
+                const taRef = collection(classRef, 'TAs');
+                await setDoc(doc(taRef, studentId), {
+                    // You can add any additional fields for the TA document here.
+                });
+    
                 setStudents(studentList.filter(id => id !== studentId));
                 setClassDetails({ ...classDetails, TAs: [...taList, studentId] });
                 window.location.reload();
             }
         }
     };
+    
+    
+    
 
     const rerouteToClassroom = (e) => {
         const TAid = e.target.value;
-        navigate("/classrooms/" + TAid);
+        navigate(`/classrooms/${classId}/${TAid}`);
     };
 
     useEffect(() => {

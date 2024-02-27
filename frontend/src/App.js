@@ -37,8 +37,9 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/class/:classId" element={<ClassDetails />} />
         <Route path="/me" element={<UserDetails />} />
-        <Route path="/classrooms/:TAid" element={<Classroom />} />
         <Route path="/create-class" element={<CreateClassForm />} />
+        <Route path="/classrooms/:classId/:TAid" element={<Classroom />} />
+
       </Routes>
     </Router>
   );

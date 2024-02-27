@@ -32,9 +32,6 @@ const UserDetails = () => {
     const [editingFirstName, setEditingFirstName] = useState(false);
     const [editingLastName, setEditingLastName] = useState(false);
 
-
-
-
     const performReset = () => {
         sendPasswordResetEmail(auth, user.email).then(() => {
             console.log(user.email)

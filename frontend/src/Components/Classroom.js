@@ -15,6 +15,7 @@ const Classroom = () => {
     const [name, setName] = useState("")
     const [roomURL, setRoomURL] = useState("")
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
+    const { classId } = useParams();
 
     const currentUser = localStorage.getItem("userID")
    
@@ -76,14 +77,20 @@ const Classroom = () => {
         }
         console.log(dates)
     }
+    
     const sendTimeInformation = (e) => {
         e.preventDefault()
         const start_time = e.target.start_time.value
         const end_time = e.target.end_time.value
-        const userRef = doc(db, "users", currentUser);
+        
+
+        console.log(classId);
+        const userRef = doc(db, "users", currentUser, "classes", classId);
+        
         if(!userRef) {
             console.log("cannot find user document with that user ID")
         }
+        
         setDoc(userRef, {
             OHtimes: {
                 days: dates,
