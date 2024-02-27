@@ -8,5 +8,17 @@
     },
     "scripts": {
         "start": "node server.js"
-    }
+    },
+    "builds": [
+        {
+          "src": "server.js",
+          "use": "@now/node"
+        }
+      ],
+      "routes": [
+        {
+          "src": "/(.*)",
+          "dest": "server.js"
+        }
+      ]
 }
