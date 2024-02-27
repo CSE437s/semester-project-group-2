@@ -6,7 +6,7 @@ const NewRoom = (props) => {
     // const api = useRef();
     console.log(props)
     const DEBUGGING = false
-    const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com"
+    const base_url = "https://carefully-certain-swift.ngrok-free.app"
     const debugging_url ="http://localhost:3001"
     const api_url = DEBUGGING ? debugging_url : base_url
     return (<>
