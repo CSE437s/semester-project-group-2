@@ -14,9 +14,10 @@ var store = multer.diskStorage(
 );
 
 const upload = multer({ store: store } )
-
+const DEBUGGING = false
+const url = DEBUGGING ? "http://localhost:3000" : "https://carefully-certain-swift.ngrok-free.app"
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
+    res.header("Access-Control-Allow-Origin", url); 
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
   });
