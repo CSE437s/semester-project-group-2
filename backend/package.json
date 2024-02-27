@@ -7,6 +7,9 @@
         "serve-static": "^1.15.0"
     },
     "scripts": {
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
         "start": "node api/index.js"
     },
     "builds": [
@@ -21,4 +24,16 @@
           "dest": "api/index.js"
         }
       ]
+=======
+        "start": "node server.js"
+    }
+>>>>>>> parent of 8893871 (fix build scripts')
+=======
+        "start": "node server.js"
+    }
+>>>>>>> parent of 8893871 (fix build scripts')
+=======
+        "start": "node server.js"
+    }
+>>>>>>> parent of 8893871 (fix build scripts')
 }
