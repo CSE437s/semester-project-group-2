@@ -49,7 +49,7 @@ const Classroom = () => {
                 },
             });
         }
-    }, [currentUser]);
+    }, [currentUser, api_url]);
 
     useEffect(() => {
         console.log("Fetching TA's name...");
