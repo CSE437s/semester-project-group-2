@@ -221,7 +221,7 @@ const ClassDetails = () => {
                                 <p className="text-lg mb-4 text-gray-700">{classDetails.classDescription}</p>
                                 <div className="border-t border-gray-300 pt-4">
                                     <p className="text-black font-semibold">Professor:</p>
-                                    <p className="text-gray-700">{user?.email}</p>
+                                    <p className="text-gray-700">{user?.firstName+" "+user?.lastName}</p>
                                 </div>
                             </div>
 
