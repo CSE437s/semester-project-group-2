@@ -1,7 +1,5 @@
-// this file was provided by the Firebase Setup Docs at https://firebase.google.com/docs/web/setup
-
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+// import { getAnalytics } from "firebase/analytics"
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
@@ -12,16 +10,14 @@ import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
-  authDomain: "officehoursproject-e6c61.firebaseapp.com",
-  projectId: "officehoursproject-e6c61",
-  storageBucket: "officehoursproject-e6c61.appspot.com",
-  messagingSenderId: "499685175743",
-  appId: "1:499685175743:web:bc9735e7b4cfffd0c7b10a",
-  measurementId: "G-2ET81PM6DK"
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_APP_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
