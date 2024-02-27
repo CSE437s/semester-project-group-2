@@ -4,17 +4,20 @@ const OHschedule = ({ dates, start, end }) => {
   const daysOfWeek = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
 
   const timeSlots = Array.from({ length: (22 - 8) * 2 }, (_, index) => {
-    const hour = 8 + Math.floor(index / 2);
+    const hour = Math.floor(index / 2) + 8;
     const minute = index % 2 === 0 ? '00' : '30';
-    return `${hour}:${minute}`;
+    return `${hour.toString().padStart(2, '0')}:${minute}`;
   });
+  
 
   const to12HourFormat = (time24) => {
-    const [hours, minutes] = time24.split(':');
-    const hours12 = hours % 12 || 12;
+    let [hours, minutes] = time24.split(':').map(num => parseInt(num, 10));
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    return `${hours12}:${minutes} ${ampm}`;
+    hours = hours % 12;
+    hours = hours === 0 ? 12 : hours; // Convert "00" hrs to "12"
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
   };
+  
 
   const isScheduled = (day, time) => {
     const scheduledDays = dates.map(day => daysOfWeek.indexOf(day));
