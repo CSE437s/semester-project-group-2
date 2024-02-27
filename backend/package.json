@@ -7,18 +7,18 @@
         "serve-static": "^1.15.0"
     },
     "scripts": {
-        "start": "node index.js"
+        "start": "node api/index.js"
     },
     "builds": [
         {
-          "src": "index.js",
+          "src": "api/index.js",
           "use": "@now/node"
         }
       ],
       "routes": [
         {
           "src": "/(.*)",
-          "dest": "index.js"
+          "dest": "api/index.js"
         }
       ]
 }
