@@ -73,8 +73,8 @@ const Login = () => {
                     </Link>
                 </div>
             </header>
-            <div className="flex justify-center mt-6 p-10 pb-4 ">
-                <form onSubmit={performLogin} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
+            <div className="flex justify-center mt-6 p-10 pb-4">
+                <form onSubmit={performLogin} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                             Email

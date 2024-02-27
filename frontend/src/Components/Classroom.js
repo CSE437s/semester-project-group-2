@@ -1,24 +1,25 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import LogoutButton from './LogoutButton';
-import { db } from "../firebase"
-import { doc, getDoc, setDoc } from "firebase/firestore"
-import NewRoom from "./NewRoom"
+import { db } from "../firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import NewRoom from "./NewRoom";
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from "axios"
-import OHschedule from "./OHSchedule"
+import axios from "axios";
+import OHschedule from "./OHSchedule";
 
 const Classroom = () => {
-    const DEBUGGING = false
-    const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com"
-    const debugging_url = "http://localhost:3001"
-    const api_url = DEBUGGING ? debugging_url : base_url
-    const [room, createRoom] = useState(undefined)
-    const [name, setName] = useState("")
-    const [roomURL, setRoomURL] = useState("")
+    const DEBUGGING = false;
+    const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com";
+    const debugging_url = "http://localhost:3001";
+    const api_url = DEBUGGING ? debugging_url : base_url;
+    const [room, createRoom] = useState(undefined);
+    const [name, setName] = useState("");
+    const [roomURL, setRoomURL] = useState("");
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
     const { classId, TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
-    const currentUser = localStorage.getItem("userID")
+    const currentUser = localStorage.getItem("userID");
+    const isOwner = currentUser === TAid; // Determine if current user is the owner of the classroom
 
     const navigate = useNavigate();
 
@@ -27,14 +28,14 @@ const Classroom = () => {
             const userDocRef = doc(db, "users", currentUser);
             if (userDocRef) {
                 getDoc(userDocRef).then((d) => {
-                    const docData = d.data()
-                    setName(docData.email)
+                    const docData = d.data();
+                    setName(docData.email);
                 }).catch((error) => {
-                    console.log(error)
-                })
+                    console.log(error);
+                });
             }
         }
-    }, [currentUser])
+    }, [currentUser]);
 
     useEffect(() => {
         console.log("Fetching TA's name...");
@@ -81,12 +82,10 @@ const Classroom = () => {
             });
     }, [classId, TAid]); // Dependencies: classId and TAid
 
-    const isOwner = currentUser === TAid; // Determine if current user is the owner of the classroom
-
     const handleSubmit = (e) => {
-        const newRoomName = Math.random() * 1000 + "." + Date.now()
-        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />)
-    }
+        const newRoomName = Math.random() * 1000 + "." + Date.now();
+        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />);
+    };
 
     const getNewUrl = (roomOwner) => {
         axios.post(api_url + "/api/getVideoURL", { "creator": roomOwner }, {
@@ -94,47 +93,47 @@ const Classroom = () => {
                 "content-type": "application/json",
             },
         }).then((res) => {
-            setRoomURL(res.data.url)
+            setRoomURL(res.data.url);
         }).catch(e => {
-            console.log(e)
-        })
-    }
+            console.log(e);
+        });
+    };
 
-    var dates = []
+    var dates = [];
     const removeElement = (element) => {
-        const newDates = []
+        const newDates = [];
         for (var day in dates) {
             if (dates[day] !== element) {
-                newDates.push(dates[day])
+                newDates.push(dates[day]);
             }
         }
-        dates = newDates
-    }
+        dates = newDates;
+    };
 
     const handleDayPicker = (e) => {
-        e.preventDefault()
-        const day = e.target.value
-        const color = e.target.style.backgroundColor
-        if (color !== '' && color !== "white") { // deselecting
-            e.target.style.backgroundColor = "white"
-            removeElement(day)
+        e.preventDefault();
+        const day = e.target.value;
+        const color = e.target.style.backgroundColor;
+        if (color !== '' && color !== "") { // deselecting
+            e.target.style.backgroundColor = "";
+            removeElement(day);
         }
         else { //  selecting
-            e.target.style.backgroundColor = "red"
-            dates.push(day)
+            e.target.style.backgroundColor = "#818cf8";
+            dates.push(day);
         }
-        console.log(dates)
-    }
+        console.log(dates);
+    };
 
     const sendTimeInformation = (e) => {
-        e.preventDefault()
-        const start_time = e.target.start_time.value
-        const end_time = e.target.end_time.value
+        e.preventDefault();
+        const start_time = e.target.start_time.value;
+        const end_time = e.target.end_time.value;
 
         const userRef = doc(db, "classes", classId, "TAs", currentUser);
 
         if (!userRef) {
-            console.log("cannot find user document with that user ID")
+            console.log("cannot find user document with that user ID");
         }
 
         setDoc(userRef, {
@@ -144,9 +143,9 @@ const Classroom = () => {
                 end: end_time
             }
         }, { merge: true }).then(() => {
-            console.log("successfully updated office hours schedule")
-            window.location.reload()
-        }).catch(e => console.log(e))
+            console.log("successfully updated office hours schedule");
+            window.location.reload();
+        }).catch(e => console.log(e));
         // TODO after MVP, move API requests to backend/
         // axios.post("/api/updateOHTime", officeHours, {
         //     headers: {
@@ -163,44 +162,59 @@ const Classroom = () => {
         //         console.log("!! ERROR:", res.systemerror)
         //     }
         // })
-        dates = []
-    }
+        dates = [];
+    };
 
     let render;
 
     if (isOwner === false) {
         if (roomURL) {
-            render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />
+            render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />;
         }
         else {
-            getNewUrl(TAid)
+            getNewUrl(TAid);
         }
     }
     else {
         render = room ? room : (
-            <>
-                <form onSubmit={handleSubmit} className="text-center">
-                    <label htmlFor="roomtype" className="block">What would you like to name your room?</label>
-                    <input id="roomtype" type="text" className="border border-gray-300 rounded px-4 py-2 mt-2" />
-                    <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
-                </form>
-                <form onSubmit={sendTimeInformation}>
-                    <label>When would you like to host your office hours?</label>
-                    <label>from</label>
-                    <input type="time" name="start_time" />
-                    <label>until</label>
-                    <input type="time" name="end_time" />
-                    <button onClick={handleDayPicker} value="M">M </button>
-                    <button onClick={handleDayPicker} value="T">T </button>
-                    <button onClick={handleDayPicker} value="W">W </button>
-                    <button onClick={handleDayPicker} value="Th">Th </button>
-                    <button onClick={handleDayPicker} value="F">F </button>
-                    <button onClick={handleDayPicker} value="S">S </button>
-                    <button onClick={handleDayPicker} value="Su">Su</button>
-                    <button type="submit">Submit</button>
-                </form>
-            </>
-        )
+            <div className="flex justify-center space-x-4">
+                {/* Classroom Name Form Card */}
+                <div className="flex-1 rounded-lg shadow-md p-8 bg-indigo-200">
+                    <form onSubmit={handleSubmit} className="text-center">
+                        <label htmlFor="roomtype" className="block mb-4 font-bold">What would you like to name your room?</label>
+                        <input id="roomtype" type="text" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                        <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
+                    </form>
+                </div>
+
+                {/* Time Information Form Card */}
+                <div className="flex-1 justify-center rounded-lg shadow-md p-8 bg-indigo-200" >
+                    <form onSubmit={sendTimeInformation}>
+                        <label className="block mb-4 text-center font-bold">When would you like to host your office hours?</label>
+                        <div className="flex justify-between mb-4">
+                            <label htmlFor="start_time" className="mr-2">from</label>
+                            <input id="start_time" type="time" name="start_time" />
+                        </div>
+                        <div className="flex justify-between mb-4">
+                            <label htmlFor="end_time" className="mr-2">until</label>
+                            <input id="end_time" type="time" name="end_time" />
+                        </div>
+                        <div className="flex justify-center space-x-4">
+                            <button onClick={handleDayPicker} value="M">M </button>
+                            <button onClick={handleDayPicker} value="T">T </button>
+                            <button onClick={handleDayPicker} value="W">W </button>
+                            <button onClick={handleDayPicker} value="Th">Th </button>
+                            <button onClick={handleDayPicker} value="F">F </button>
+                            <button onClick={handleDayPicker} value="S">S </button>
+                            <button onClick={handleDayPicker} value="Su">Su</button>
+                        </div>
+                        <div className="flex justify-center"> {/* Centered horizontally */}
+                            <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -233,12 +247,12 @@ const Classroom = () => {
             </header>
 
             <div className="container mx-auto px-4 py-8">
-                <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Welcome to your Classroom" : `Welcome to ${taName}'s Classroom!`}</h1>
+                <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
                 {render}
                 {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
             </div>
         </div>
-    )
+    );
 }
 
-export default Classroom
+export default Classroom;
