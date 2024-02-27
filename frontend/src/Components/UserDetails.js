@@ -19,8 +19,8 @@ const cleanFileName = (fileName) => {
 
 const UserDetails = () => {
     const DEBUGGING = false
-    const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com/"
-    const debugging_url = "http://localhost:3001/"
+    const base_url = "https://carefully-certain-swift.ngrok-free.app"
+    const debugging_url = "http://localhost:3001"
     const api_url = DEBUGGING ? debugging_url : base_url
 
     const navigate = useNavigate();
