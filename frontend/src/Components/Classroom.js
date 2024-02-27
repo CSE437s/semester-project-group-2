@@ -15,9 +15,8 @@ const Classroom = () => {
     const [name, setName] = useState("")
     const [roomURL, setRoomURL] = useState("")
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
-    const { classId } = useParams();
-    const { TAid } = useParams();
-
+    const { classId, TAid } = useParams();
+    const [taName, setTaName] = useState(""); // State to store TA's name
     const currentUser = localStorage.getItem("userID")
 
     useEffect(() => {
@@ -31,16 +30,30 @@ const Classroom = () => {
                     console.log(error)
                 })
             }
-
         }
     }, [currentUser])
 
-    const instructor = useParams("TAid")
-    const isOwner = currentUser === instructor.TAid
+    useEffect(() => {
+        console.log("Fetching TA's name...");
+        const taDocRef = doc(db, "users", TAid); // Assuming TA information is stored in "users" collection
+
+        getDoc(taDocRef)
+            .then((taDoc) => {
+                if (taDoc.exists()) {
+                    const taData = taDoc.data();
+                    setTaName(taData.firstName); // Assuming TA's name is stored in "name" field
+                } else {
+                    console.log("TA document does not exist");
+                }
+            })
+            .catch((error) => {
+                console.log("Error getting TA document:", error);
+            });
+    }, [TAid]); // Dependency: TAid
 
     useEffect(() => {
         console.log("looking for hours...");
-        const taRef = doc(db, "classes", classId, "TAs", instructor.TAid);
+        const taRef = doc(db, "classes", classId, "TAs", TAid);
 
         if (!taRef) {
             console.log("Cannot find TA document with that TA ID");
@@ -63,7 +76,9 @@ const Classroom = () => {
             .catch((error) => {
                 console.log("Error getting TA document:", error);
             });
-    }, [classId, instructor.TAid]); // Dependencies: classId and instructor.TAid
+    }, [classId, TAid]); // Dependencies: classId and TAid
+
+    const isOwner = currentUser === TAid; // Determine if current user is the owner of the classroom
 
     const handleSubmit = (e) => {
         const newRoomName = Math.random() * 1000 + "." + Date.now()
@@ -155,7 +170,7 @@ const Classroom = () => {
             render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />
         }
         else {
-            getNewUrl(instructor.TAid)
+            getNewUrl(TAid)
         }
     }
     else {
@@ -187,7 +202,7 @@ const Classroom = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Welcome to your Classroom" : `Welcome to ${name}'s Classroom!`}</h1>
+            <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Welcome to your Classroom" : `Welcome to ${taName}'s Classroom!`}</h1>
             {render}
             {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
         </div>
