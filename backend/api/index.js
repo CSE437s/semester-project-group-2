@@ -13,7 +13,7 @@ const path = require("path")
 //     }
 // );
 
-const upload = multer({ store: store } )
+// const upload = multer({ store: store } )
 
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
     res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
