@@ -134,8 +134,45 @@ const ClassDetails = () => {
         const suffix = hours >= 12 ? 'PM' : 'AM';
         const hours12 = ((hours + 11) % 12 + 1);
         return `${hours12}:${minutes} ${suffix}`;
-      }
+    }
 
+    function getDayAbbreviation(day) {
+        const dayAbbreviations = {
+            'Sunday': 'Su',
+            'Monday': 'M',
+            'Tuesday': 'T',
+            'Wednesday': 'W',
+            'Thursday': 'Th',
+            'Friday': 'F',
+            'Saturday': 'S'
+        };
+        return dayAbbreviations[day] || '';
+    }
+
+    function isCurrentlyOH(ohTimes, currentTime) {
+        const currentDayFullName = currentTime.toLocaleString('en-US', { weekday: 'long' });
+        const currentDay = getDayAbbreviation(currentDayFullName); const currentHour = currentTime.getHours();
+        const currentMinute = currentTime.getMinutes();
+
+        console.log(`Current day: ${currentDay}`);
+        console.log(`Current time: ${currentHour}:${currentMinute}`);
+        console.log(`OH start time: ${ohTimes.start}`);
+        console.log(`OH end time: ${ohTimes.end}`);
+
+        const isInDay = ohTimes.days.includes(currentDay);
+        const isAfterStart = currentHour > parseInt(ohTimes.start.split(':')[0], 10) ||
+            (currentHour === parseInt(ohTimes.start.split(':')[0], 10) && currentMinute >= parseInt(ohTimes.start.split(':')[1], 10));
+        const isBeforeEnd = currentHour < parseInt(ohTimes.end.split(':')[0], 10) ||
+            (currentHour === parseInt(ohTimes.end.split(':')[0], 10) && currentMinute < parseInt(ohTimes.end.split(':')[1], 10));
+
+        console.log(`Is in day: ${isInDay}`);
+        console.log(`Is after start: ${isAfterStart}`);
+        console.log(`Is before end: ${isBeforeEnd}`);
+
+        return isInDay && isAfterStart && isBeforeEnd;
+    }
+
+    const currentTime = new Date();
 
     useEffect(() => {
         if (classDetails) {
@@ -195,6 +232,7 @@ const ClassDetails = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                                     {teachingAssistants.map((ta) => {
                                         const taSchedule = taSchedules.find(schedule => schedule.taId === ta.id);
+                                        const isOHNow = taSchedule && isCurrentlyOH(taSchedule.ohTimes, currentTime);
                                         return (
                                             <div key={ta.id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
                                                 <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
@@ -202,18 +240,19 @@ const ClassDetails = () => {
                                                     <div className="text-center mb-4">
                                                         <p className="font-semibold">Office Hours:</p>
                                                         {taSchedule.ohTimes.days.map((day, index) => (
-  <p key={index}>
-    {day}: {formatTime24to12(taSchedule.ohTimes.start)} - {formatTime24to12(taSchedule.ohTimes.end)}
-  </p>
-))}
+                                                            <p key={index}>
+                                                                {day}: {formatTime24to12(taSchedule.ohTimes.start)} - {formatTime24to12(taSchedule.ohTimes.end)}
+                                                            </p>
+                                                        ))}
                                                     </div>
                                                 )}
                                                 <button
-                                                    className="mt-auto bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out"
+                                                    // Change the color if you don't like it...
+                                                    className={`mt-auto ${isOHNow ? 'bg-green-500 hover:bg-green-700' : 'bg-indigo-500 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
                                                     value={ta.id}
                                                     onClick={rerouteToClassroom}
                                                 >
-                                                    View Classroom
+                                                    {isOHNow ? 'Join Office Hours Now' : 'View Classroom'}
                                                 </button>
                                             </div>
                                         );
