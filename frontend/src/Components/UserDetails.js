@@ -51,24 +51,24 @@ const UserDetails = () => {
         updateUserInfo();
     };
 
-    // const uploadProfilePicture = async (e) => {
-    //     // const photo = e.target.files[0]
-    //     // const renamedPhoto = new File([photo], cleanFileName(photo.name), { type: photo.type });
-    //     // const data = new FormData()
-    //     // data.append("myFile", renamedPhoto);
-    //     // await axios.post(api_url + "/api/fileUpload", data, {
-    //     //     headers: {
-    //     //         "content-type": "multipart/form-data",
-    //     //     },
-    //     // });
-    //     // const url = "backend/uploadedFiles/" + cleanFileName(photo.name)
-    //     // updateProfile(user, {
-    //     //     "photoURL": url
-    //     // }).then(() => {
-    //     //     alert("Photo has been updated!")
-    //     //     navigate("/me")
-    //     // }).catch(e => console.log(e));
-    // }
+    const uploadProfilePicture = async (e) => {
+        const photo = e.target.files[0]
+        const renamedPhoto = new File([photo], cleanFileName(photo.name), { type: photo.type });
+        const data = new FormData()
+        data.append("myFile", renamedPhoto);
+        await axios.post(api_url + "/api/fileUpload", data, {
+            headers: {
+                "content-type": "multipart/form-data",
+            },
+        });
+        const url = "backend/uploadedFiles/" + cleanFileName(photo.name)
+        updateProfile(user, {
+            "photoURL": url
+        }).then(() => {
+            alert("Photo has been updated!")
+            navigate("/me")
+        }).catch(e => console.log(e));
+    }
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -227,7 +227,7 @@ const UserDetails = () => {
 
                 <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
                     <div className="flex items-center">
-                        {/* <label htmlFor="profilePicture" className="cursor-pointer bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                        <label htmlFor="profilePicture" className="cursor-pointer bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                             Change Photo
                         </label>
                         <input
@@ -237,7 +237,7 @@ const UserDetails = () => {
                             accept="image/*"
                             onChange={uploadProfilePicture}
                             className="hidden"
-                        /> */}
+                        />
                     </div>
                     <div className="flex mt-4">
                         <button onClick={performReset} className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2">

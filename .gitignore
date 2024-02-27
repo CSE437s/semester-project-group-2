@@ -1,3 +1,8 @@
 
 node_modules
-backend/uploadedFiles
+
+private-key.pem
+csr.pem
+https-cert.crt
+
+backend/.ebextensions 
