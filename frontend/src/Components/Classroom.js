@@ -69,11 +69,12 @@ const Classroom = () => {
             .then((taDoc) => {
                 if (taDoc.exists()) {
                     const taData = taDoc.data();
+
                     if (taData.OHtimes) {
                         setOHSchedule(taData.OHtimes);
                         setIsLoading(false);
-
                     } else {
+                        setIsLoading(false);
                         console.log("TA's office hours data is missing");
                     }
                 } else {
@@ -83,6 +84,7 @@ const Classroom = () => {
             .catch((error) => {
                 console.log("Error getting TA document:", error);
             });
+
     }, [classId, TAid]); // Dependencies: classId and TAid
 
     const handleSubmit = (e) => {
