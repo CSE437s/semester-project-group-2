@@ -267,7 +267,7 @@ const ClassDetails = () => {
                                                     value={ta.id}
                                                     onClick={rerouteToClassroom}
                                                 >
-                                                    {isOHNow ? 'Join Office Hours Now' : 'View Classroom'}
+                                                    {isOHNow ? 'Join Office Hours Now' : 'View Virtual Classroom'}
                                                 </button>
                                             </div>
                                         );
