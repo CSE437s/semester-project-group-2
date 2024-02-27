@@ -26,7 +26,7 @@ app.use(express.json());
 
 const URLs = new Map()
 
-app.post("/api/sendVideoURL", (req, res) => {
+app.post("/sendVideoURL", (req, res) => {
     console.log(req.body)
     const callCreatedBy = req.body.creator
     const url = req.body.url
@@ -35,7 +35,7 @@ app.post("/api/sendVideoURL", (req, res) => {
     res.sendStatus(201)
 })
 
-app.post("/api/getVideoURL", (req, res) => {
+app.post("/getVideoURL", (req, res) => {
     const user = req.body.creator
     if(URLs.has(user) == true) {
         console.log("returning the URL")
@@ -46,7 +46,7 @@ app.post("/api/getVideoURL", (req, res) => {
     }
 })
 
-app.post("/api/updateOHTime", (req, res)=> {
+app.post("/updateOHTime", (req, res)=> {
     // TODO after MVP, move API requests to database to the backend
     // const user = req.body.user
     // const days = req.body.days
