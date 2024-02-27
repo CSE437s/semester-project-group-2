@@ -159,7 +159,7 @@ const UserDetails = () => {
 
 
             <div classsName="">
-                {user && user.photoURL ? <img src={user.photoURL.replace("backend/", api_url)} className="rounded-full mx-auto mb-4" alt="Profile" width="100px" /> : null}
+                {/* {user && user.photoURL ? <img src={user.photoURL.replace("backend/", api_url)} className="rounded-full mx-auto mb-4" alt="Profile" width="100px" /> : null} */}
 
                 <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
                     <h1 className="text-3xl font-bold text-center mb-4 flex justify-center items-center gap-3">
@@ -228,7 +228,7 @@ const UserDetails = () => {
 
                 <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
                     <div className="flex items-center">
-                        <label htmlFor="profilePicture" className="cursor-pointer bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                        {/* <label htmlFor="profilePicture" className="cursor-pointer bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                             Change Photo
                         </label>
                         <input
@@ -238,7 +238,7 @@ const UserDetails = () => {
                             accept="image/*"
                             onChange={uploadProfilePicture}
                             className="hidden"
-                        />
+                        /> */}
                     </div>
                     <div className="flex mt-4">
                         <button onClick={performReset} className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2">
