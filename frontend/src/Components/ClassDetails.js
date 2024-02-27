@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayRemove, arrayUnion, collection , setDoc} from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayRemove, arrayUnion, collection, setDoc } from 'firebase/firestore';
 
 
 const ClassDetails = () => {
@@ -10,9 +10,12 @@ const ClassDetails = () => {
     const [classDetails, setClassDetails] = useState(null);
     const [students, setStudents] = useState([]);
     const [teachingAssistants, setTeachingAssistants] = useState([]);
+    const [taSchedules, setTASchedules] = useState([]);
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [instructorId, setInstructorId] = useState("");
+
+
 
     useEffect(() => {
         const fetchUsersDetails = async (userIds) => {
@@ -48,52 +51,91 @@ const ClassDetails = () => {
                     setUser(instructorSnapshot.data());
                     setInstructorId(classData.instructor);
                 }
-            }
-        };
+                if (classData.TAs) {
+                    await fetchTASchedules(classData.TAs);
+                }
+            };
+
+        }
 
         fetchClassDetailsAndUsers();
     }, [classId]);
+
+    const fetchTASchedules = async (taIds) => {
+        try {
+            const schedules = await Promise.all(taIds.map(async (TAid) => {
+                const taRef = doc(db, "classes", classId, "TAs", TAid);
+
+                const taDoc = await getDoc(taRef);
+                if (taDoc.exists()) {
+                    const taData = taDoc.data();
+                    if (taData.OHtimes) {
+                        return { taId: TAid, ohTimes: taData.OHtimes };
+                    } else {
+                        console.log(`TA with ID ${TAid} has no office hours data.`);
+                        return null;
+                    }
+                } else {
+                    console.log(`TA document with ID ${TAid} does not exist.`);
+                    return null;
+                }
+            }));
+
+            setTASchedules(schedules.filter(Boolean));
+        } catch (error) {
+            console.error("Error fetching TA schedules:", error);
+        }
+    };
 
     const promoteToTA = async (studentId) => {
         if (instructorId && auth.currentUser.uid !== instructorId) {
             alert('Only instructors can promote students to TAs.');
             return;
         }
-    
+
         const classRef = doc(db, 'classes', classId);
         const classSnapshot = await getDoc(classRef);
-    
+
         if (classSnapshot.exists()) {
             const studentList = classSnapshot.data().students;
             const taList = classSnapshot.data().TAs;
-    
+
             if (studentList.includes(studentId) && !taList.includes(studentId)) {
                 // Promote the student to TA by removing them from the students list and adding them to the TAs list.
                 await updateDoc(classRef, {
                     students: arrayRemove(studentId),
                     TAs: arrayUnion(studentId)
                 });
-    
+
                 // Add the student to the TAs subcollection within the class document.
                 const taRef = collection(classRef, 'TAs');
                 await setDoc(doc(taRef, studentId), {
                     // You can add any additional fields for the TA document here.
                 });
-    
+
                 setStudents(studentList.filter(id => id !== studentId));
                 setClassDetails({ ...classDetails, TAs: [...taList, studentId] });
                 window.location.reload();
             }
         }
     };
-    
-    
-    
+
+
+
 
     const rerouteToClassroom = (e) => {
         const TAid = e.target.value;
         navigate(`/classrooms/${classId}/${TAid}`);
     };
+
+    function formatTime24to12(time24) {
+        const [hours24, minutes] = time24.split(':');
+        const hours = parseInt(hours24, 10);
+        const suffix = hours >= 12 ? 'PM' : 'AM';
+        const hours12 = ((hours + 11) % 12 + 1);
+        return `${hours12}:${minutes} ${suffix}`;
+      }
+
 
     useEffect(() => {
         if (classDetails) {
@@ -135,7 +177,7 @@ const ClassDetails = () => {
                 {classDetails && (
                     <>
                         <div className="font-mono home-container">
-                            
+
                             {/* class name and prof */}
                             <div className="container mx-auto mt-6 bg-indigo-200 p-10 mb-6 rounded-lg shadow-lg">
                                 <h1 className="text-3xl font-bold mb-4">{classDetails.className}</h1>
@@ -148,23 +190,37 @@ const ClassDetails = () => {
 
 
                             {/* TAs */}
-                            <div className="mb-6">
-                                <h2 className="text-2xl font-bold mb-4">Teaching Assistants</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                    {teachingAssistants.map((ta) => (
-                                        <div key={ta.id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center h-48 font-bold">
-                                            <h2 className="text-center text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h2>
-                                            <button
-                                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                                                value={ta.id}
-                                                onClick={rerouteToClassroom}
-                                            >
-                                                View Classroom
-                                            </button>
-                                        </div>
-                                    ))}
+                            <div className="mb-8">
+                                <h2 className="text-3xl font-bold mb-6">Teaching Assistants</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                                    {teachingAssistants.map((ta) => {
+                                        const taSchedule = taSchedules.find(schedule => schedule.taId === ta.id);
+                                        return (
+                                            <div key={ta.id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
+                                                <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
+                                                {taSchedule && (
+                                                    <div className="text-center mb-4">
+                                                        <p className="font-semibold">Office Hours:</p>
+                                                        {taSchedule.ohTimes.days.map((day, index) => (
+  <p key={index}>
+    {day}: {formatTime24to12(taSchedule.ohTimes.start)} - {formatTime24to12(taSchedule.ohTimes.end)}
+  </p>
+))}
+                                                    </div>
+                                                )}
+                                                <button
+                                                    className="mt-auto bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out"
+                                                    value={ta.id}
+                                                    onClick={rerouteToClassroom}
+                                                >
+                                                    View Classroom
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
+
 
                             {/* students */}
                             <div className="mb-6">
