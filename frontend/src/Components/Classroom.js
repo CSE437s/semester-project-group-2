@@ -9,7 +9,7 @@ import OHschedule from "./OHSchedule"
 const Classroom = () => {
     const DEBUGGING = false
     const base_url = "http://sweworkshop.us-east-2.elasticbeanstalk.com"
-    const debugging_url ="http://localhost:3001"
+    const debugging_url = "http://localhost:3001"
     const api_url = DEBUGGING ? debugging_url : base_url
     const [room, createRoom] = useState(undefined)
     const [name, setName] = useState("")
@@ -18,7 +18,7 @@ const Classroom = () => {
     const { classId } = useParams();
 
     const currentUser = localStorage.getItem("userID")
-   
+
     useEffect(() => {
         if (currentUser) {
             const userDocRef = doc(db, "users", currentUser);
@@ -30,7 +30,7 @@ const Classroom = () => {
                     console.log(error)
                 })
             }
-            
+
         }
     }, [currentUser])
 
@@ -43,7 +43,7 @@ const Classroom = () => {
     }
 
     const getNewUrl = (roomOwner) => {
-        axios.post(api_url+"/api/getVideoURL", { "creator": roomOwner }, {
+        axios.post(api_url + "/api/getVideoURL", { "creator": roomOwner }, {
             headers: {
                 "content-type": "application/json",
             },
@@ -56,18 +56,18 @@ const Classroom = () => {
     var dates = []
     const removeElement = (element) => {
         const newDates = []
-        for(var day in dates) {
-            if(dates[day] !== element) {
+        for (var day in dates) {
+            if (dates[day] !== element) {
                 newDates.push(dates[day])
             }
         }
         dates = newDates
-     }
+    }
     const handleDayPicker = (e) => {
         e.preventDefault()
         const day = e.target.value
         const color = e.target.style.backgroundColor
-        if(color !== '' && color !== "white") { // deselecting
+        if (color !== '' && color !== "white") { // deselecting
             e.target.style.backgroundColor = "white"
             removeElement(day)
         }
@@ -77,27 +77,27 @@ const Classroom = () => {
         }
         console.log(dates)
     }
-    
+
     const sendTimeInformation = (e) => {
         e.preventDefault()
         const start_time = e.target.start_time.value
         const end_time = e.target.end_time.value
-        
 
-        console.log(classId);
-        const userRef = doc(db, "users", currentUser, "classes", classId);
-        
-        if(!userRef) {
+
+
+        const userRef = doc(db, "classes", classId, "TAs", currentUser);
+
+        if (!userRef) {
             console.log("cannot find user document with that user ID")
         }
-        
+
         setDoc(userRef, {
             OHtimes: {
                 days: dates,
                 start: start_time,
                 end: end_time
             }
-        }, { merge: true }).then(()=>{
+        }, { merge: true }).then(() => {
             console.log("successfully updated office hours schedule")
             window.location.reload()
         }).catch(e => console.log(e))
@@ -119,26 +119,38 @@ const Classroom = () => {
         // })
         dates = []
     }
-    const getOHTimes = () => {
-        const userRef = doc(db, "users", instructor.TAid);
-        if(!userRef) {
-            console.log("cannot find user document with that user ID")
+    useEffect(() => {
+        console.log("looking for hours...");
+        const taRef = doc(db, "classes", classId, "TAs", instructor.TAid);
+
+        if (!taRef) {
+            console.log("Cannot find TA document with that TA ID");
+            return;
         }
-        getDoc(userRef).then((u)=>{
-            console.log("got:", u.data())
-            const info = u.data().OHtimes
-            setOHSchedule(info)
-        }).catch(e => console.log(e))
-    }
-    if(!schedule.days) {
-        getOHTimes()
-    }
+
+        getDoc(taRef)
+            .then((taDoc) => {
+                if (taDoc.exists()) {
+                    const taData = taDoc.data();
+                    if (taData.OHtimes) {
+                        setOHSchedule(taData.OHtimes);
+                    } else {
+                        console.log("TA's office hours data is missing");
+                    }
+                } else {
+                    console.log("TA document does not exist");
+                }
+            })
+            .catch((error) => {
+                console.log("Error getting TA document:", error);
+            });
+    }, []); // Empty dependency array to run effect only once
 
     let render;
 
     if (isOwner === false) {
         if (roomURL) {
-            render  = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />
+            render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />
         }
         else {
             getNewUrl(instructor.TAid)
@@ -147,26 +159,26 @@ const Classroom = () => {
     else {
         render = room ? room : (
             <>
-            <form onSubmit={handleSubmit} className="text-center">
-                <label htmlFor="roomtype" className="block">What would you like to name your room?</label>
-                <input id="roomtype" type="text" className="border border-gray-300 rounded px-4 py-2 mt-2" />
-                <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
-            </form>
-            <form onSubmit={sendTimeInformation}>
-                <label>When would you like to host your office hours?</label>
-                <label>from</label>
-                <input type="time" name="start_time"/>
-                <label>until</label>
-                <input type="time" name="end_time"/>
-                <button onClick={handleDayPicker} value="M">M </button> 
-                <button onClick={handleDayPicker} value="T">T </button> 
-                <button onClick={handleDayPicker} value="W">W </button> 
-                <button onClick={handleDayPicker} value="Th">Th </button> 
-                <button onClick={handleDayPicker} value="F">F </button> 
-                <button onClick={handleDayPicker} value="S">S </button> 
-                <button onClick={handleDayPicker} value="Su">Su</button> 
-                <button type="submit">Submit</button>
-            </form>
+                <form onSubmit={handleSubmit} className="text-center">
+                    <label htmlFor="roomtype" className="block">What would you like to name your room?</label>
+                    <input id="roomtype" type="text" className="border border-gray-300 rounded px-4 py-2 mt-2" />
+                    <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
+                </form>
+                <form onSubmit={sendTimeInformation}>
+                    <label>When would you like to host your office hours?</label>
+                    <label>from</label>
+                    <input type="time" name="start_time" />
+                    <label>until</label>
+                    <input type="time" name="end_time" />
+                    <button onClick={handleDayPicker} value="M">M </button>
+                    <button onClick={handleDayPicker} value="T">T </button>
+                    <button onClick={handleDayPicker} value="W">W </button>
+                    <button onClick={handleDayPicker} value="Th">Th </button>
+                    <button onClick={handleDayPicker} value="F">F </button>
+                    <button onClick={handleDayPicker} value="S">S </button>
+                    <button onClick={handleDayPicker} value="Su">Su</button>
+                    <button type="submit">Submit</button>
+                </form>
             </>
         )
     }
@@ -175,7 +187,7 @@ const Classroom = () => {
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Welcome to your Classroom" : `Welcome to ${name}'s Classroom!`}</h1>
             {render}
-            {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></> }
+            {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
         </div>
     )
 }

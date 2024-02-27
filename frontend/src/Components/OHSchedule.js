@@ -1,11 +1,10 @@
-
 const OHschedule = (props) => {
     const convertToName = (d) => {
         const lookup = {
             "S": "Saturdays",
             "Su": "Sundays",
             "M": "Mondays",
-            "T": "Tuesdays", 
+            "T": "Tuesdays",  
             "W": "Wednesdays",
             "Th": "Thursdays",
             "F": "Fridays"
@@ -13,13 +12,14 @@ const OHschedule = (props) => {
         return lookup[d]
     }
     const dates = props.dates
-    return (<> 
+    return (<>  
         OH Schedule:
-        {dates.map((d) =>  {
-             return <h3>{convertToName(d)}</h3>
+        {dates.map((d, index) =>  {
+             return <h3 key={index}>{convertToName(d)}</h3>
         })}
         <h4>From {props.start} to {props.end}</h4>
     </>)
 }
+
 
 export default OHschedule
