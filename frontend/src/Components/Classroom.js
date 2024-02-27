@@ -13,6 +13,7 @@ const Classroom = () => {
     const debugging_url = "http://localhost:3001";
     const api_url = DEBUGGING ? debugging_url : base_url;
     const [room, createRoom] = useState(undefined);
+    // eslint-disable-next-line
     const [name, setName] = useState("");
     const [roomURL, setRoomURL] = useState("");
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });

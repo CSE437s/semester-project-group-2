@@ -28,6 +28,7 @@ const ClassDetails = () => {
             return userDetails.filter(Boolean);
         };
 
+        // eslint-disable-next-line
         const fetchClassDetailsAndUsers = async () => {
             const classRef = doc(db, 'classes', classId);
             const classSnapshot = await getDoc(classRef);
