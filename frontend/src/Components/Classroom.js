@@ -37,6 +37,17 @@ const Classroom = () => {
                     console.log(error);
                 });
             }
+            // wipe any old calls on entering classroom
+            const data = {
+                "creator": localStorage.getItem("userID"),
+                "url": ""
+            }
+            console.log(data)
+            axios.post(api_url + "/api/sendVideoURL", data, {
+                headers: {
+                    "content-type": "application/json",
+                },
+            });
         }
     }, [currentUser]);
 
@@ -100,7 +111,9 @@ const Classroom = () => {
                 "content-type": "application/json",
             },
         }).then((res) => {
-            setRoomURL(res.data.url);
+            if(res.data.url !== "") {
+                setRoomURL(res.data.url);
+            }
         }).catch(e => {
             console.log(e);
         });
@@ -192,9 +205,9 @@ const Classroom = () => {
         }
         else {
             getNewUrl(TAid);
-            // if(!roomURL) {
-            //     render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
-            // }
+            if(!roomURL) {
+                render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
+            }
         
         }
     }
