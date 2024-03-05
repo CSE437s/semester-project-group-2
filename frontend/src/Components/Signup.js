@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { supabase } from '../supabase'; 
 
 const Signup = () => {
     const [email, setEmail] = useState("");
@@ -14,31 +12,38 @@ const Signup = () => {
     const [checkingAuth, setCheckingAuth] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCheckingAuth(false);
-            if (user) {
-                navigate('/dashboard');
-            }
-        });
-        return unsubscribe;
+        
+        const user = supabase.auth.user();
+        setCheckingAuth(false);
+        if (user) {
+            navigate('/dashboard');
+        }
     }, [navigate]);
 
     const handleSignup = async (e) => {
         e.preventDefault();
 
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            console.log("Signup Success:", userCredential.user);
-            const userDocRef = doc(db, "users", userCredential.user.uid);
-
-            await setDoc(userDocRef, {
+            const { user, error } = await supabase.auth.signUp({
                 email: email,
-                firstName: firstName,
-                lastName: lastName,
-                role: role,
-                status: role === "instructor" ? "pending" : "approved",
-                id: userCredential.user.uid
+                password: password
             });
+
+            if (error) throw error;
+            const { data, error: insertError } = await supabase
+            .from('users')
+            .insert([
+                {
+                    email: email,
+                    first_name: firstName,
+                    last_name: lastName,
+                    role: role,
+                    status: role === "instructor" ? "pending" : "approved",
+                    id: user.id
+                }
+            ]);
+
+            if (insertError) throw insertError;
 
             // For instructors, check the status
             if (role === "instructor") {
@@ -47,14 +52,23 @@ const Signup = () => {
                 navigate('/dashboard');
             }
         } catch (error) {
-            console.error("Signup Error:", error);
+            console.error("Signup Error: ", error.message);
             alert(error.message); // Show error message to the user
         }
     };
 
     if (checkingAuth) {
-        return <div>Loading...</div>;
-    }
+        return (
+          <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center">
+              <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
+              </svg>
+            </div>
+          </div>
+        );
+      }
 
 
     return (

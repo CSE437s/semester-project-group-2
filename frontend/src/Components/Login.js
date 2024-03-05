@@ -1,7 +1,6 @@
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../firebase";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabase';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -9,16 +8,15 @@ const Login = () => {
     const [email, setEmail] = useState("");
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCheckingAuth(false);
-            if (user) {
-                navigate('/dashboard');
-            }
-        });
-        return unsubscribe;
+        const user = supabase.auth.user();
+        setCheckingAuth(false);
+        if (user) {
+            navigate('/dashboard');
+        }
     }, [navigate]);
 
-    const performLogin = (e) => {
+
+    const performLogin =  async (e) => {
         e.preventDefault();
         if (!e.target.email.value) {
             alert("Please enter an email!");
@@ -31,35 +29,43 @@ const Login = () => {
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
 
-        signInWithEmailAndPassword(auth, email, pass)
-            .then((credentials) => {
-                console.log("Success!");
-                localStorage.setItem("userID", credentials.user.uid);
-                navigate('/dashboard'); // Navigate to the dashboard route
-            })
-            .catch((error) => {
-                if (error.code === "auth/invalid-credential") {
-                    alert("Incorrect password");
-                } else if (error.code === "auth/invalid-email") {
-                    alert("Invalid Email");
-                }
+        try {
+            const { user, error } = await supabase.auth.signIn({
+                email: email,
+                password: pass
             });
+
+            if (error) throw error;
+
+            console.log("Success!");
+            localStorage.setItem("userID", user.id);
+            navigate('/dashboard'); 
+        } catch (error) {
+            alert(error.message);
+        }
     };
 
-    const handleForgotPassword = () => {
+    const handleForgotPassword = async () => {
         console.log("resetting password...")
-        sendPasswordResetEmail(auth, email).then(() => {
-            alert("An email to reset your password has been sent!")
-        }).catch((e) => {
-            if (e.code === "auth/invalid-email") {
-                alert("Please enter a valid email and then click \"forgot password?\"");
-            }
-        });
+        const { data, error } = await supabase.auth.api.resetPasswordForEmail(email);
+        if (error) {
+            alert(error.message);
+        } else {
+            alert("An email to reset your password has been sent!");
+        }
     };
 
     if (checkingAuth) {
-        return <div>Loading...</div>;
-    }
+        return (
+            <div className="flex justify-center items-center h-screen">
+              <div className="flex justify-center items-center">
+                <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
+                </svg>
+              </div>
+            </div>
+          );    }
 
     return (
         <div className="font-mono">
