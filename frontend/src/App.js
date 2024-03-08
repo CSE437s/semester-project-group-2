@@ -13,6 +13,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
 import Classroom from "./Components/Classroom"
 import CreateClassForm from "./Components/CreateClassForm";
+import Whiteboard from './Components/Whiteboard';
 
 
 
@@ -39,6 +40,7 @@ const App = () => {
         <Route path="/me" element={<UserDetails />} />
         <Route path="/create-class" element={<CreateClassForm />} />
         <Route path="/classrooms/:classId/:TAid" element={<Classroom />} />
+        <Route path="/whiteboard" element={<Whiteboard />} />
 
       </Routes>
     </Router>

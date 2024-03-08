@@ -2,12 +2,18 @@ import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/aut
 import { auth } from "../firebase";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from "axios";
+import bcrypt from "bcryptjs-react";
+const workFactor = 8;
 
 const Login = () => {
     const navigate = useNavigate();
     const [checkingAuth, setCheckingAuth] = useState(true);
     const [email, setEmail] = useState("");
-
+    const DEBUGGING = false
+    const url = "https://carefully-certain-swift.ngrok-free.app"
+    const debugging_url = "http://localhost:3001"
+    const base_url = DEBUGGING ? debugging_url : url
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
             setCheckingAuth(false);
@@ -30,20 +36,32 @@ const Login = () => {
         }
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
-
-        signInWithEmailAndPassword(auth, email, pass)
-            .then((credentials) => {
-                console.log("Success!");
-                localStorage.setItem("userID", credentials.user.uid);
-                navigate('/dashboard'); // Navigate to the dashboard route
+        bcrypt.hash(pass, workFactor).then((hashedPassword) => {
+            axios.post(base_url + "/api/login", {
+                email: email,
+                pass: hashedPassword
+            }).then((data)=>{
+                console.log("Success, got", data)
+            }).catch((e)=>{
+                console.log("***ERROR", e)
             })
-            .catch((error) => {
-                if (error.code === "auth/invalid-credential") {
-                    alert("Incorrect password");
-                } else if (error.code === "auth/invalid-email") {
-                    alert("Invalid Email");
-                }
-            });
+        }).catch((e)=>{
+            console.log("ERROR", e)
+        })
+        
+        // signInWithEmailAndPassword(auth, email, pass)
+        //     .then((credentials) => {
+        //         console.log("Success!");
+        //         localStorage.setItem("userID", credentials.user.uid);
+        //         navigate('/dashboard'); // Navigate to the dashboard route
+        //     })
+        //     .catch((error) => {
+        //         if (error.code === "auth/invalid-credential") {
+        //             alert("Incorrect password");
+        //         } else if (error.code === "auth/invalid-email") {
+        //             alert("Invalid Email");
+        //         }
+        //     });
     };
 
     const handleForgotPassword = () => {

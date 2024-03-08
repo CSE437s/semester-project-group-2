@@ -2,7 +2,11 @@ const express = require("express");
 const app = express();
 const multer  = require('multer')
 const path = require("path")
+const http = require("http")
+const httpServer = http.createServer(app) // create HTTP server on the port
+const io = require("socket.io")(http) // communicate over the httpServer
 
+// PROFILE PICTURES
 // setup multer for file upload
 var store = multer.diskStorage(
     {
@@ -25,6 +29,8 @@ app.use(express.json());
 // serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
 
+
+// VIDEO CALLING URLS
 const URLs = new Map()
 
 app.post("/api/sendVideoURL", (req, res) => {
@@ -47,6 +53,8 @@ app.post("/api/getVideoURL", (req, res) => {
     }
 })
 
+
+// USER INFORMATION
 app.post("/api/updateOHTime", (req, res)=> {
     // TODO after MVP, move API requests to database to the backend
     // const user = req.body.user
@@ -81,5 +89,9 @@ app.post("/api/fileUpload", upload.single('myFile'), (req, res, next) => {
     res.sendStatus(200);
 });
 
+
+
+
+// open port
 const port = process.env.PORT || 3001
 app.listen(port, () => console.log("Listening on port " + port));
