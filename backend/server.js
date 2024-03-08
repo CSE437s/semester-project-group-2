@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const multer  = require('multer')
 const path = require("path")
+const passport = require("passport")
+const bcrypt = require("bcrypt")
+const mongoose = require("mongoose")
+import db from "./database/conn";
 
 // setup multer for file upload
 var store = multer.diskStorage(
@@ -15,7 +19,7 @@ var store = multer.diskStorage(
 
 const upload = multer({ store: store } )
 const DEBUGGING = true
-const url = DEBUGGING ? "http://localhost:3000" : "https://carefully-certain-swift.ngrok-free.app"
+const url = DEBUGGING ? "http://localhost:3000" : "https://main--437ohproject.netlify.app" // where the request is coming from (frontend)
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
     res.header("Access-Control-Allow-Origin", url); 
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -80,6 +84,47 @@ app.post("/api/fileUpload", upload.single('myFile'), (req, res, next) => {
     console.log(req.file.originalname + " file successfully uploaded !!");
     res.sendStatus(200);
 });
+
+
+app.post("/api/login", (req, res)=> {
+    db.collection("users").then((collection) => {
+        const email = req.body.email
+        const pass = req.body.pass
+    })
+    
+    supa.auth.signInWithPassword({
+        email: email,
+        password: pass,
+      }).then((data) => {
+        console.log(data)
+        res.send(data)
+      }).catch((e)=>{
+        console.log("*** ERROR in LOGIN ***")
+        res.send(e)
+      })
+})
+
+app.post("/api/signup", (req, res)=>{
+    const email = req.body.email
+    const pass = req.body.pass
+    const firstName = req.body.firstName
+    const lastName = req.body.lastName
+    // TODO create docs for the user DB and add this information
+    supa.auth.signUp({
+        email: email,
+        password: pass,
+    }).then((data) => {
+        console.log("Success", data)
+        res.send(data)
+    }).catch((e)=>{
+        console.log("*** ERROR in SIGNUP ***")
+        res.send(e)
+    })
+})
+
+
+
+
 
 const port = process.env.PORT || 3001
 app.listen(port, () => console.log("Listening on port " + port));
