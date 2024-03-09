@@ -145,6 +145,22 @@ io.on("connect", (socket) => {
             }
         })
     })
+    socket.on("clearChildren", () => {
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("childClear")
+            }
+        })
+    })
+    socket.on("changeSize", (data) => {
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("editListenerSize", {
+                    "newSize": data.newSize
+                })
+            }
+        })
+    })
     socket.on("closePath", ()=>{
         connections.forEach(listeningSocket => {
             if(listeningSocket.id !== socket.id) {

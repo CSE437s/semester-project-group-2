@@ -12,6 +12,19 @@ const Whiteboard = () => {
     const socket = io("http://localhost:3001", {
         autoConnect: false
     })
+    const editWidth = (e) => {
+        const percentage = e.target.value
+        const max = 20
+        const min = 1
+        const size = Math.floor((percentage / 100.0) * (max-min) + 1)
+        resize(size)
+    }
+    const resize = (newSize) => {
+        context.lineWidth = newSize
+        socket.emit("changeSize", {
+            "newSize": newSize
+        })
+    }
     const getChangeColor = (e) => {
         e.preventDefault()
         const color = e.target.value
@@ -22,7 +35,14 @@ const Whiteboard = () => {
         const colorLookup = {
             "red": "#FF0000",
             "blue": "#0500FF",
-            "black": "#000000"
+            "black": "#000000",
+            "erase": "#FFFFFF"
+        }
+        if(color === "erase") {
+            context.lineWidth = 15
+        }
+        else {
+            context.lineWidth = 1
         }
         context.strokeStyle = colorLookup[color]
         socket.emit("colorChange", {
@@ -31,6 +51,7 @@ const Whiteboard = () => {
     }
     const clear = () => {
         context.reset()
+        socket.emit("clearChildren")
     }
     const onConnect = () => {
         setConnected(true)
@@ -93,9 +114,20 @@ const Whiteboard = () => {
                 })
             })
         })
+        socket.on("childClear", () => {
+            context.reset()
+        })
         socket.on("changeMyColor", (data)=> {
-            console.log("CHANGING COLOR?")
             context.strokeStyle = data.newColor
+            if(data.newColor === "#FFFFFF") {
+                context.lineWidth = 15
+            }
+            else {
+                context.lineWidth = 1
+            }
+        })
+        socket.on("editListenerSize", (data) => {
+            context.lineWidth = data.newSize
         })
         socket.connect()
         return () => {
@@ -110,7 +142,9 @@ const Whiteboard = () => {
         <button onClick={getChangeColor} value="red">red </button>
         <button onClick={getChangeColor} value="blue">blue </button>
         <button onClick={getChangeColor} value="black">black </button>
+        <button onClick={getChangeColor} value="erase">erase</button>
         <button onClick={clear} value="clear">clear</button>
+        <input type="range" min="1" max="100" onChange={editWidth}/>
     </>)
 }
 
