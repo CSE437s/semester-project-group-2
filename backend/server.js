@@ -3,8 +3,7 @@ const app = express();
 const multer  = require('multer')
 const path = require("path")
 const http = require("http")
-const httpServer = http.createServer(app) // create HTTP server on the port
-const io = require("socket.io")(http) // communicate over the httpServer
+// const httpServer = http.createServer(app) // create HTTP server on the port
 
 // PROFILE PICTURES
 // setup multer for file upload
@@ -94,4 +93,58 @@ app.post("/api/fileUpload", upload.single('myFile'), (req, res, next) => {
 
 // open port
 const port = process.env.PORT || 3001
-app.listen(port, () => console.log("Listening on port " + port));
+const server = app.listen(port, () => console.log("Listening on port " + port));
+const io = require("socket.io")(server, {
+    cors: {
+        "origin": "http://localhost:3000"
+    }
+}) // communicate over the httpServer
+
+
+//WHITEBOARD SOCKETS
+// thank you to this random guy who helped me use sockets for this purpose: https://www.youtube.com/watch?v=Br4uaXHrODg
+var connections = []
+const printIDs = (connections) => {
+    var ids = ""
+    for(var socket in connections) {
+        ids += connections[socket].id + ", "
+    }
+    return ids
+}
+io.on("connect", (socket) => {
+    connections.push(socket) // keep track of all connected sockets
+    console.log("connected sockets:", printIDs(connections))
+    console.log("Socket:", socket.id, "has connected")
+    socket.on("begin-draw", (data) => {
+        connections.forEach((listeningSocket)=>{
+            if(listeningSocket.id !== socket.id) { // only draw the new points on the canvas' that DONT belong to original socket
+                listeningSocket.emit("start-drawing", {
+                    "x": data.x, 
+                    "y": data.y
+                })
+            }
+           
+        })
+    })
+    socket.on("end-draw", (data)=>{
+        console.log(socket.id, "just drew at", data.x, data.y)
+        connections.forEach((listeningSocket)=>{
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("get-drawing", {
+                    "x": data.x, 
+                    "y": data.y
+                })
+            }
+        })
+    })
+
+    socket.on("disconnect", (e)=>{
+        console.log("Socket", socket.id, "disconnected because", e)
+        connections = connections.filter((item)=>{ 
+            if(item.id !== socket.id) {
+                return item;
+            }
+        })
+        console.log("connected sockets", printIDs(connections))
+    })
+})
