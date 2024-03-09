@@ -8,6 +8,10 @@ import { io } from "socket.io-client"
 const Whiteboard = () => {
     const [isConnected, setConnected] = useState(false)
     const canvasRef = useRef(null)
+    const [context, setContext] = useState(null)
+    const socket = io("http://localhost:3001", {
+        autoConnect: false
+    })
     const getChangeColor = (e) => {
         e.preventDefault()
         const color = e.target.value
@@ -20,7 +24,13 @@ const Whiteboard = () => {
             "blue": "#0500FF",
             "black": "#000000"
         }
-        canvasRef.current.getContext("2d").strokeStyle = colorLookup[color]
+        context.strokeStyle = colorLookup[color]
+        socket.emit("colorChange", {
+            "newColor": colorLookup[color]
+        })
+    }
+    const clear = () => {
+        context.reset()
     }
     const onConnect = () => {
         setConnected(true)
@@ -30,9 +40,9 @@ const Whiteboard = () => {
     }
     useEffect(()=>{
         const canvasObject = canvasRef.current  
+        setContext(canvasObject.getContext("2d"))
         canvasObject.width = 500
         canvasObject.height = 500
-        const context = canvasObject.getContext("2d")
         let mouseDown = false
         window.onmousedown = (e) => {
             console.log(e)
@@ -40,6 +50,7 @@ const Whiteboard = () => {
             const y = e.clientY
             mouseDown = true // mark that we have placed the pen dowwn
             context.moveTo(x, y) // start our drawing at current coordinates
+            context.beginPath()
             socket.emit("begin-draw", {
                 "x": x,
                 "y": y,
@@ -60,10 +71,12 @@ const Whiteboard = () => {
                 context.lineTo(x, y);
                 context.stroke()
             }
+            else {
+                socket.emit("closePath")
+                context.closePath()
+            }
         }
-        const socket = io("http://localhost:3001", {
-            autoConnect: false
-        })
+        
         socket.on("connect", onConnect)
         socket.on("disconnect", onDisconnect)
         socket.on('connect_error', (e)=>{
@@ -71,10 +84,18 @@ const Whiteboard = () => {
         })
         socket.on("start-drawing", (coordinates) => {
             context.moveTo(coordinates.x, coordinates.y)
+            context.beginPath()
             socket.on("get-drawing", (coordinates) => {
                 context.lineTo(coordinates.x, coordinates.y)
                 context.stroke()
+                socket.on("closePath", () => {
+                    context.closePath()
+                })
             })
+        })
+        socket.on("changeMyColor", (data)=> {
+            console.log("CHANGING COLOR?")
+            context.strokeStyle = data.newColor
         })
         socket.connect()
         return () => {
@@ -89,6 +110,7 @@ const Whiteboard = () => {
         <button onClick={getChangeColor} value="red">red </button>
         <button onClick={getChangeColor} value="blue">blue </button>
         <button onClick={getChangeColor} value="black">black </button>
+        <button onClick={clear} value="clear">clear</button>
     </>)
 }
 

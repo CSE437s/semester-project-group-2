@@ -127,13 +127,28 @@ io.on("connect", (socket) => {
         })
     })
     socket.on("end-draw", (data)=>{
-        console.log(socket.id, "just drew at", data.x, data.y)
         connections.forEach((listeningSocket)=>{
             if(listeningSocket.id !== socket.id) {
                 listeningSocket.emit("get-drawing", {
                     "x": data.x, 
                     "y": data.y
                 })
+            }
+        })
+    })
+    socket.on("colorChange", (data) => {
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("changeMyColor", {
+                    "newColor": data.newColor
+                })
+            }
+        })
+    })
+    socket.on("closePath", ()=>{
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("closePath")
             }
         })
     })
