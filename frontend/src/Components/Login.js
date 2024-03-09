@@ -36,32 +36,36 @@ const Login = () => {
         }
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
-        bcrypt.hash(pass, workFactor).then((hashedPassword) => {
-            axios.post(base_url + "/api/login", {
-                email: email,
-                pass: hashedPassword
-            }).then((data)=>{
-                console.log("Success, got", data)
-            }).catch((e)=>{
-                console.log("***ERROR", e)
-            })
-        }).catch((e)=>{
-            console.log("ERROR", e)
-        })
-        
-        // signInWithEmailAndPassword(auth, email, pass)
-        //     .then((credentials) => {
-        //         console.log("Success!");
-        //         localStorage.setItem("userID", credentials.user.uid);
-        //         navigate('/dashboard'); // Navigate to the dashboard route
+        // DEBUGGING WORKAROUND TODO FIXME
+        // alert("CURRENTLY NOT CHECKING PASSWORD FOR DEBUGGING REASONS, HIT OK TO PROCEED")
+        // localStorage.setItem("userID", "Db7f2lq6dyc77vbaQA2ZNdcw62z1");
+        // navigate("/dashboard")
+        // bcrypt.hash(pass, workFactor).then((hashedPassword) => {
+        //     axios.post(base_url + "/api/login", {
+        //         email: email,
+        //         pass: hashedPassword
+        //     }).then((data)=>{
+        //         console.log("Success, got", data)
+        //     }).catch((e)=>{
+        //         console.log("***ERROR", e)
         //     })
-        //     .catch((error) => {
-        //         if (error.code === "auth/invalid-credential") {
-        //             alert("Incorrect password");
-        //         } else if (error.code === "auth/invalid-email") {
-        //             alert("Invalid Email");
-        //         }
-        //     });
+        // }).catch((e)=>{
+        //     console.log("ERROR", e)
+        // })
+        
+        signInWithEmailAndPassword(auth, email, pass)
+            .then((credentials) => {
+                console.log("Success!");
+                localStorage.setItem("userID", credentials.user.uid);
+                navigate('/dashboard'); // Navigate to the dashboard route
+            })
+            .catch((error) => {
+                if (error.code === "auth/invalid-credential") {
+                    alert("Incorrect password");
+                } else if (error.code === "auth/invalid-email") {
+                    alert("Invalid Email");
+                }
+            });
     };
 
     const handleForgotPassword = () => {

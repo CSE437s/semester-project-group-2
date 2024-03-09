@@ -40,7 +40,7 @@ const App = () => {
         <Route path="/me" element={<UserDetails />} />
         <Route path="/create-class" element={<CreateClassForm />} />
         <Route path="/classrooms/:classId/:TAid" element={<Classroom />} />
-        <Route path="/whiteboard" element={<Whiteboard />} />
+        {/* <Route path="/whiteboard" element={<Whiteboard />} /> for debugging purposes */}
 
       </Routes>
     </Router>

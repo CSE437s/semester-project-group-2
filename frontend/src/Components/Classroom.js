@@ -6,9 +6,10 @@ import NewRoom from "./NewRoom";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from "axios";
 import OHschedule from "./OHSchedule";
+import Whiteboard from "./Whiteboard";
 
 const Classroom = () => {
-    const DEBUGGING = false;
+    const DEBUGGING = true;
     const base_url = "https://carefully-certain-swift.ngrok-free.app";
     const debugging_url = "http://localhost:3001";
     const api_url = DEBUGGING ? debugging_url : base_url;
@@ -346,6 +347,7 @@ const Classroom = () => {
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
                 {render}
+                <Whiteboard width={1000} height={500}/>
                 {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
             </div>
         </div>

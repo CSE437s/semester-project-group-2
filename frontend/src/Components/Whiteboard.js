@@ -5,7 +5,7 @@ import { io } from "socket.io-client"
 //BOY did a lot of things help me with this
 //canvas help: https://www.w3schools.com/html/html5_canvas.asp
 //canvas with react help: https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
-const Whiteboard = () => {
+const Whiteboard = (props) => {
     const [isConnected, setConnected] = useState(false)
     const canvasRef = useRef(null)
     const [context, setContext] = useState(null)
@@ -60,37 +60,65 @@ const Whiteboard = () => {
         setConnected(false)
     }
     useEffect(()=>{
+        console.log("USE EFFECT RUN")
         const canvasObject = canvasRef.current  
         setContext(canvasObject.getContext("2d"))
-        canvasObject.width = 500
-        canvasObject.height = 500
+        canvasObject.width = props.width
+        canvasObject.height = props.height
+        const xOffset = canvasRef.current.offsetLeft
+        const yOffset = canvasRef.current.offsetTop
+        console.log("!!", xOffset, yOffset)
         let mouseDown = false
+        if(!canvasObject || canvasObject === null) {
+            return
+        }
         window.onmousedown = (e) => {
-            console.log(e)
-            const x = e.clientX // get starting coordinates
-            const y = e.clientY
-            mouseDown = true // mark that we have placed the pen dowwn
-            context.moveTo(x, y) // start our drawing at current coordinates
-            context.beginPath()
-            socket.emit("begin-draw", {
-                "x": x,
-                "y": y,
-            })
-            window.onmouseup = (e) => {
-                // instead of drawing from start to end, we can just draw something new when you move at all (creating smoother drawing)
-                mouseDown = false // mark that we have picked up the pen
+            var x = e.pageX - xOffset  // get starting coordinates
+            var y = e.pageY - yOffset 
+            mouseDown = true // mark that we have placed the pen down
+            if(x >= 0 && x < props.width && y >= 0 && y < props.height) {
+                context.moveTo(x, y) // start our drawing at current coordinates
+                context.beginPath()
+                socket.emit("begin-draw", {
+                    "x": x,
+                    "y": y,
+                })
+                window.onmouseup = (e) => {
+                    // instead of drawing from start to end, we can just draw something new when you move at all (creating smoother drawing)
+                    mouseDown = false // mark that we have picked up the pen
+                }
             }
+            else {
+                mouseDown = false // you drew out of bounds. we wont have it
+            }
+
         }
         window.onmousemove = (e) => {
             if(mouseDown === true) {
-                const x = e.clientX
-                const y = e.clientY
-                socket.emit("end-draw", { // alert all of the other sockets that we have drawn something and have them display it
-                    "x": x,
-                    "y":y ,
-                })
-                context.lineTo(x, y);
-                context.stroke()
+                console.log("X", e.pageX, e.target.offsetLeft)
+            console.log("Y",e.pageY,  e.target.offsetTop)
+                var x = e.pageX - xOffset  // get starting coordinates
+                var y = e.pageY - yOffset
+                if(x < 0) {
+                    x = 0
+                }
+                else if(x > props.width) {
+                    x = props.width
+                }
+                if(y < 0) {
+                    y = 0
+                }
+                else if(y > props.height) {
+                    y = props.height
+                }
+                if(y >= 0 && y <= props.height) {
+                    socket.emit("end-draw", { // alert all of the other sockets that we have drawn something and have them display it
+                        "x": x,
+                        "y": y,
+                    })
+                    context.lineTo(x, y);
+                    context.stroke()
+                }
             }
             else {
                 socket.emit("closePath")
