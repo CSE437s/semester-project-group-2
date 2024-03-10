@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
-import db from "./database/conn";
-
+const passportLocalMongoose = require('passport-local-mongoose');
+require("dotenv").config()
 // from: https://medium.com/@anandam00/build-a-secure-authentication-system-with-nodejs-and-mongodb-58accdeb5144
 
 const userSchema = new mongoose.Schema(
@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-    },
-    password: {
-      type: String,
-      required: true,
     },
     role: {
       type: String,
@@ -45,7 +41,7 @@ userSchema.pre("save", function (next) {
     if (!user.isModified("password")) {
         return next()
     }
-    bcrypt.genSalt().then((salt) => {
+    bcrypt.genSalt(15).then((salt) => {
         bcrypt.hash(user.password, salt).then((hashed) => {
             user.password = hashed
             next()
@@ -55,8 +51,12 @@ userSchema.pre("save", function (next) {
 
 // Compare the given password with the hashed password in the database
 userSchema.methods.comparePassword = async function (password) {
-  return bcrypt.compare(password, this.password);
+  return bcrypt.compare(password, this.password, (res) =>{
+    return res
+  });
 };
+
+userSchema.plugin(passportLocalMongoose)
 
 const User = mongoose.model("User", userSchema);
 
