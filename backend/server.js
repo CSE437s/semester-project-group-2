@@ -6,12 +6,14 @@ const passport = require("passport")
 const mongoose = require("mongoose")
 const session = require("express-session")
 const handlebars = require("express-handlebars")
+const crypto = require("crypto")
 const Strategy = require("passport-local").Strategy
 const bcrypt = require("bcrypt")
 const JWTstrategy = require("passport-jwt").Strategy
 const JWTextract = require("passport-jwt").ExtractJwt 
 const userModel = require("./database/models/userModel")
 const JWT = require("jsonwebtoken")
+const sendEmail = require("./sendEmail")
 
 // setup multer for file upload
 var store = multer.diskStorage(
@@ -22,6 +24,7 @@ var store = multer.diskStorage(
         }
     }
 );
+
 
 const upload = multer({ store: store } )
 const DEBUGGING = true
@@ -39,40 +42,35 @@ app.use(express.json());
 mongoose.connect(process.env.ATLAS_URI)
 
 // setup middleware 
-// app.engine("handlebars", handlebars())
-// app.set("view engine", "handlebars")
 app.use(session({
     secret: process.env.secret,
     resave: false,
     saveUninitialized: true
 }))
-// app.use(express.urlencoded({extended: false}))
 
 // setup passport
 app.use(passport.initialize()) // setup
 app.use(passport.session()) // keep local sessions
 const strategy = new Strategy(userModel.authenticate())
 passport.use(strategy);
-// passport.serializeUser(userModel.serializeUser());
-// passport.deserializeUser(userModel.deserializeUser());
 passport.serializeUser((err, user, next) => { // take the user info that is currently in JSON form and encrypt user information in the form of JWT
-    console.log("HUH", user)
+    if(err)  {
+        console.log(err)
+        next(err, null)
+    }
     next(null, user._id) 
 })
 passport.deserializeUser((id, next) => { // go from encrypted data and return the user JSON object
     userModel.findById(id).then((user) => { // look in the collection for a user with the given id
-        console.log("USER", user)
         return next(null, user)
     }).catch(e => next(e, null))
 })
-
 passport.use(new JWTstrategy({
         secretOrKey: process.env.JWT_SECRET,
         jwtFromRequest: JWTextract.fromAuthHeaderAsBearerToken()
     },
     (token, next) => {
         try {
-            console.log("found token", token)
             return next(null, token)
         }
         catch (e) {
@@ -90,7 +88,6 @@ passport.use("login", new Strategy({
     console.log("taking in", email, password, next)
     userModel.findOne({email: email}).then((user) =>{
         if(!user) {
-            console.log("no user with this email found in the database")
             return next(null, null,{ message: "this email does not have as associated account" })
         }
         user.comparePassword(password).then((res) => {
@@ -99,18 +96,6 @@ passport.use("login", new Strategy({
             }
             return next(null, user, null)
         }).catch( e => next(e, null, null))
-        // bcrypt.compare(password, user.password, (err, res) => {
-        //     if(err) {
-        //         console.log(err)
-        //         return next(err)
-        //     }
-        //     if(res === false) {
-        //         return next(null, {message: "incorrect password"})
-        //     }
-        //     return next(null, user)
-
-        // })
-        //  return next(null, user, null)
     }).catch((e) => {
         next(e, null, null)
     })
@@ -127,11 +112,6 @@ passport.use("signup", new Strategy({
         const last = body.lastName
         const role = body.role
         const status = body.status
-        // if(!email || !password || !firstName || !lastName) {
-        //     return callback({
-        //         "error": "missing one of email, password, first, or last"
-        //     }, null)
-        // }
         userModel.create({ "email": email, "password": password, "firstName": first, "lastName": last, "role": role, "status": status}).then((user) => {
             return callback(null, {
                 "message": "success",
@@ -151,6 +131,25 @@ passport.use("signup", new Strategy({
     }
 ))
 
+passport.use("reset", new Strategy({
+    usernameField: "email",
+    passwordField: "password",
+    passReqToCallback: true
+    },
+    (req, email, password, next) => {
+        userModel.findOne({email: email}).then((user) => {
+            if(!user) {
+                return next(null, null, {message: "user does not exist"})
+            }
+            console.log("resetting password for user", user)
+            const resetToken = crypto.randomBytes(32).toString("hex") // from https://blog.logrocket.com/implementing-secure-password-reset-node-js/#password-request-service
+            const hash = bcrypt.hash(resetToken, bcrypt.genSalt(10))
+            const resetLink = url + "/passwordReset?token=" + resetToken + "&user=" + user._id
+            sendEmail(user.email, resetLink)
+        }).catch(e => next(e, null, null))
+    }
+))
+
 app.post("/api/login", (req, res, next) => {
     passport.authenticate("login", (error, user, info) => {
         console.log("!", error, user, info)
@@ -162,12 +161,13 @@ app.post("/api/login", (req, res, next) => {
         }
         else {
             req.login(user, (error) => {
-                console.log(user, error)
                 if(error) {
-                    return next(error)
+                    console.log(error)
+                    return
+                    // return next(error)
                 }
                 const token = JWT.sign( { userId: user._id, "email": user.email, "firstName": user.firstName, "lastName": user.lastName, "role": user.role, "status": user.status }, process.env.JWT_SECRET, {expiresIn: "48h"})
-                return res.json({ token })
+                res.json({ token })
             })
         }
     })(req, res, next)
@@ -198,9 +198,10 @@ app.post("/api/signup", (req, res) => {
 app.get('/api/profile', function(req, res) {
     console.log(req.session)
     if (req.isAuthenticated()) {
-      res.json({ message: 'You made it to the secured profie' })
+      res.json({ message: "success", "user": req.user})
     } else {
-      res.json({ message: 'You are not authenticated' })
+        // res.status(501)
+        res.json({ message: 'Access denied' })
     }
   })
 

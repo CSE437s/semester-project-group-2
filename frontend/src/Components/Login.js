@@ -2,6 +2,7 @@ import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/aut
 import { auth } from "../firebase";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from "axios"
 
 const Login = () => {
     const navigate = useNavigate();
@@ -30,20 +31,19 @@ const Login = () => {
         }
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
-
-        signInWithEmailAndPassword(auth, email, pass)
-            .then((credentials) => {
-                console.log("Success!");
-                localStorage.setItem("userID", credentials.user.uid);
-                navigate('/dashboard'); // Navigate to the dashboard route
-            })
-            .catch((error) => {
-                if (error.code === "auth/invalid-credential") {
-                    alert("Incorrect password");
-                } else if (error.code === "auth/invalid-email") {
-                    alert("Invalid Email");
+        axios.post("http://localhost:5050/api/login", {
+            email: email,
+            password: pass,
+        },).then((res) => {
+            const token = res.data.token
+            axios.get("http://localhost:5050/api/profile", {
+                headers: {
+                    "Authorization": "Bearer " + token
                 }
-            });
+            }).then((profileRes) => {
+                console.log(profileRes)
+            })
+        }).catch(e => console.log(e))
     };
 
     const handleForgotPassword = () => {
