@@ -14,6 +14,7 @@ import { auth } from './firebase';
 import Classroom from "./Components/Classroom"
 import CreateClassForm from "./Components/CreateClassForm";
 import ResetPassword from "./Components/ResetPassword";
+import ForgotPassword from "./Components/ForgotPassword";
 
 
 
@@ -41,6 +42,7 @@ const App = () => {
         <Route path="/create-class" element={<CreateClassForm />} />
         <Route path="/classrooms/:classId/:TAid" element={<Classroom />} />
         <Route path="/passwordReset" element={<ResetPassword />} />
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
 
       </Routes>
     </Router>

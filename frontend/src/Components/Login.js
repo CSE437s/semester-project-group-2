@@ -47,14 +47,7 @@ const Login = () => {
     };
 
     const handleForgotPassword = () => {
-        console.log("resetting password...")
-        sendPasswordResetEmail(auth, email).then(() => {
-            alert("An email to reset your password has been sent!")
-        }).catch((e) => {
-            if (e.code === "auth/invalid-email") {
-                alert("Please enter a valid email and then click \"forgot password?\"");
-            }
-        });
+        navigate("/forgotPassword")
     };
 
     if (checkingAuth) {

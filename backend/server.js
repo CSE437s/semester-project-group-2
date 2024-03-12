@@ -12,18 +12,17 @@ const bcrypt = require("bcrypt")
 const JWTstrategy = require("passport-jwt").Strategy
 const JWTextract = require("passport-jwt").ExtractJwt 
 const userModel = require("./database/models/userModel")
+const tokenModel = require("./database/models/tokenModel")
 const JWT = require("jsonwebtoken")
 const sendEmail = require("./sendEmail")
 
 // setup multer for file upload
-var store = multer.diskStorage(
-    {
-        destination: './uploadedFiles',
-        filename: function (req, file, cb ) {
-            cb( null, file.originalname);
-        }
+var store = multer.diskStorage({
+    destination: './uploadedFiles',
+    filename: function (req, file, cb ) {
+        cb( null, file.originalname);
     }
-);
+});
 
 
 const upload = multer({ store: store } )
@@ -131,24 +130,25 @@ passport.use("signup", new Strategy({
     }
 ))
 
-passport.use("reset", new Strategy({
-    usernameField: "email",
-    passwordField: "password",
-    passReqToCallback: true
-    },
-    (req, email, password, next) => {
-        userModel.findOne({email: email}).then((user) => {
-            if(!user) {
-                return next(null, null, {message: "user does not exist"})
-            }
-            console.log("resetting password for user", user)
-            const resetToken = crypto.randomBytes(32).toString("hex") // from https://blog.logrocket.com/implementing-secure-password-reset-node-js/#password-request-service
-            const hash = bcrypt.hash(resetToken, bcrypt.genSalt(10))
-            const resetLink = url + "/passwordReset?token=" + resetToken + "&user=" + user._id
-            sendEmail(user.email, resetLink)
-        }).catch(e => next(e, null, null))
-    }
-))
+// passport.use("reset", new Strategy({
+//     usernameField: "email",
+//     passwordField: "password",
+//     passReqToCallback: true
+//     },
+//     (req, email, password, next) => {
+//         userModel.findOne({email: email}).then((user) => {
+//             if(!user) {
+//                 return next(null, null, {message: "user does not exist"})
+//             }
+//             console.log("resetting password for user", user)
+//             const resetToken = crypto.randomBytes(32).toString("hex") // from https://blog.logrocket.com/implementing-secure-password-reset-node-js/#password-request-service
+//             const hash = bcrypt.hash(resetToken, bcrypt.genSalt(10))
+//             const resetLink = url + "/passwordReset?token=" + resetToken + "&user=" + user._id
+//             return next(null, user, {"resetLink": resetLink})
+//             // sendEmail(user.email, resetLink)
+//         }).catch(e => next(e, null, null))
+//     }
+// ))
 
 app.post("/api/login", (req, res, next) => {
     passport.authenticate("login", (error, user, info) => {
@@ -171,6 +171,74 @@ app.post("/api/login", (req, res, next) => {
             })
         }
     })(req, res, next)
+})
+
+app.post("/api/initiateReset", (req, res) => {
+    const email = req.body.email
+    userModel.findOne({email: email}).then((user) => {
+        if(!user) {
+            return next(null, null, {message: "user does not exist"})
+        }
+        //really readable line of code to first locate any token that is associated with the user and delete it
+        tokenModel.findOne({userId: user._id}).then((oldToken) => tokenModel.deleteOne(oldToken).then((msg) => console.log(msg)).catch(e => console.log(e))).catch(e => console.log(e))
+        const resetToken = crypto.randomBytes(32).toString("hex")
+            bcrypt.hash(resetToken, Number(bcrypt.genSalt(10))).then((hash) => {
+                tokenModel.create({
+                    userId: user._id,
+                    token: hash,
+                    createdAt: Date.now()
+                }).then((_) => {
+                    const resetLink = url + "/passwordReset?token=" + resetToken + "&user=" + user._id
+                    const result = sendEmail(user.email, resetLink)
+                    console.log("???", result)
+                    // res.send({"resetLink": resetLink})
+                }).catch(e => {
+                    console.log(e)
+                    res.status(500).send({"error": e})
+                }) // from https://blog.logrocket.com/implementing-secure-password-reset-node-js/#password-request-service
+            }).catch(e => {
+                res.status(500).send({"message": "there was an error hashing the token", "error": e})
+            })
+            
+    }).catch(e => { 
+        console.log(e)
+        res.status(500).send({"error": e})
+    })
+})
+
+app.post("/api/resetPassword", (req, res) => {
+    tokenModel.findOne({userId: req.body.id}).then((token) =>{
+        if(!token) {
+            console.log("no token for this user found")
+            res.send({"message": "no token was found registered for this user"})
+        }
+        else {
+            bcrypt.compare(token, req.body.token).then((validity) => {
+                if(validity === true) {
+                    bcrypt.hash(req.body.newPassword, bcrypt.genSalt(10)).then((hashedPassword) => {
+                        userModel.updateOne({_id: req.body.id}, {
+                            $set: {
+                                password: hashedPassword
+                            }
+                        },
+                        {new: true}
+                        )
+                    })
+                    token.deleteOne().then((result) => {
+                        if(result) {
+                            return true
+                        }
+                    }).catch(e => e)
+                    
+                }
+                else {
+                    console.log("NO!")
+                    res.sendStatus(401)
+                    res.send({"message": "invalid token you suck"})
+                }
+            })
+        }
+    })
 })
  
 app.post("/api/signup", (req, res) => {
