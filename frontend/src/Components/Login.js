@@ -1,4 +1,3 @@
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,7 +6,6 @@ import axios from "axios"
 const Login = () => {
     const navigate = useNavigate();
     const [checkingAuth, setCheckingAuth] = useState(true);
-    const [email, setEmail] = useState("");
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
@@ -80,7 +78,6 @@ const Login = () => {
                             id="email"
                             type="text"
                             name="email"
-                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Email"
                         />
                     </div>
