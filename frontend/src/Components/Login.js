@@ -32,17 +32,20 @@ const Login = () => {
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
         axios.post("http://localhost:5050/api/login", {
+            withCredentials: true,
             email: email,
             password: pass,
-        },).then((res) => {
+        }).then((res) => {
             const token = res.data.token
+            console.log("Bearer " + token)
             axios.get("http://localhost:5050/api/profile", {
+                withCredentials: true, 
                 headers: {
-                    "Authorization": "Bearer " + token
-                }
-            }).then((profileRes) => {
-                console.log(profileRes)
-            })
+                  Authorization: "Bearer " + token
+                } 
+              }).then((profileRes) => {
+                // console.log(profileRes)
+            }).catch(e => console.log(e))
         }).catch(e => console.log(e))
     };
 

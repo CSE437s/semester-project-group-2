@@ -30,7 +30,9 @@ const DEBUGGING = true
 const url = DEBUGGING ? "http://localhost:3000" : "https://main--437ohproject.netlify.app" // where the request is coming from (frontend)
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
     res.header("Access-Control-Allow-Origin", url); 
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "*"); 
+    res.header("Access-Control-Allow-Credentials", true)
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     next();
   });
 app.use(express.json());
@@ -44,7 +46,10 @@ mongoose.connect(process.env.ATLAS_URI)
 app.use(session({
     secret: process.env.secret,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: {
+        sameSite: "none"
+    }
 }))
 
 // setup passport
@@ -54,7 +59,6 @@ const strategy = new Strategy(userModel.authenticate())
 passport.use(strategy);
 passport.serializeUser((err, user, next) => { // take the user info that is currently in JSON form and encrypt user information in the form of JWT
     if(err)  {
-        console.log(err)
         next(err, null)
     }
     next(null, user._id) 
@@ -84,7 +88,6 @@ passport.use("login", new Strategy({
     passReqToCallback: true
     },
     (req, email, password, next) => { // create a strategy for authentication, setup what we will do during auth
-    console.log("taking in", email, password, next)
     userModel.findOne({email: email}).then((user) =>{
         if(!user) {
             return next(null, null,{ message: "this email does not have as associated account" })
@@ -130,44 +133,28 @@ passport.use("signup", new Strategy({
     }
 ))
 
-// passport.use("reset", new Strategy({
-//     usernameField: "email",
-//     passwordField: "password",
-//     passReqToCallback: true
-//     },
-//     (req, email, password, next) => {
-//         userModel.findOne({email: email}).then((user) => {
-//             if(!user) {
-//                 return next(null, null, {message: "user does not exist"})
-//             }
-//             console.log("resetting password for user", user)
-//             const resetToken = crypto.randomBytes(32).toString("hex") // from https://blog.logrocket.com/implementing-secure-password-reset-node-js/#password-request-service
-//             const hash = bcrypt.hash(resetToken, bcrypt.genSalt(10))
-//             const resetLink = url + "/passwordReset?token=" + resetToken + "&user=" + user._id
-//             return next(null, user, {"resetLink": resetLink})
-//             // sendEmail(user.email, resetLink)
-//         }).catch(e => next(e, null, null))
-//     }
-// ))
-
 app.post("/api/login", (req, res, next) => {
     passport.authenticate("login", (error, user, info) => {
-        console.log("!", error, user, info)
         if(error) {
-            res.send({"error": error})
+            console.log("hello>", error)
+            // next({"error": JSON.stringify(error)})
         }
         else if(user === null && !info) {
-            res.send({"error": "no user with that email"})
+            console.log("what")
+            // next({"error": "no user with that email"})
         }
         else {
-            req.login(user, (error) => {
+            req.login(user, function (error) {
                 if(error) {
-                    console.log(error)
-                    return
                     // return next(error)
                 }
-                const token = JWT.sign( { userId: user._id, "email": user.email, "firstName": user.firstName, "lastName": user.lastName, "role": user.role, "status": user.status }, process.env.JWT_SECRET, {expiresIn: "48h"})
-                res.json({ token })
+                else {
+                    console.log("successfully logged in ")
+                    const token = JWT.sign( { userId: user._id, "email": user.email, "firstName": user.firstName, "lastName": user.lastName, "role": user.role, "status": user.status }, process.env.JWT_SECRET, {expiresIn: "48h"})
+                    res.cookie()
+                    res.send({ token: token })
+                    // next(null, {token: token})
+                }
             })
         }
     })(req, res, next)
@@ -180,42 +167,42 @@ app.post("/api/initiateReset", (req, res) => {
             return next(null, null, {message: "user does not exist"})
         }
         //really readable line of code to first locate any token that is associated with the user and delete it
-        tokenModel.findOne({userId: user._id}).then((oldToken) => tokenModel.deleteOne(oldToken).then((msg) => console.log(msg)).catch(e => console.log(e))).catch(e => console.log(e))
+        // tokenModel.findOne({userId: user._id}).then((oldToken) => tokenModel.deleteOne(oldToken).then((msg) => console.log(msg)).catch(e => console.log(e))).catch(e => console.log(e))
         const resetToken = crypto.randomBytes(32).toString("hex")
             bcrypt.hash(resetToken, Number(bcrypt.genSalt(10))).then((hash) => {
                 tokenModel.create({
                     userId: user._id,
                     token: hash,
                     createdAt: Date.now()
-                }).then((_) => {
+                }).then((createdToken) => {
                     const resetLink = url + "/passwordReset?token=" + resetToken + "&user=" + user._id
-                    const result = sendEmail(user.email, resetLink)
-                    console.log("???", result)
-                    // res.send({"resetLink": resetLink})
+                    sendEmail(user.email, resetLink)
                 }).catch(e => {
-                    console.log(e)
-                    res.status(500).send({"error": e})
+                    // console.log(e)
+                    res.status(418).send({"error": e})
                 }) // from https://blog.logrocket.com/implementing-secure-password-reset-node-js/#password-request-service
             }).catch(e => {
-                res.status(500).send({"message": "there was an error hashing the token", "error": e})
+                res.status(418).send({"message": "there was an error hashing the token", "error": e})
             })
             
     }).catch(e => { 
-        console.log(e)
-        res.status(500).send({"error": e})
+        // console.log(e)
+        res.status(418).send({"error": e})
     })
 })
 
 app.post("/api/resetPassword", (req, res) => {
-    tokenModel.findOne({userId: req.body.id}).then((token) =>{
-        if(!token) {
-            console.log("no token for this user found")
-            res.send({"message": "no token was found registered for this user"})
+    // console.log(req.body.id)
+    tokenModel.findOne({userId: req.body.id}).then((tokenObject) =>{
+        if(!tokenObject) {
+            // console.log("no token for this user found")
+            res.status(418).send({"message": "no token was found registered for this user"})
         }
         else {
-            bcrypt.compare(token, req.body.token).then((validity) => {
+            const token = tokenObject.token
+            bcrypt.compare(req.body.token, token).then((validity) => {
                 if(validity === true) {
-                    bcrypt.hash(req.body.newPassword, bcrypt.genSalt(10)).then((hashedPassword) => {
+                    bcrypt.hash(req.body.newPassword, Number(bcrypt.genSalt(10))).then((hashedPassword) => {
                         userModel.updateOne({_id: req.body.id}, {
                             $set: {
                                 password: hashedPassword
@@ -224,7 +211,7 @@ app.post("/api/resetPassword", (req, res) => {
                         {new: true}
                         )
                     })
-                    token.deleteOne().then((result) => {
+                    tokenModel.deleteOne({userId: req.body.id}).then((result) => {
                         if(result) {
                             return true
                         }
@@ -233,8 +220,7 @@ app.post("/api/resetPassword", (req, res) => {
                 }
                 else {
                     console.log("NO!")
-                    res.sendStatus(401)
-                    res.send({"message": "invalid token you suck"})
+                    res.status(401).send({"message": "invalid token you suck"})
                 }
             })
         }
@@ -263,13 +249,13 @@ app.post("/api/signup", (req, res) => {
     })(req, res)    
 })
 
-app.get('/api/profile', function(req, res) {
-    console.log(req.session)
+app.get('/api/profile', function (req, res) {
+    console.log(req)
     if (req.isAuthenticated()) {
-      res.json({ message: "success", "user": req.user})
+      res.status(200).send({ message: "success", "user": req.user})
     } else {
         // res.status(501)
-        res.json({ message: 'Access denied' })
+        res.status(401).send({ message: 'Access denied' })
     }
   })
 
@@ -279,18 +265,15 @@ app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles'))
 const URLs = new Map()
 
 app.post("/api/sendVideoURL", (req, res) => {
-    console.log(req.body)
     const callCreatedBy = req.body.creator
     const url = req.body.url
     URLs.set(callCreatedBy, url)
-    console.log(URLs)
     res.sendStatus(201)
 })
 
 app.post("/api/getVideoURL", (req, res) => {
     const user = req.body.creator
     if(URLs.has(user) == true) {
-        console.log("returning the URL")
         res.json({"url": URLs.get(user)})
     }
     else {
