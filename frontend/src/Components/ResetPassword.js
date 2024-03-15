@@ -14,9 +14,8 @@ const ResetPassword = () => {
         }).then(res => console.log(res)).catch(e => console.log(e))
     }
     return (<>
-        you dummy
+        change password time. pls enter your new one
         <form onSubmit={onFormSubmit}>
-            <input className="shadow appearance-none border rounded w-full py-2 my-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="email" />
             <input className="shadow appearance-none border rounded w-full py-2 my-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="password" name="newPassword" />
             <input type="submit" value="submit" />
         </form>

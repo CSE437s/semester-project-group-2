@@ -39,13 +39,17 @@ const Login = () => {
         })
         // .then(r => console.log(r)).catch(e => console.log(e))
         .then((res) => {
-            console.log(res.data)
-            axios.get("http://localhost:5050/api/profile", {
-                withCredentials: true,
-                headers: {
-                    Authorization: "Bearer " + res.data.token
-                }
-            }).then(profileRes => console.log(profileRes)).catch(e => console.log(e))
+            if(res.data.error ===  "\"incorrect password\"") {
+                alert("incorrect password")
+            }
+            else {
+                axios.get("http://localhost:5050/api/profile", {
+                    withCredentials: true,
+                    headers: {
+                        Authorization: "Bearer " + res.data.token
+                    }
+                }).then(profileRes => console.log(profileRes)).catch(e => console.log(e))
+            }
         }).catch(e => console.log(e))
     };
 

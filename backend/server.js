@@ -101,9 +101,14 @@ passport.use("login", new Strategy({
         if(!user) {
             return next(null, null,{ message: "this email does not have as associated account" })
         }
-        user.comparePassword(password).then((res) => {
+        user.comparePassword(password)
+        .then((res) => {
+            console.log(res)
+            if(res === undefined) {
+                return next("something went wrong while comparing")
+            }
             if(res === false) {
-                return next(null, null, { message: "incorrect password" })
+                return next("incorrect password")
             }
             return next(null, user, null)
         }).catch( e => next(e, null, null))
@@ -154,18 +159,16 @@ app.post("/api/login", (req, res, next) => {
         else {
             req.login(user, function (error) {
                 if(error) {
-                    // return next(error)
-                    console.log(error)
-                    res.send({"error": error})
+                    if(error === "incorrect password") {
+                        res.status(401).send("incorrect password")
+                    }
+                    else {
+                        res.status(500).send({"error": error})
+                    }
                 }
                 else {
-                    console.log("successfully logged in ")
                     const token = JWT.sign( { userId: user._id, "email": user.email, "firstName": user.firstName, "lastName": user.lastName, "role": user.role, "status": user.status }, process.env.JWT_SECRET, {expiresIn: "48h"})
-                    // res.cookie()
                     res.send({ token : token })
-                    // res.set({Authorization: "Bearer " + token})
-                    // res.redirect("/")
-                    // next(null, {token: token})
                 }
             })
         }
@@ -179,35 +182,31 @@ app.post("/api/initiateReset", (req, res) => {
             return next(null, null, {message: "user does not exist"})
         }
         //really readable line of code to first locate any token that is associated with the user and delete it
-        // tokenModel.findOne({userId: user._id}).then((oldToken) => tokenModel.deleteOne(oldToken).then((msg) => console.log(msg)).catch(e => console.log(e))).catch(e => console.log(e))
+        tokenModel.findOne({userId: user._id}).then((oldToken) => tokenModel.deleteOne(oldToken).then((msg) => console.log(msg)).catch(e => console.log(e))).catch(e => console.log(e))
         const resetToken = crypto.randomBytes(32).toString("hex")
-            bcrypt.hash(resetToken, Number(bcrypt.genSalt(10))).then((hash) => {
-                tokenModel.create({
-                    userId: user._id,
-                    token: hash,
-                    createdAt: Date.now()
-                }).then((createdToken) => {
-                    const resetLink = url + "/passwordReset?token=" + resetToken + "&user=" + user._id
-                    sendEmail(user.email, resetLink)
-                }).catch(e => {
-                    // console.log(e)
-                    res.status(418).send({"error": e})
-                }) // from https://blog.logrocket.com/implementing-secure-password-reset-node-js/#password-request-service
+        bcrypt.hash(resetToken, Number(bcrypt.genSalt(10))).then((hash) => {
+            tokenModel.create({
+                userId: user._id,
+                token: hash,
+                createdAt: Date.now()
+            }).then((createdToken) => {
+                const resetLink = url + "/passwordReset?token=" + resetToken + "&user=" + user._id
+                sendEmail(user.email, resetLink)
             }).catch(e => {
-                res.status(418).send({"message": "there was an error hashing the token", "error": e})
-            })
+                res.status(418).send({"error": e})
+            }) // from https://blog.logrocket.com/implementing-secure-password-reset-node-js/#password-request-service
+        }).catch(e => {
+            res.status(418).send({"message": "there was an error hashing the token", "error": e})
+        })
             
     }).catch(e => { 
-        // console.log(e)
         res.status(418).send({"error": e})
     })
 })
 
 app.post("/api/resetPassword", (req, res) => {
-    console.log(req.body.id)
     tokenModel.findOne({userId: req.body.id}).then((tokenObject) =>{
         if(!tokenObject) {
-            // console.log("no token for this user found")
             res.status(418).send({"message": "no token was found registered for this user"})
         }
         else {
@@ -221,8 +220,15 @@ app.post("/api/resetPassword", (req, res) => {
                             }
                         },
                         {new: true}
-                        )
-                    })
+                        ).then(msg => {
+                            if(msg.modifiedCount === 1) {
+                                res.status(201).send({message: "password successfully modified"})
+                            }
+                            else {
+                                res.status(500).send({message: "we were unable to modify password"})
+                            }
+                        })
+                    }).catch(e => console.log(e))
                     tokenModel.deleteOne({userId: req.body.id}).then((result) => {
                         if(result) {
                             return true
@@ -231,7 +237,6 @@ app.post("/api/resetPassword", (req, res) => {
                     
                 }
                 else {
-                    console.log("NO!")
                     res.status(401).send({"message": "invalid token you suck"})
                 }
             })
@@ -262,7 +267,6 @@ app.post("/api/signup", (req, res) => {
 })
 
 app.get('/api/profile', (req, res) => {
-    console.log(req.headers)
     passport.authenticate("jwt", {session: false}, (error, user) => {
         if(error) {
             res.status(500).send({error: error})
@@ -273,29 +277,9 @@ app.get('/api/profile', (req, res) => {
         else {
             res.send({user: user})
         }
-        // console.log(error, user, info)
     })(req, res)
-}
-    // console.log(req.user)
-    // // console.log(res.heade )
-    // if(req.isAuthenticated()) {
-    //     res.send({user: req.user})
-    // }
-    // else {
-    //     res.status(401).send({error: "not aut"})
-    // }
-    // passport.authenticate("jwt", (error, user, info) => {
-    //     if(error) {
-    //         res.status(500).send({"error": error})
-    //     }
-    //     else if(!user) {
-    //         res.status(404).send({"error": "user not found"})
-    //     }
-    //     else {
-    //         res.send({user: user })
-    //     }
-    // })(req, res, next)
-)
+})
+
 
 // serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
