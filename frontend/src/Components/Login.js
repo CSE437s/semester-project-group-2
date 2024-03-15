@@ -2,6 +2,8 @@ import { auth } from "../firebase";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios"
+axios.defaults.withCredentials = true
+
 
 const Login = () => {
     const navigate = useNavigate();
@@ -30,20 +32,20 @@ const Login = () => {
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
         axios.post("http://localhost:5050/api/login", {
-            withCredentials: true,
             email: email,
             password: pass,
-        }).then((res) => {
-            const token = res.data.token
-            console.log("Bearer " + token)
+        }, {
+            withCredentials: true
+        })
+        // .then(r => console.log(r)).catch(e => console.log(e))
+        .then((res) => {
+            console.log(res.data)
             axios.get("http://localhost:5050/api/profile", {
-                withCredentials: true, 
+                withCredentials: true,
                 headers: {
-                  Authorization: "Bearer " + token
-                } 
-              }).then((profileRes) => {
-                // console.log(profileRes)
-            }).catch(e => console.log(e))
+                    Authorization: "Bearer " + res.data.token
+                }
+            }).then(profileRes => console.log(profileRes)).catch(e => console.log(e))
         }).catch(e => console.log(e))
     };
 

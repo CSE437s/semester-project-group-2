@@ -15,7 +15,7 @@ const userModel = require("./database/models/userModel")
 const tokenModel = require("./database/models/tokenModel")
 const JWT = require("jsonwebtoken")
 const sendEmail = require("./sendEmail")
-
+const cors = require('cors')
 // setup multer for file upload
 var store = multer.diskStorage({
     destination: './uploadedFiles',
@@ -28,6 +28,7 @@ var store = multer.diskStorage({
 const upload = multer({ store: store } )
 const DEBUGGING = true
 const url = DEBUGGING ? "http://localhost:3000" : "https://main--437ohproject.netlify.app" // where the request is coming from (frontend)
+app.use(cors({ credentials: true, origin: url}));
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
     res.header("Access-Control-Allow-Origin", url); 
     res.header("Access-Control-Allow-Methods", "*"); 
@@ -55,30 +56,38 @@ app.use(session({
 // setup passport
 app.use(passport.initialize()) // setup
 app.use(passport.session()) // keep local sessions
+app.use(function(req,res,next){
+  res.locals.currentUser = req.user;
+  next();
+})
 const strategy = new Strategy(userModel.authenticate())
 passport.use(strategy);
-passport.serializeUser((err, user, next) => { // take the user info that is currently in JSON form and encrypt user information in the form of JWT
-    if(err)  {
-        next(err, null)
-    }
-    next(null, user._id) 
+passport.serializeUser((user, next) => { // take the user info that is currently in JSON form and encrypt user information in the form of JWT
+    next(null, user._id)
 })
 passport.deserializeUser((id, next) => { // go from encrypted data and return the user JSON object
+    console.log("DESERIALIZE")
     userModel.findById(id).then((user) => { // look in the collection for a user with the given id
         return next(null, user)
     }).catch(e => next(e, null))
 })
-passport.use(new JWTstrategy({
+passport.use("jwt", new JWTstrategy({
         secretOrKey: process.env.JWT_SECRET,
         jwtFromRequest: JWTextract.fromAuthHeaderAsBearerToken()
     },
     (token, next) => {
-        try {
-            return next(null, token)
-        }
-        catch (e) {
-            console.log(e)
-        }
+        console.log("WAT")
+        // try {
+        //     console.log(token)
+            userModel.findOne({_id: token.userId}).then((user) => {
+                return next(null, user)
+            }).catch(error => {
+                return next(error)
+            })
+        // }
+        // catch (e) {
+        //     return next(e)
+        // }
     }
 ))
 
@@ -134,25 +143,28 @@ passport.use("signup", new Strategy({
 ))
 
 app.post("/api/login", (req, res, next) => {
-    passport.authenticate("login", (error, user, info) => {
+    passport.authenticate("login", 
+    (error, user, info) => {
         if(error) {
-            console.log("hello>", error)
-            // next({"error": JSON.stringify(error)})
+            res.send({"error": JSON.stringify(error)})
         }
         else if(user === null && !info) {
-            console.log("what")
-            // next({"error": "no user with that email"})
+            res.send({"error": "no user with that email"})
         }
         else {
             req.login(user, function (error) {
                 if(error) {
                     // return next(error)
+                    console.log(error)
+                    res.send({"error": error})
                 }
                 else {
                     console.log("successfully logged in ")
                     const token = JWT.sign( { userId: user._id, "email": user.email, "firstName": user.firstName, "lastName": user.lastName, "role": user.role, "status": user.status }, process.env.JWT_SECRET, {expiresIn: "48h"})
-                    res.cookie()
-                    res.send({ token: token })
+                    // res.cookie()
+                    res.send({ token : token })
+                    // res.set({Authorization: "Bearer " + token})
+                    // res.redirect("/")
                     // next(null, {token: token})
                 }
             })
@@ -192,7 +204,7 @@ app.post("/api/initiateReset", (req, res) => {
 })
 
 app.post("/api/resetPassword", (req, res) => {
-    // console.log(req.body.id)
+    console.log(req.body.id)
     tokenModel.findOne({userId: req.body.id}).then((tokenObject) =>{
         if(!tokenObject) {
             // console.log("no token for this user found")
@@ -249,15 +261,41 @@ app.post("/api/signup", (req, res) => {
     })(req, res)    
 })
 
-app.get('/api/profile', function (req, res) {
-    console.log(req)
-    if (req.isAuthenticated()) {
-      res.status(200).send({ message: "success", "user": req.user})
-    } else {
-        // res.status(501)
-        res.status(401).send({ message: 'Access denied' })
-    }
-  })
+app.get('/api/profile', (req, res) => {
+    console.log(req.headers)
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(404).send({error: "no user could be found"})
+        }
+        else {
+            res.send({user: user})
+        }
+        // console.log(error, user, info)
+    })(req, res)
+}
+    // console.log(req.user)
+    // // console.log(res.heade )
+    // if(req.isAuthenticated()) {
+    //     res.send({user: req.user})
+    // }
+    // else {
+    //     res.status(401).send({error: "not aut"})
+    // }
+    // passport.authenticate("jwt", (error, user, info) => {
+    //     if(error) {
+    //         res.status(500).send({"error": error})
+    //     }
+    //     else if(!user) {
+    //         res.status(404).send({"error": "user not found"})
+    //     }
+    //     else {
+    //         res.send({user: user })
+    //     }
+    // })(req, res, next)
+)
 
 // serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
