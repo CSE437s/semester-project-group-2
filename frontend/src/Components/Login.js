@@ -1,6 +1,7 @@
 import { auth } from "../firebase";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {getUser} from "../UserUtils"
 import axios from "axios"
 axios.defaults.withCredentials = true
 
@@ -31,26 +32,9 @@ const Login = () => {
         }
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
-        axios.post("http://localhost:5050/api/login", {
-            email: email,
-            password: pass,
-        }, {
-            withCredentials: true
+        getUser(email, pass).then(userResult => {
+            navigate("/dashboard")
         })
-        // .then(r => console.log(r)).catch(e => console.log(e))
-        .then((res) => {
-            if(res.data.error ===  "\"incorrect password\"") {
-                alert("incorrect password")
-            }
-            else {
-                axios.get("http://localhost:5050/api/profile", {
-                    withCredentials: true,
-                    headers: {
-                        Authorization: "Bearer " + res.data.token
-                    }
-                }).then(profileRes => console.log(profileRes)).catch(e => console.log(e))
-            }
-        }).catch(e => console.log(e))
     };
 
     const handleForgotPassword = () => {

@@ -36,6 +36,24 @@ const userSchema = new mongoose.Schema(
       enum: ["pending", "approved"],
       default: "pending",
     },
+    classesAsInstructor: {
+      type: Array,
+      required: false,
+      unique: false,
+      default: []
+    },
+    classesAsTA: {
+      type: Array,
+      required: false,
+      unique: false,
+      default: []
+    },
+    classesAsStudent: {
+      type: Array,
+      required: false,
+      unique: false,
+      default: []
+    },
   },
   { timestamps: true }
 );

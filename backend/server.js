@@ -5,7 +5,6 @@ const path = require("path")
 const passport = require("passport")
 const mongoose = require("mongoose")
 const session = require("express-session")
-const handlebars = require("express-handlebars")
 const crypto = require("crypto")
 const Strategy = require("passport-local").Strategy
 const bcrypt = require("bcrypt")
@@ -13,6 +12,7 @@ const JWTstrategy = require("passport-jwt").Strategy
 const JWTextract = require("passport-jwt").ExtractJwt 
 const userModel = require("./database/models/userModel")
 const tokenModel = require("./database/models/tokenModel")
+const classModel = require("./database/models/classModel")
 const JWT = require("jsonwebtoken")
 const sendEmail = require("./sendEmail")
 const cors = require('cors')
@@ -280,6 +280,87 @@ app.get('/api/profile', (req, res) => {
     })(req, res)
 })
 
+
+app.post("/api/userClasses", (req, res) => {
+    const userId = req.body.id
+    userModel.findById(userId).then(user => {
+        if(!user) {
+            res.status(404).send({error: "user not found"})
+        }
+        else {
+            const instructorClasses = user.classesAsInstructor
+            const TAclasses = user.classesAsTA
+            const studentClasses = user.classesAsStudent
+
+            // const classes = [
+            //     ...instructorClasses,
+            //     ...TAclasses,
+            //     ...studentClasses
+            // ]
+            const classes = {
+                instructor: instructorClasses,
+                TA: TAclasses,
+                student: studentClasses
+            }
+            res.status(200).send({classes: classes})
+        }
+    }).catch(e => res.status(500).send(e))
+})
+
+app.post("/api/enrollInCourse", (req, res) => {
+    const userId = req.body.id
+    const classCode = req.body.courseId
+    const roleInCourse = req.body.newRole
+    classModel.findOne({ classCode: classCode }).then(classToEnroll => {
+
+        console.log(classToEnroll)
+        if(!classToEnroll) {
+            res.status(404).send({message: "couldn't find course with this code"})
+            return
+        }
+        var itemToAdd;
+        if(roleInCourse === "instructor") {
+            itemToAdd = {
+                $push: { "classesAsInstructor" : classToEnroll }
+            }
+        }
+        else if (roleInCourse === "student") {
+            itemToAdd = {
+                $push: { "classesAsStudent" : classToEnroll }
+            }
+        }
+        else {
+            itemToAdd = {
+                $push: { "classesAsTA" : classToEnroll }
+            }
+        }
+        userModel.findByIdAndUpdate(userId, itemToAdd).then((oldObject) => {
+            res.status(201).send({message: "successfully updated"})
+        }).catch(e => res.status(500).send(e))
+    }).catch(e => res.status(500).send(e))
+})
+
+app.post("/api/createClass", (req, res) => {
+    const body = req.body
+    classModel.create({
+        className: body.className,
+        classDescription: body.classDescription,
+        classCode: body.classCode,
+        createdBy: body.createdBy,
+        instructorId: body.instructorId,
+    }).then((createdCourse) => {
+        if(createdCourse) {
+            res.status(200).send({createdClass: createdCourse})
+        }
+    }).catch(e => {
+        if(e.code === 11000) {
+            res.status(501).send({error: "class already exists"})
+        }
+        else {
+            res.status(500).send({error: e})
+        }
+    })
+})
 
 // serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
