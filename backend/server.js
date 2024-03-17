@@ -96,7 +96,7 @@ passport.use("login", new Strategy({
     passwordField: "password", 
     passReqToCallback: true
     },
-    (req, email, password, next) => { // create a strategy for authentication, setup what we will do during auth
+    (req, email, password, next) => { // create a strategy for authentication, setup what we will do during auth 
     userModel.findOne({email: email}).then((user) =>{
         if(!user) {
             return next(null, null,{ message: "this email does not have as associated account" })
@@ -134,6 +134,7 @@ passport.use("signup", new Strategy({
                 "user": user
             })
         }).catch(e => {
+            console.log(e)
             if(e.code === 11000) {
                 console.log("we already have this user")
                 callback({
@@ -353,6 +354,7 @@ app.post("/api/createClass", (req, res) => {
             res.status(200).send({createdClass: createdCourse})
         }
     }).catch(e => {
+        console.log(e)
         if(e.code === 11000) {
             res.status(501).send({error: "class already exists"})
         }
@@ -382,6 +384,17 @@ app.post("/api/getVideoURL", (req, res) => {
     else {
         res.json({"error": "couldn't find a URL associated with user:"+user})
     }
+})
+
+app.get("/api/logout", (req, res) => {
+    req.logout(err => {
+        if(err) {
+            res.status(500).send(err)
+        }
+        else {
+            res.status(200).send({message: "successfully logged out. be sure to remove the token from LS"})
+        }
+    })
 })
 
 app.post("/api/updateOHTime", (req, res)=> {

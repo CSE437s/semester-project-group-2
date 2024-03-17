@@ -50,6 +50,7 @@ export function getUser(email, pass) {
 export function getCurrentUser() {
     const token = localStorage.getItem("token")
     if(!token) {
+        console.log(" no token ")
         return {"error": "token is not stored"}
     }
     return axios.get(url + "/api/profile", {
@@ -83,5 +84,19 @@ export function getEnrolledCourses(userId) {
     }).catch(e => {
         console.log(e)
         return null
+    })
+}
+
+/**
+ * Helper function to logout a user
+ * @returns true if successfully logged out, error otherwise
+ */
+export function logout() {
+    localStorage.removeItem("token")
+    return axios.get(url + "/api/logout").then(res => {
+        return true
+    }).catch(e => {
+        console.log("ERROR LOGGING OUT", e)
+        return e
     })
 }

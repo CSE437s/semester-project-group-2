@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["pending", "approved"],
-      default: "pending",
+      default: "approved", // FIXME 
     },
     classesAsInstructor: {
       type: Array,

@@ -1,15 +1,16 @@
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { logout } from '../UserUtils';
 import { useNavigate } from 'react-router-dom';
 
 const LogoutButton = () => {
     const navigate = useNavigate();
 
     const performLogout = () => {
-        signOut(auth)
-            .then(() => {
-                alert("Successfully signed out. See ya!");
-                navigate("/home");
+        logout()
+            .then((res) => {
+                if(res === true) {
+                    alert("Successfully signed out. See ya!");
+                    navigate("/home");
+                }
             })
             .catch((error) => {
                 console.error("Error signing out:", error);

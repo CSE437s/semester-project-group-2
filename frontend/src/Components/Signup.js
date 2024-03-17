@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from "axios"
+import { getUser } from '../UserUtils';
 
 const Signup = () => {
     const [email, setEmail] = useState("");
@@ -32,7 +33,11 @@ const Signup = () => {
             "status": "approved" // TODO create approval system and remove hard coded value
         }).then((data) => {
             if(data.data.user) {
-                navigate("/dashboard")
+                getUser(email, password).then(res => {
+                    if(!res.error) {
+                        navigate("/dashboard")
+                    }
+                })
             }
             else if(data.error) {
                 alert("something went wrong. please try again")

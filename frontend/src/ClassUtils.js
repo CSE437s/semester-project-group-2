@@ -22,7 +22,33 @@ export function createClass(className, classDescription, classCode, creator, ins
     })
     .then((res) => {
         console.log("created course successfully")
+        joinClass(classCode, instructorId, "instructor").then(value => {
+            if(value === true) {
+                return true
+            }
+        }).catch(e => {
+            return {error: e}
+        })
     }).catch((error) => {
         return {"error": error}
+    })
+}
+
+/**
+ * Helper function that will enroll a user in a specified course
+ * @param  classCode 
+ * @param userId 
+ * @param  newRole 
+ * @returns true if successfully joined, error otherwise
+ */
+export function joinClass(classCode, userId, newRole) {
+    return axios.post(url + "/api/enrollInCourse", {
+        id: userId,
+        courseId: classCode,
+        newRole: newRole
+    }).then(res => {
+        return true
+    }).catch(e => {
+        return e
     })
 }

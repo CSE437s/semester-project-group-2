@@ -4,7 +4,7 @@ import LogoutButton from "./LogoutButton";
 import { Link } from "react-router-dom";
 import axios from "axios"
 import {getUser, getCurrentUser, getEnrolledCourses } from "../UserUtils"
-import {createClass} from "../ClassUtils"
+import {createClass, joinClass} from "../ClassUtils"
 
 const Dashboard = () => {
   const [user, setUser] = useState(null)
@@ -18,7 +18,12 @@ const Dashboard = () => {
   const [userClasses, setUserClasses] = useState([]);
 
   useEffect(() => {
-      getCurrentUser().then(userObject => {
+      const currentUser = getCurrentUser()
+      console.log(currentUser)
+      if(currentUser && currentUser.error) {
+        navigate("/login")
+      }
+      currentUser.then(userObject => {
         if(userObject.data && userObject.data.user) {
           const currentUser = userObject.data.user
           console.log("logged in as", currentUser)
@@ -33,7 +38,7 @@ const Dashboard = () => {
         else {
           navigate("/login")
         }
-      })
+      }).catch(e => console.log(e))
   }, [navigate])
 
 
@@ -47,7 +52,7 @@ const Dashboard = () => {
     }
 
     try {
-      createClass(className, classDescription, user.email, classCode, user._id).then((result) => {
+      createClass(className, classDescription, classCode,  user.email, user._id).then((result) => {
         console.log(result)
       })
 
@@ -66,41 +71,19 @@ const Dashboard = () => {
   const handleJoinClassSubmit = async (e) => {
     e.preventDefault();
 
-    // try {
-    //   // Query the classes collection to find the document with the matching class code
-    //   const q = query(
-    //     collection(db, "classes"),
-    //     where("classCode", "==", joinClassCode)
-    //   );
-    //   const querySnapshot = await getDocs(q);
-
-    //   if (!querySnapshot.empty) {
-    //     querySnapshot.forEach(async (classDoc) => {
-    //       // const classData = classDoc.data();
-
-    //       // Update user document with the class joined
-    //       const userRef = doc(db, "users", auth.currentUser.uid);
-    //       await updateDoc(userRef, {
-    //         classes: arrayUnion(classDoc.id),
-    //       });
-
-    //       // Update class document with the student joined
-    //       await updateDoc(classDoc.ref, {
-    //         students: arrayUnion(auth.currentUser.uid),
-    //       });
-
-    //       alert("You have successfully joined the class! Refreshing...");
-    //       window.location.reload();// force automatic reload to see the joined class
-    //     });
-    //   } else {
-    //     alert("Class not found. Please check the code and try again.");
-    //   }
-
-    //   setJoinClassCode("");
-    // } catch (error) {
-    //   console.error("Error joining class:", error);
-    //   alert("Failed to join class. Please try again.");
-    // }
+    joinClass(joinClassCode, user._id, "student").then((result) => {// all users are added to a course as a student at first
+      if(result === true) {
+        alert("You have successfully joined the class! Refreshing...");
+        window.location.reload();// force automatic reload to see the joined class
+      }
+      else {
+            alert("Class not found. Please check the code and try again.");
+      }
+      setJoinClassCode("");
+    }).catch (error => {
+      console.error("Error joining class:", error);
+      alert("Failed to join class. Please try again.");
+    })
   };
 
   if (isLoading) {
@@ -167,8 +150,8 @@ const Dashboard = () => {
           }
           </div>
         </div>
-{/* 
-        {!isLoading && userRole === "instructor" ? (
+
+        {!isLoading && user.role === "instructor" ? (
           <form onSubmit={handleCreateClassSubmit} className="mb-6 flex items-center font-mono mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
             <label htmlFor="classCode" className="mr-2 font-bold">
               Create A Class:
@@ -211,7 +194,7 @@ const Dashboard = () => {
         ) : null}
 
 
-        {!isLoading && userRole === "student" ? (
+        {!isLoading && user.role === "student" ? (
           <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200 ">
             <label htmlFor="joinClassCode" className="mr-2 font-bold ">
               Join a Class:
@@ -231,8 +214,8 @@ const Dashboard = () => {
               Join Class
             </button>
           </form>
-        ) : null} */}
-        {/* <div className="flex justify-between items-center mb-6">
+        ) : null}
+        <div className="flex justify-between items-center mb-6">
 
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -240,7 +223,7 @@ const Dashboard = () => {
           >
             Go to Classroom
           </button>
-        </div> */}
+        </div>
       </div>
     </div>
   );

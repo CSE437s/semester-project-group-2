@@ -33,8 +33,11 @@ const Login = () => {
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
         getUser(email, pass).then(userResult => {
+            if(userResult.error) {
+                console.log("something went wrong", userResult.error)
+            }
             navigate("/dashboard")
-        })
+        }).catch(e => console.log(e))
     };
 
     const handleForgotPassword = () => {
