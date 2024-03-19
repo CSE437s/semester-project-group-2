@@ -1,7 +1,4 @@
 import { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
-import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
 // import axios from "axios";
 import { useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';

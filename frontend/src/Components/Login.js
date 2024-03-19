@@ -1,7 +1,6 @@
-import { auth } from "../firebase";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {getUser} from "../UserUtils"
+import {getUser, getCurrentUser} from "../UserUtils"
 import axios from "axios"
 axios.defaults.withCredentials = true
 
@@ -9,15 +8,21 @@ axios.defaults.withCredentials = true
 const Login = () => {
     const navigate = useNavigate();
     const [checkingAuth, setCheckingAuth] = useState(true);
+    const currentToken = localStorage.getItem("token")
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCheckingAuth(false);
-            if (user) {
-                navigate('/dashboard');
-            }
-        });
-        return unsubscribe;
+        if(currentToken) {
+            getCurrentUser().then(user => {
+                setCheckingAuth(false);
+                if (user) {
+                    navigate('/dashboard');
+                }
+            });
+        }
+        setCheckingAuth(false)
+        // else {
+        //     navigate("/login")
+        // }
     }, [navigate]);
 
     const performLogin = (e) => {

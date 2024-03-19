@@ -52,3 +52,39 @@ export function joinClass(classCode, userId, newRole) {
         return e
     })
 }
+
+/**
+ * getClass helper function
+ * @param classCode 
+ * @returns classObject if successfully found, null otherwise
+ */
+export function getClassByCode(classCode) {
+    return axios.post(url + "/api/getClass", {
+        classCode: classCode
+    }).then(res => {
+        if(res.data.class) {
+            return res.data.class
+        }
+        return null
+    }).catch(e => {
+        return null
+    })
+}
+
+/**
+ * helper function that finds class by ID
+ * @param  classId 
+ * @returns class if found, null otherwise
+ */
+export function getClassByID(classId) {
+    return axios.post(url + "/api/getClassById", {
+        classId: classId
+    }).then(res => {
+        if(res.data.class) {
+            return res.data.class
+        }
+        return null
+    }).catch(e => {
+        return null
+    })
+}

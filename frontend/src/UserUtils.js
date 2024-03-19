@@ -66,7 +66,16 @@ export function getCurrentUser() {
             return {"message": "unable to find the profile"}
         }
     }).catch(e => {
-        return {"error": e}
+        console.log(e)
+        if(e.response) {
+            if(e.response.status === 401) {
+                console.log("token has expired")
+                return {"message": "token has expired. logout and redirect to login", status: 401}
+            }
+        } 
+        else {
+            return {error: e}
+        }
     })
 }
 
@@ -99,4 +108,63 @@ export function logout() {
         console.log("ERROR LOGGING OUT", e)
         return e
     })
+}
+
+/**
+ * find and return specified user object
+ * @param userId 
+ * @returns user object if user exists, null otherwise
+ */
+export function findUser(userId) {
+    return axios.post(url + "/api/findUser", {
+        id: userId
+    }).then(res => {
+        const user = res.data.user
+        if(user) {
+            return user
+        }
+        return null
+    }).catch(e => null)
+}
+
+/**
+ * get all of the hours objects associated with a user 
+ * @param  userId 
+ * @returns array of hour objects if successful, null otherwise
+ */
+export function getUsersHours(userId) {
+    return axios.post(url + "/api/getHours", {
+        userId: userId
+    }).then(res => {
+        if(res.error) {
+            return null;
+        }
+        else {
+            return res.data.hours
+        }
+    })
+}
+
+/**
+ * add hours to database and ID to user's list of IDs
+ * @param userId 
+ * @param className 
+ * @param classId 
+ * @param hours 
+ * @returns true if successful, false otherwise
+ */
+export function addUserHours(userId, className, classId, hours) {
+    return axios.post(url + "/api/addHours", {
+        classId: classId,
+        className: className,
+        userId: userId,
+        hours: hours
+    }).then(res => {
+        if(res.status === 200) {
+            return true
+        } 
+        else {
+            return false
+        }
+    }).catch(e => false)
 }

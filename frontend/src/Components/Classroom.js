@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import LogoutButton from './LogoutButton';
-import { db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import NewRoom from "./NewRoom";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from "axios";
 import OHschedule from "./OHSchedule";
+import { getCurrentUser, findUser, getUsersHours, addUserHours } from "../UserUtils";
+import { getClassByCode } from "../ClassUtils";
+
 
 const Classroom = () => {
     const DEBUGGING = false;
@@ -15,89 +16,65 @@ const Classroom = () => {
     const [room, createRoom] = useState(undefined);
     // eslint-disable-next-line
     const [name, setName] = useState("");
-    const [roomURL, setRoomURL] = useState("");
+    const [roomURL, setRoomURL] = useState("")
+    const [user, setCurrentUser] = useState(null);
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
+    const [isOwner, setIsOwner] = useState(false);
     const { classId, TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
-    const currentUser = localStorage.getItem("userID");
-    const isOwner = currentUser === TAid; // Determine if current user is the owner of the classroom
+    const currentToken = localStorage.getItem("token");
+    // const isOwner = currentUser._id === TAid; // Determine if current user is the owner of the classroom
     const [isLoading, setIsLoading] = useState(true);
     // const [roomOnline, setOnline] = useState(false)
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (currentUser) {
-            const userDocRef = doc(db, "users", currentUser);
-            if (userDocRef) {
-                getDoc(userDocRef).then((d) => {
-                    const docData = d.data();
-                    setName(docData.email);
-                }).catch((error) => {
-                    console.log(error);
-                });
-            }
+        if (currentToken) {
+            getCurrentUser().then(user => {
+                setCurrentUser(user)
+                setName(user.firstName + " " + user.lastName)
+                if(user._id === TAid) {
+                    setIsOwner(true)
+                }
+            })
             // wipe any old calls on entering classroom
             const data = {
-                "creator": localStorage.getItem("userID"),
+                "creator": user._id,
                 "url": ""
             }
-            console.log(data)
             axios.post(api_url + "/api/sendVideoURL", data, {
                 headers: {
                     "content-type": "application/json",
                 },
             });
         }
-    }, [currentUser, api_url]);
+    }, [currentToken, api_url]);
 
     useEffect(() => {
         console.log("Fetching TA's name...");
-        const taDocRef = doc(db, "users", TAid); // Assuming TA information is stored in "users" collection
-
-        getDoc(taDocRef)
-            .then((taDoc) => {
-                if (taDoc.exists()) {
-                    const taData = taDoc.data();
-                    setTaName(taData.firstName); // Assuming TA's name is stored in "name" field
-                } else {
-                    console.log("TA document does not exist");
-                }
-            })
-            .catch((error) => {
-                console.log("Error getting TA document:", error);
-            });
+        findUser(TAid).then(TA => {
+            if(TA !== null) {
+                setTaName(TA.firstName)
+            }
+            else {
+                console.log("TA was unable to be found")
+            }
+        }).catch(e => console.log(e))
     }, [TAid]); // Dependency: TAid
 
     useEffect(() => {
-        console.log("looking for hours...");
-        const taRef = doc(db, "classes", classId, "TAs", TAid);
-
-        if (!taRef) {
-            console.log("Cannot find TA document with that TA ID");
-            return;
-        }
-
-        getDoc(taRef)
-            .then((taDoc) => {
-                if (taDoc.exists()) {
-                    const taData = taDoc.data();
-
-                    if (taData.OHtimes) {
-                        setOHSchedule(taData.OHtimes);
-                        setIsLoading(false);
-                    } else {
-                        setIsLoading(false);
-                        console.log("TA's office hours data is missing");
-                    }
-                } else {
-                    console.log("TA document does not exist");
-                }
-            })
-            .catch((error) => {
-                console.log("Error getting TA document:", error);
-            });
-
+        getUsersHours(TAid).then(hours => {
+            if (hours) {
+                setOHSchedule(hours);
+                setIsLoading(false);
+            } else {
+                setIsLoading(false);
+                console.log("TA's office hours data is missing");
+            }
+        }).catch((error) => {
+            console.log("Error getting TA document:", error);
+        });
     }, [classId, TAid]); // Dependencies: classId and TAid
 
     const handleSubmit = (e) => {
@@ -159,25 +136,25 @@ const Classroom = () => {
 
     const sendTimeInformation = (e) => {
         e.preventDefault();
-        const start_time = e.target.start_time.value;
-        const end_time = e.target.end_time.value;
+        // const start_time = e.target.start_time.value;
+        // const end_time = e.target.end_time.value;
 
-        const userRef = doc(db, "classes", classId, "TAs", currentUser);
+        // const userRef = doc(db, "classes", classId, "TAs", currentUser);
 
-        if (!userRef) {
-            console.log("cannot find user document with that user ID");
-        }
+        // if (!userRef) {
+        //     console.log("cannot find user document with that user ID");
+        // }
 
-        setDoc(userRef, {
-            OHtimes: {
-                days: dates,
-                start: start_time,
-                end: end_time
-            }
-        }, { merge: true }).then(() => {
-            console.log("successfully updated office hours schedule");
-            window.location.reload();
-        }).catch(e => console.log(e));
+        // setDoc(userRef, {
+        //     OHtimes: {
+        //         days: dates,
+        //         start: start_time,
+        //         end: end_time
+        //     }
+        // }, { merge: true }).then(() => {
+        //     console.log("successfully updated office hours schedule");
+        //     window.location.reload();
+        // }).catch(e => console.log(e));
         // TODO after MVP, move API requests to backend/
         // axios.post("/api/updateOHTime", officeHours, {
         //     headers: {

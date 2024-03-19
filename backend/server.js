@@ -13,6 +13,7 @@ const JWTextract = require("passport-jwt").ExtractJwt
 const userModel = require("./database/models/userModel")
 const tokenModel = require("./database/models/tokenModel")
 const classModel = require("./database/models/classModel")
+const hoursModel = require("./database/models/hoursModel")
 const JWT = require("jsonwebtoken")
 const sendEmail = require("./sendEmail")
 const cors = require('cors')
@@ -63,6 +64,7 @@ app.use(function(req,res,next){
 const strategy = new Strategy(userModel.authenticate())
 passport.use(strategy);
 passport.serializeUser((user, next) => { // take the user info that is currently in JSON form and encrypt user information in the form of JWT
+    console.log(user, next)
     next(null, user._id)
 })
 passport.deserializeUser((id, next) => { // go from encrypted data and return the user JSON object
@@ -164,7 +166,7 @@ app.post("/api/login", (req, res, next) => {
                         res.status(401).send("incorrect password")
                     }
                     else {
-                        res.status(500).send({"error": error})
+                        res.status(500).send({"error": "failed to serialize user"})
                     }
                 }
                 else {
@@ -246,6 +248,7 @@ app.post("/api/resetPassword", (req, res) => {
 })
  
 app.post("/api/signup", (req, res) => {
+    console.log(req.body)
     passport.authenticate("signup", (error, info) => {
         if(error !== null) {
             res.send({"error": error.error})
@@ -259,7 +262,7 @@ app.post("/api/signup", (req, res) => {
             }
             else {
                 res.send({
-                    "message": "could not locate specified user"
+                    "message": info
                 })
             }
             
@@ -273,7 +276,7 @@ app.get('/api/profile', (req, res) => {
             res.status(500).send({error: error})
         }
         else if(!user) {
-            res.status(404).send({error: "no user could be found"})
+            res.status(401).send({error: "invalid auth"})
         }
         else {
             res.send({user: user})
@@ -281,6 +284,16 @@ app.get('/api/profile', (req, res) => {
     })(req, res)
 })
 
+app.post("/api/findUser", (req, res) => {
+    userModel.findById(req.body.id).then(user => {
+        if(user) {
+            res.status(200).send({user: user})
+        }
+        else {
+            res.status(404).send({message: "user not found"})
+        }
+    }).catch(e => res.status(500).send({error: e}))
+})
 
 app.post("/api/userClasses", (req, res) => {
     const userId = req.body.id
@@ -362,6 +375,56 @@ app.post("/api/createClass", (req, res) => {
             res.status(500).send({error: e})
         }
     })
+})
+
+app.post("/api/getClass", (req, res) => {
+    const classCode = req.body.classCode
+    classModel.findOne({ classCode : classCode }).then(classObject => {
+        if(classObject) {
+            res.status(200).send({class: classObject})
+        }
+    }).catch(e => res.status(500).send(e))
+})
+
+app.post("/api/getClassById", (req, res) => {
+    const classId = req.body.classId
+    classModel.findById(classId).then(classObject => {
+        if(classObject) {
+            res.status(200).send({class: classObject})
+        }
+    }).catch(e => res.status(500).send(e))
+})
+
+app.post("/api/addHours", (req, res) => {
+    hoursModel.create({
+        classId: req.body.classId,
+        className: req.body.className,
+        userId: req.body.userId,
+        hours: req.body.hours
+    }).then(hourObject => {
+        userModel.findByIdAndUpdate(req.body.userId, {
+            $push: { "hoursIDs" : hourObject._id }
+        }).then(() => {
+            console.log("added hours to user")
+            res.status(200).send({hourId: hourObject._id})
+        }).catch(e => {
+            res.status(500).send({error: e})
+        })
+    })
+})
+
+app.post("/api/getHours",  (req, res) => {
+    const hours = []
+    userModel.findById(req.body.userId).then(async user => {
+        const hoursIds = user.hoursIDs
+        for(var i in hoursIds) {
+            const hourObject = await hoursModel.findById(hoursIds[i])
+            if(hourObject) {
+                hours.push(hourObject)
+            }
+        }
+        res.status(200).send({hours: hours})
+    }).catch(e => res.status(500).send({error: e}))
 })
 
 // serve profile pictures statically 

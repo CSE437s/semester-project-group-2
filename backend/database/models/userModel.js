@@ -54,6 +54,12 @@ const userSchema = new mongoose.Schema(
       unique: false,
       default: []
     },
+    hoursIDs: {
+      type: Array,
+      required: false,
+      unique: false,
+      default: []
+    }
   },
   { timestamps: true }
 );

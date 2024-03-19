@@ -9,8 +9,6 @@ import Dashboard from './Components/Dashboard';
 import UserDetails from './Components/UserDetails';
 import ClassDetails from './Components/ClassDetails';
 import React, { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase';
 import Classroom from "./Components/Classroom"
 import CreateClassForm from "./Components/CreateClassForm";
 import ResetPassword from "./Components/ResetPassword";
@@ -19,15 +17,6 @@ import ForgotPassword from "./Components/ForgotPassword";
 
 
 const App = () => {
-  // eslint-disable-next-line
-  const [_, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, user => {
-      setCurrentUser(user);
-    });
-    return () => unsubscribe(); // Clean up subscription
-  }, []);
   return (
     <Router>
       <Routes>

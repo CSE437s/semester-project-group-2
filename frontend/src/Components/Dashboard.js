@@ -2,12 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
 import { Link } from "react-router-dom";
-import axios from "axios"
-import {getUser, getCurrentUser, getEnrolledCourses } from "../UserUtils"
+import {getUser, getCurrentUser, getEnrolledCourses, logout } from "../UserUtils"
 import {createClass, joinClass} from "../ClassUtils"
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null)
   const [name, setName] = useState("Guest")
   const [className, setClassName] = useState("");
   const [classDescription, setClassDescription] = useState("");
@@ -16,30 +14,55 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [userClasses, setUserClasses] = useState([]);
+  const [user, setUser] = useState(null)
+  const currentToken = localStorage.getItem("token")
+
 
   useEffect(() => {
-      const currentUser = getCurrentUser()
-      console.log(currentUser)
-      if(currentUser && currentUser.error) {
-        navigate("/login")
-      }
-      currentUser.then(userObject => {
-        if(userObject.data && userObject.data.user) {
-          const currentUser = userObject.data.user
-          console.log("logged in as", currentUser)
-          setUser(currentUser)
-          setName(currentUser.firstName + " " + currentUser.lastName)
-          // get user's classes
-          getEnrolledCourses(currentUser._id).then(courses => {
-            setUserClasses(courses)
-            setIsLoading(false)
+    const currentUser = getCurrentUser()
+    console.log(currentUser)
+    if(!currentToken) {
+      navigate("/login")
+    }
+    if(currentUser.error) {
+      return;
+    }
+    currentUser.then(userObject => {
+      console.log(userObject)
+      if(userObject.status) {
+        if(userObject.status === 401) {
+          logout().then(res => {
+            if(res === true) {
+              navigate("/login")
+            }
+            else {
+              alert("something has gone wrong. pls close and try again")
+              return;
+            }
           })
         }
-        else {
-          navigate("/login")
-        }
-      }).catch(e => console.log(e))
-  }, [navigate])
+      }
+      if(userObject.data && userObject.data.user) {
+        const currentUser = userObject.data.user
+        setUser(currentUser)
+        setName(currentUser.firstName + " " + currentUser.lastName)
+        // get user's classes
+        getEnrolledCourses(currentUser._id).then(courses => {
+          setUserClasses(courses)
+          setIsLoading(false)
+        })
+      }
+      else if (userObject.message) {
+        console.log(userObject)
+        // if(userObject.error.response.data.error === "invalid auth") {
+        //   console.log("auth token has expired")
+        // }
+      }
+      // else {
+      //   navigate("/login")
+      // }
+    }).catch(e => console.log(e))
+}, [navigate])
 
 
   const handleCreateClassSubmit = async (e) => {
