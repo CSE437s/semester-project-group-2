@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema(
       unique: false,
       default: []
     },
-    hoursIDs: {
+    hours: {
       type: Array,
       required: false,
       unique: false,

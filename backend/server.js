@@ -332,24 +332,16 @@ app.post("/api/enrollInCourse", (req, res) => {
             res.status(404).send({message: "couldn't find course with this code"})
             return
         }
-        var itemToAdd;
-        if(roleInCourse === "instructor") {
-            itemToAdd = {
-                $push: { "classesAsInstructor" : classToEnroll }
-            }
-        }
-        else if (roleInCourse === "student") {
-            itemToAdd = {
-                $push: { "classesAsStudent" : classToEnroll }
-            }
-        }
-        else {
-            itemToAdd = {
-                $push: { "classesAsTA" : classToEnroll }
-            }
-        }
-        userModel.findByIdAndUpdate(userId, itemToAdd).then((oldObject) => {
-            res.status(201).send({message: "successfully updated"})
+        var studentItemToAdd;
+        var classItemToAdd;
+        userModel.findByIdAndUpdate(userId, {
+            $push: {["classesAs" + roleInCourse] : classToEnroll }
+        }).then((oldObject) => {
+            classToEnroll.updateOne({
+                $push: {[roleInCourse + "s"] : oldObject }
+            }).then(oldClass => {
+                res.status(201).send({message: "successfully updated"})
+            }).catch(e => res.status(500).send(e))
         }).catch(e => res.status(500).send(e))
     }).catch(e => res.status(500).send(e))
 })
@@ -396,34 +388,55 @@ app.post("/api/getClassById", (req, res) => {
 })
 
 app.post("/api/addHours", (req, res) => {
-    hoursModel.create({
-        classId: req.body.classId,
-        className: req.body.className,
-        userId: req.body.userId,
-        hours: req.body.hours
-    }).then(hourObject => {
-        userModel.findByIdAndUpdate(req.body.userId, {
-            $push: { "hoursIDs" : hourObject._id }
-        }).then(() => {
-            console.log("added hours to user")
-            res.status(200).send({hourId: hourObject._id})
-        }).catch(e => {
-            res.status(500).send({error: e})
-        })
+    console.log(req.body)
+    userModel.findById(req.body.userId).then(user => {
+        var changed = false
+        if(user) {
+            console.log(user)
+            const hours = user.hours
+            for(var i in hours) {
+                const hoursObject = hours[i]
+                if(hoursObject.classId === req.body.classId) {
+                    hours[i].hours.push({
+                        startTime: req.body.hours.startTime,
+                        endTime: req.body.hours.endTime,
+                        day: req.body.hours.day
+                    })
+                    changed = true
+                    // res.status(200).send({message: "successfully pushed new time"})
+                    // return
+                }
+            }
+            if(changed === false) {
+                hours.push({
+                    classId: req.body.classId,
+                    hours: [
+                        {
+                            startTime: req.body.hours.startTime,
+                            endTime: req.body.hours.endTime,
+                            day: req.body.hours.day
+                        }
+                    ]
+                })
+            }
+            user.updateOne({hours: hours}).then(something => {
+
+                res.status(200).send({message: "created new class object"})
+            })
+        }
+        // res.status(500).send({error: "not"})
     })
 })
 
 app.post("/api/getHours",  (req, res) => {
     const hours = []
     userModel.findById(req.body.userId).then(async user => {
-        const hoursIds = user.hoursIDs
-        for(var i in hoursIds) {
-            const hourObject = await hoursModel.findById(hoursIds[i])
-            if(hourObject) {
-                hours.push(hourObject)
-            }
+        if(user) {
+           res.status(200).send({hours: user.hours})
         }
-        res.status(200).send({hours: hours})
+        else {
+            res.status(404).send({message: "could not locate user"})
+        }
     }).catch(e => res.status(500).send({error: e}))
 })
 

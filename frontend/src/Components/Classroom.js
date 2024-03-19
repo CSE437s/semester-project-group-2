@@ -4,7 +4,7 @@ import NewRoom from "./NewRoom";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from "axios";
 import OHschedule from "./OHSchedule";
-import { getCurrentUser, findUser, getUsersHours, addUserHours } from "../UserUtils";
+import { getCurrentUser, findUser, getAllUserHours, getUserHoursForClass, addUserHours } from "../UserUtils";
 import { getClassByCode } from "../ClassUtils";
 
 
@@ -64,7 +64,7 @@ const Classroom = () => {
     }, [TAid]); // Dependency: TAid
 
     useEffect(() => {
-        getUsersHours(TAid).then(hours => {
+        getAllUserHours(TAid).then(hours => {
             if (hours) {
                 setOHSchedule(hours);
                 setIsLoading(false);

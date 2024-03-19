@@ -132,7 +132,7 @@ export function findUser(userId) {
  * @param  userId 
  * @returns array of hour objects if successful, null otherwise
  */
-export function getUsersHours(userId) {
+export function getAllUserHours(userId) {
     return axios.post(url + "/api/getHours", {
         userId: userId
     }).then(res => {
@@ -143,6 +143,18 @@ export function getUsersHours(userId) {
             return res.data.hours
         }
     })
+}
+
+/**
+ * helper function to get user hours for specified class
+ * @param userId 
+ * @param classId 
+ * @returns hours for that class, undefined if they don't exist or null if something goes wrong
+ */
+export function getUserHoursForClass(userId, classId) {
+    return getAllUserHours(userId).then(hours => hours.filter((hour) => {
+        hour.classId === classId
+    })).catch(e => null)
 }
 
 /**
