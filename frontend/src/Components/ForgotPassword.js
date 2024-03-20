@@ -1,8 +1,6 @@
 import axios from "axios"
-import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = () => {
-    const navigate = useNavigate()
     const initiateReset = (e) => {
         e.preventDefault()
         const userEmail = e.target.email.value

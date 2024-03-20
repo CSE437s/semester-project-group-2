@@ -4,8 +4,8 @@ import NewRoom from "./NewRoom";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from "axios";
 import OHschedule from "./OHSchedule";
-import { getCurrentUser, findUser, getAllUserHours, getUserHoursForClass, addUserHours } from "../UserUtils";
-import { getClassByCode, getClassByID } from "../ClassUtils";
+import { getCurrentUser, findUser, getAllUserHours, addUserHours } from "../UserUtils";
+// import { getClassByCode, getClassByID } from "../ClassUtils";
 
 
 const Classroom = () => {
@@ -52,7 +52,7 @@ const Classroom = () => {
             }
             // wipe any old calls on entering classroom
         }
-    }, [currentToken, api_url]);
+    }, [currentToken, api_url, TAid, user]);
 
     useEffect(() => {
         console.log("Fetching TA's name...");

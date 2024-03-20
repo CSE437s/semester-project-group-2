@@ -10,6 +10,7 @@ const ClassDetails = () => {
     const [classDetails, setClassDetails] = useState(null);
     const [students, setStudents] = useState([]);
     const [teachingAssistants, setTeachingAssistants] = useState([]);
+    // eslint-disable-next-line
     const [taSchedules, setTASchedules] = useState([]);
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
@@ -38,6 +39,7 @@ const ClassDetails = () => {
                 setUser(user.data.user)
             }
         }).catch(e => console.log(e))
+        //eslint-disable-next-line
         const fetchUsersDetails = async (userIds) => {
             const userDetails = await Promise.all(userIds.map(async (id) => {
                 findUser(id).then(user => {
@@ -74,8 +76,9 @@ const ClassDetails = () => {
             setIsLoading(false);
         }
         fetchClassDetailsAndUsers();
-    }, [classId]);
+    }, [classId, navigate, token]);
 
+    //eslint-disable-next-line
     const fetchTASchedules = async (taIds) => {
         // try {
         //     const schedules = await Promise.all(taIds.map(async (TAid) => {
@@ -296,6 +299,11 @@ const ClassDetails = () => {
                                                     </button>
                                                 </div>
                                             );
+                                        }
+                                        else {
+                                            return (<>
+                                            error
+                                            </>)
                                         }
                                     })}
                                 </div>

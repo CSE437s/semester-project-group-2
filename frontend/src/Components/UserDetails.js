@@ -86,7 +86,7 @@ const UserDetails = () => {
         else {
             navigate("/login")
         }
-    }, [navigate]);
+    }, [navigate, currentToken]);
 
 
     if (!user) {

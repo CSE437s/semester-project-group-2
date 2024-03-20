@@ -20,10 +20,7 @@ const Login = () => {
             });
         }
         setCheckingAuth(false)
-        // else {
-        //     navigate("/login")
-        // }
-    }, [navigate]);
+    }, [navigate, currentToken]);
 
     const performLogin = (e) => {
         e.preventDefault();

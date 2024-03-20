@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
 import { Link } from "react-router-dom";
-import {getUser, getCurrentUser, getEnrolledCourses, logout } from "../UserUtils"
+import { getCurrentUser, getEnrolledCourses, logout } from "../UserUtils"
 import {createClass, joinClass} from "../ClassUtils"
 
 const Dashboard = () => {
-  const [name, setName] = useState("Guest")
   const [className, setClassName] = useState("");
   const [classDescription, setClassDescription] = useState("");
   const [classCode, setClassCode] = useState("");
@@ -45,7 +44,6 @@ const Dashboard = () => {
       if(userObject.data && userObject.data.user) {
         const currentUser = userObject.data.user
         setUser(currentUser)
-        setName(currentUser.firstName + " " + currentUser.lastName)
         // get user's classes
         getEnrolledCourses(currentUser._id).then(courses => {
           setUserClasses(courses)
@@ -62,7 +60,7 @@ const Dashboard = () => {
       //   navigate("/login")
       // }
     }).catch(e => console.log(e))
-}, [navigate])
+}, [navigate, currentToken])
 
 
   const handleCreateClassSubmit = async (e) => {

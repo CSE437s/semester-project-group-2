@@ -64,11 +64,9 @@ app.use(function(req,res,next){
 const strategy = new Strategy(userModel.authenticate())
 passport.use(strategy);
 passport.serializeUser((user, next) => { // take the user info that is currently in JSON form and encrypt user information in the form of JWT
-    console.log(user, next)
     next(null, user._id)
 })
 passport.deserializeUser((id, next) => { // go from encrypted data and return the user JSON object
-    console.log("DESERIALIZE")
     userModel.findById(id).then((user) => { // look in the collection for a user with the given id
         return next(null, user)
     }).catch(e => next(e, null))
@@ -78,27 +76,20 @@ passport.use("jwt", new JWTstrategy({
         jwtFromRequest: JWTextract.fromAuthHeaderAsBearerToken()
     },
     (token, next) => {
-        console.log("WAT")
-        // try {
-        //     console.log(token)
-            userModel.findOne({_id: token.userId}).then((user) => {
-                return next(null, user)
-            }).catch(error => {
-                return next(error)
-            })
-        // }
-        // catch (e) {
-        //     return next(e)
-        // }
+        userModel.findOne({_id: token.userId}).then((user) => {
+            return next(null, user)
+        }).catch(error => {
+            return next(error)
+        })
     }
 ))
 
 passport.use("login", new Strategy({
     usernameField: "email",
     passwordField: "password", 
-    passReqToCallback: true
+    passReqToCallback: false
     },
-    (req, email, password, next) => { // create a strategy for authentication, setup what we will do during auth 
+    (email, password, next) => { // create a strategy for authentication, setup what we will do during auth 
     userModel.findOne({email: email}).then((user) =>{
         if(!user) {
             return next(null, null,{ message: "this email does not have as associated account" })
@@ -248,7 +239,6 @@ app.post("/api/resetPassword", (req, res) => {
 })
  
 app.post("/api/signup", (req, res) => {
-    console.log(req.body)
     passport.authenticate("signup", (error, info) => {
         if(error !== null) {
             res.send({"error": error.error})
@@ -326,16 +316,11 @@ app.post("/api/enrollInCourse", (req, res) => {
     const classCode = req.body.courseId
     const roleInCourse = req.body.newRole
     classModel.findOne({ classCode: classCode }).then(classToEnroll => {
-
-        console.log(classToEnroll)
         if(!classToEnroll) {
             res.status(404).send({message: "couldn't find course with this code"})
             return
         }
-        var studentItemToAdd;
-        var classItemToAdd;
         const tempRole = roleInCourse.charAt(0).toUpperCase() + roleInCourse.substring(1)
-        console.log(tempRole)
         userModel.findByIdAndUpdate(userId, {
             $push: {["classesAs" + tempRole] : classToEnroll }
         }).then((oldObject) => {
@@ -390,11 +375,9 @@ app.post("/api/getClassById", (req, res) => {
 })
 
 app.post("/api/addHours", (req, res) => {
-    console.log(req.body)
     userModel.findById(req.body.userId).then(user => {
         var changed = false
         if(user) {
-            console.log(user)
             const hours = user.hours
             for(var i in hours) {
                 const hoursObject = hours[i]
@@ -469,8 +452,6 @@ app.post("/api/changeRoleInClass", (req, res) => {
                     classesToAdd = user.classesAsInstructor
                 }
                 const arrayWithOldRoleRemoved = classesToSearch.filter((c) => c._id.toString() !== req.body.classId)
-                console.log(course)
-                // updatedRoster.push(user)
                 classesToAdd.push(course)
                 const tempOldRole = oldRole.charAt(0).toUpperCase() + oldRole.substring(1)
                 const tempRole = newRole.charAt(0).toUpperCase() + newRole.substring(1)
@@ -503,7 +484,6 @@ app.post("/api/updateUserName", (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName
     }).then(r => {
-        console.log(r)
         if(r) {
             res.status(201).send({message: "updated successfully"})
         }

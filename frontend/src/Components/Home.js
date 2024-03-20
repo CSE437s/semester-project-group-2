@@ -19,7 +19,7 @@ const Home = () => {
         else {
             navigate("/login")
         }
-    }, [navigate]);
+    }, [navigate, currentToken]);
 
     if (checkingAuth) {
         return <div>Loading...</div>;
