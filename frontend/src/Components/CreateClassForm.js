@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createClass } from "../ClassUtils";
+import { getCurrentUser } from "../UserUtils";
+
 
 const CreateClassForm = () => {
     const [className, setClassName] = useState("");
@@ -9,22 +12,37 @@ const CreateClassForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const classesCollection = collection(db, "classes");
-            await addDoc(classesCollection, {
-                className,
-                classDescription,
-                classCode,
-                instructor: auth.currentUser.uid,
-                students: [],
-                TAs: [],
-            });
-            alert("Class created successfully!");
-            navigate("/dashboard");
-        } catch (error) {
-            console.error("Error creating class:", error);
-            alert("Failed to create class. Please try again.");
-        }
+        getCurrentUser().then(user => {
+            if(user) {
+                createClass(className, classDescription, classCode, user._id).then(result => {
+                    if(result === true) {
+                        alert("Class was created!")
+                        navigate("/dashboard")
+                    }
+                    else {
+                        alert("Failed to create class. Please try again.");
+                        console.log(e)
+                    }
+                }).catch(e => console.log(e))
+            }
+        }).catch(e => console.log(e))
+        
+        // try {
+        //     const classesCollection = collection(db, "classes");
+        //     await addDoc(classesCollection, {
+        //         className,
+        //         classDescription,
+        //         classCode,
+        //         instructor: auth.currentUser.uid,
+        //         students: [],
+        //         TAs: [],
+        //     });
+        //     alert("Class created successfully!");
+        //     navigate("/dashboard");
+        // } catch (error) {
+        //     console.error("Error creating class:", error);
+        //     alert("Failed to create class. Please try again.");
+        // }
     };
 
     return (

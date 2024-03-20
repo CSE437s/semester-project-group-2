@@ -22,7 +22,7 @@ export function createClass(className, classDescription, classCode, creator, ins
     })
     .then((res) => {
         console.log("created course successfully")
-        joinClass(classCode, instructorId, "instructor").then(value => {
+        return joinClass(classCode, instructorId, "instructor").then(value => {
             if(value === true) {
                 return true
             }

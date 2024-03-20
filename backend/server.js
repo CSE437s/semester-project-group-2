@@ -334,8 +334,10 @@ app.post("/api/enrollInCourse", (req, res) => {
         }
         var studentItemToAdd;
         var classItemToAdd;
+        const tempRole = roleInCourse.charAt(0).toUpperCase() + roleInCourse.substring(1)
+        console.log(tempRole)
         userModel.findByIdAndUpdate(userId, {
-            $push: {["classesAs" + roleInCourse] : classToEnroll }
+            $push: {["classesAs" + tempRole] : classToEnroll }
         }).then((oldObject) => {
             classToEnroll.updateOne({
                 $push: {[roleInCourse + "s"] : oldObject }
@@ -437,6 +439,62 @@ app.post("/api/getHours",  (req, res) => {
         else {
             res.status(404).send({message: "could not locate user"})
         }
+    }).catch(e => res.status(500).send({error: e}))
+})
+
+app.post("/api/changeRoleInClass", (req, res) => {
+    userModel.findById(req.body.userId).then(user => {
+        classModel.findById(req.body.classId).then(async course => {
+            if(user && course) {
+                const oldRole = req.body.oldRole
+                const newRole = req.body.newRole
+                var classesToSearch;
+                if(oldRole === "student") {
+                    classesToSearch = user.classesAsStudent
+                }
+                else if (oldRole === "TA") {
+                    classesToSearch = user.classesAsTA
+                }
+                else {
+                    classesToSearch = user.classesAsInstructor
+                }
+                var classesToAdd;
+                if(newRole === "student") {
+                    classesToAdd = user.classesAsStudent
+                }
+                else if (newRole === "TA") {
+                    classesToAdd = user.classesAsTA
+                }
+                else {
+                    classesToAdd = user.classesAsInstructor
+                }
+                const arrayWithOldRoleRemoved = classesToSearch.filter((c) => c._id.toString() !== req.body.classId)
+                console.log(course)
+                // updatedRoster.push(user)
+                classesToAdd.push(course)
+                const tempOldRole = oldRole.charAt(0).toUpperCase() + oldRole.substring(1)
+                const tempRole = newRole.charAt(0).toUpperCase() + newRole.substring(1)
+                const status = await user.updateOne({
+                    ["classesAs" + tempOldRole]: arrayWithOldRoleRemoved,
+                    ["classesAs" + tempRole]: classesToAdd
+                })
+                userModel.findById(req.body.userId).then(async newUser => {
+                    const removedRoster = course[oldRole + "s"].filter((u) => u._id.toString() !== req.body.userId)
+                    const updatedRoster = course[newRole + "s"]
+                    updatedRoster.push(newUser)
+                    const classStatus = await course.updateOne({
+                        [oldRole + "s"]: removedRoster,
+                        [newRole + "s"]: updatedRoster
+                    })
+                    if(classStatus && classStatus.acknowledged === true) {
+                        res.status(200).send({message: "successfully updated"})
+                    }
+                    else {
+                        res.status(500).send({message: "updating course failed"})
+                    }
+                }).catch(e => res.status(500).send({error: e}))
+            }
+        }).catch(e => res.status(500).send({error: e}))
     }).catch(e => res.status(500).send({error: e}))
 })
 

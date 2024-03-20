@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
-import { findUser, getCurrentUser, logout } from '../UserUtils';
+import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
 
 
@@ -35,7 +35,7 @@ const ClassDetails = () => {
         }
         getCurrentUser().then(user => {
             if(user) {
-                setUser(user)
+                setUser(user.data.user)
             }
         }).catch(e => console.log(e))
         const fetchUsersDetails = async (userIds) => {
@@ -103,11 +103,21 @@ const ClassDetails = () => {
     };
 
     const promoteToTA = async (studentId) => {
-        // if (instructorId && auth.currentUser.uid !== instructorId) {
-        //     alert('Only instructors can promote students to TAs.');
-        //     return;
-        // }
+        console.log(user._id === instructorId, instructorId, user._id)
+        if (instructorId && user._id !== instructorId) {
+            alert('Only instructors can promote students to TAs.');
+            return;
+        }
 
+        changeRoleInClass(studentId, classId, "student", "TA").then(res => {
+            if(res === true) {
+                alert("success")
+                // window.location.reload()
+            }
+            else {
+                alert("error")
+            }
+        })
         // const classRef = doc(db, 'classes', classId);
         // const classSnapshot = await getDoc(classRef);
 
@@ -259,31 +269,34 @@ const ClassDetails = () => {
                                 <h2 className="text-3xl font-bold mb-6">Teaching Assistants</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                                     {teachingAssistants.map((ta) => {
-                                        const taSchedule = taSchedules.find(schedule => schedule.taId === ta.id);
-                                        const isOHNow = taSchedule && isCurrentlyOH(taSchedule.ohTimes, currentTime);
-                                        return (
-                                            <div key={ta.id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
-                                                <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
-                                                {taSchedule && (
-                                                    <div className="text-center mb-4">
-                                                        <p className="font-semibold">Office Hours:</p>
-                                                        {taSchedule.ohTimes.days.map((day, index) => (
-                                                            <p key={index}>
-                                                                {day}: {formatTime24to12(taSchedule.ohTimes.start)} - {formatTime24to12(taSchedule.ohTimes.end)}
-                                                            </p>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                                <button
-                                                    // Change the color if you don't like it...
-                                                    className={`mt-auto ${isOHNow ? 'bg-green-500 hover:bg-green-700' : 'bg-indigo-500 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
-                                                    value={ta.id}
-                                                    onClick={rerouteToClassroom}
-                                                >
-                                                    {isOHNow ? 'Join Office Hours Now' : 'View Virtual Classroom'}
-                                                </button>
-                                            </div>
-                                        );
+                                        // console.log(ta)
+                                        if(ta) {
+                                            const taSchedule = taSchedules.find(schedule => schedule.taId === ta._id);
+                                            const isOHNow = taSchedule && isCurrentlyOH(taSchedule.ohTimes, currentTime);
+                                            return (
+                                                <div key={ta._id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
+                                                    <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
+                                                    {taSchedule && (
+                                                        <div className="text-center mb-4">
+                                                            <p className="font-semibold">Office Hours:</p>
+                                                            {taSchedule.ohTimes.days.map((day, index) => (
+                                                                <p key={index}>
+                                                                    {day}: {formatTime24to12(taSchedule.ohTimes.start)} - {formatTime24to12(taSchedule.ohTimes.end)}
+                                                                </p>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    <button
+                                                        // Change the color if you don't like it...
+                                                        className={`mt-auto ${isOHNow ? 'bg-green-500 hover:bg-green-700' : 'bg-indigo-500 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
+                                                        value={ta._id}
+                                                        onClick={rerouteToClassroom}
+                                                    >
+                                                        {isOHNow ? 'Join Office Hours Now' : 'View Virtual Classroom'}
+                                                    </button>
+                                                </div>
+                                            );
+                                        }
                                     })}
                                 </div>
                             </div>
@@ -294,12 +307,12 @@ const ClassDetails = () => {
                                 <h2 className="text-2xl font-bold mb-4">Students</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                     {students.map((student) => (
-                                        <div key={student.id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center">
+                                        <div key={student._id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center">
                                             <span className="text-center text-xl font-bold mb-4">{student.firstName} {student.lastName}</span>
                                             {user?._id === instructorId && (
                                                 <button
                                                     className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                                                    onClick={() => promoteToTA(student.id)}
+                                                    onClick={() => promoteToTA(student._id)}
                                                 >
                                                     Promote to TA
                                                 </button>

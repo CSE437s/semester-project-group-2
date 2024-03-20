@@ -153,7 +153,7 @@ export function getAllUserHours(userId) {
  */
 export function getUserHoursForClass(userId, classId) {
     return getAllUserHours(userId).then(hours => hours.filter((hour) => {
-        hour.classId === classId
+        return hour.classId === classId
     })).catch(e => null)
 }
 
@@ -178,5 +178,27 @@ export function addUserHours(userId, className, classId, hours) {
         else {
             return false
         }
+    }).catch(e => false)
+}
+
+/**
+ * change a user's role in a specified class
+ * @param userId 
+ * @param classId 
+ * @param oldRole 
+ * @param newRole 
+ * @returns true if successful, false otherwise
+ */
+export function changeRoleInClass(userId, classId, oldRole, newRole) {
+    return axios.post(url + "/api/changeRoleInClass", {
+        userId: userId, 
+        classId: classId,
+        oldRole: oldRole,
+        newRole: newRole
+    }).then(res => {
+        if(res.data.message === "successfully updated") {
+            return true
+        }
+        return false
     }).catch(e => false)
 }
