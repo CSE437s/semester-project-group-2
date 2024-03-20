@@ -307,6 +307,7 @@ const Classroom = () => {
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
                 {render}
+                <Whiteboard width={1000} height={500}/>
                 {timeCard}
                 {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
             </div>

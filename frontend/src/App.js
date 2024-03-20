@@ -11,6 +11,7 @@ import ClassDetails from './Components/ClassDetails';
 import React, { useEffect, useState } from 'react';
 import Classroom from "./Components/Classroom"
 import CreateClassForm from "./Components/CreateClassForm";
+import Whiteboard from './Components/Whiteboard';
 import ResetPassword from "./Components/ResetPassword";
 import ForgotPassword from "./Components/ForgotPassword";
 
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/me" element={<UserDetails />} />
         <Route path="/create-class" element={<CreateClassForm />} />
         <Route path="/classrooms/:classId/:TAid" element={<Classroom />} />
+        {/* <Route path="/whiteboard" element={<Whiteboard />} /> for debugging purposes */}
         <Route path="/passwordReset" element={<ResetPassword />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
 

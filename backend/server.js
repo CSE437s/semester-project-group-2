@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const multer  = require('multer')
 const path = require("path")
+const http = require("http")
 const passport = require("passport")
 const mongoose = require("mongoose")
 const session = require("express-session")
@@ -499,6 +500,8 @@ app.post("/api/updateUserName", (req, res) => {
 // serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
 
+
+// VIDEO CALLING URLS
 const URLs = new Map()
 
 app.post("/api/sendVideoURL", (req, res) => {
@@ -564,4 +567,89 @@ app.post("/api/fileUpload", upload.single('myFile'), (req, res, next) => {
 
 
 const port = process.env.PORT || 3001
-app.listen(port, () => console.log("Listening on port " + port));
+const server = app.listen(port, () => console.log("Listening on port " + port));
+const io = require("socket.io")(server, {
+    cors: {
+        "origin": "http://localhost:3000"
+    }
+}) // communicate over the httpServer
+
+
+//WHITEBOARD SOCKETS
+// thank you to this random guy who helped me use sockets for this purpose: https://www.youtube.com/watch?v=Br4uaXHrODg
+var connections = []
+const printIDs = (connections) => {
+    var ids = ""
+    for(var socket in connections) {
+        ids += connections[socket].id + ", "
+    }
+    return ids
+}
+io.on("connect", (socket) => {
+    connections.push(socket) // keep track of all connected sockets
+    console.log("connected sockets:", printIDs(connections))
+    console.log("Socket:", socket.id, "has connected")
+    socket.on("begin-draw", (data) => {
+        connections.forEach((listeningSocket)=>{
+            if(listeningSocket.id !== socket.id) { // only draw the new points on the canvas' that DONT belong to original socket
+                listeningSocket.emit("start-drawing", {
+                    "x": data.x, 
+                    "y": data.y
+                })
+            }
+           
+        })
+    })
+    socket.on("end-draw", (data)=>{
+        connections.forEach((listeningSocket)=>{
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("get-drawing", {
+                    "x": data.x, 
+                    "y": data.y
+                })
+            }
+        })
+    })
+    socket.on("colorChange", (data) => {
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("changeMyColor", {
+                    "newColor": data.newColor
+                })
+            }
+        })
+    })
+    socket.on("clearChildren", () => {
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("childClear")
+            }
+        })
+    })
+    socket.on("changeSize", (data) => {
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("editListenerSize", {
+                    "newSize": data.newSize
+                })
+            }
+        })
+    })
+    socket.on("closePath", ()=>{
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id !== socket.id) {
+                listeningSocket.emit("closePath")
+            }
+        })
+    })
+
+    socket.on("disconnect", (e)=>{
+        console.log("Socket", socket.id, "disconnected because", e)
+        connections = connections.filter((item)=>{ 
+            if(item.id !== socket.id) {
+                return item;
+            }
+        })
+        console.log("connected sockets", printIDs(connections))
+    })
+})
