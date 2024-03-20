@@ -5,4 +5,4 @@ private-key.pem
 csr.pem
 https-cert.crt
 
-backend/.ebextensions 
+backend/.env

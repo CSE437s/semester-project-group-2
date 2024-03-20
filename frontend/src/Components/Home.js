@@ -1,20 +1,25 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { auth } from '../firebase';
 import React, { useEffect, useState } from 'react';
+import { getCurrentUser } from '../UserUtils';
 
 const Home = () => {
+    const currentToken = localStorage.getItem("token");
     const navigate = useNavigate();
     const [checkingAuth, setCheckingAuth] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCheckingAuth(false);
-            if (user) {
-                navigate('/dashboard');
-            }
-        });
-        return unsubscribe;
-    }, [navigate]);
+        if(currentToken) {
+            getCurrentUser().then(user => {
+                setCheckingAuth(false);
+                if (user) {
+                    navigate('/dashboard');
+                }
+            });
+        }
+        else {
+            navigate("/login")
+        }
+    }, [navigate, currentToken]);
 
     if (checkingAuth) {
         return <div>Loading...</div>;

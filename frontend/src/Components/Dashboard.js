@@ -1,134 +1,81 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  collection,
-  doc,
-  addDoc,
-  updateDoc,
-  arrayUnion,
-  query,
-  where,
-  getDocs,
-  getDoc,
-} from "firebase/firestore"; // Importing doc function
-import { auth, db } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
 import LogoutButton from "./LogoutButton";
 import { Link } from "react-router-dom";
+import { getCurrentUser, getEnrolledCourses, logout } from "../UserUtils"
+import {createClass, joinClass} from "../ClassUtils"
 
 const Dashboard = () => {
-  const [userEmail, setUserEmail] = useState(null);
-  // eslint-disable-next-line
-  const [userName, setUserName] = useState("");
   const [className, setClassName] = useState("");
   const [classDescription, setClassDescription] = useState("");
   const [classCode, setClassCode] = useState("");
   const [joinClassCode, setJoinClassCode] = useState("");
-  // eslint-disable-next-line
-  const [instructorId, setInstructorId] = useState("");
-  const [userRole, setUserRole] = useState(null);
-  // eslint-disable-next-line
-  const [userStatus, setUserStatus] = useState(null);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [userClasses, setUserClasses] = useState([]);
-  const [userRoleInClasses, setUserRoleInClasses] = useState({});
+  const [user, setUser] = useState(null)
+  const currentToken = localStorage.getItem("token")
+
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          setUserEmail(auth.currentUser.email);
-          setUserName(`${userData.firstName} ${userData.lastName}`);
-          setUserRole(userData.role);
-          setUserStatus(userData.status);
-
-          // Fetch user's classes...
-          const instructorClassesQuery = query(
-            collection(db, "classes"),
-            where("instructor", "==", auth.currentUser.uid)
-          );
-          const instructorClassesSnap = await getDocs(instructorClassesQuery);
-          const instructorClasses = instructorClassesSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          const studentClassesQuery = query(
-            collection(db, "classes"),
-            where("students", "array-contains", auth.currentUser.uid)
-          );
-          const studentClassesSnap = await getDocs(studentClassesQuery);
-          const studentClasses = studentClassesSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          const taClassesQuery = query(
-            collection(db, "classes"),
-            where("TAs", "array-contains", auth.currentUser.uid)
-          );
-          const taClassesSnap = await getDocs(taClassesQuery);
-          const taClasses = taClassesSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          const rolesInClasses = {};
-          for (const userClass of instructorClasses) {
-            rolesInClasses[userClass.id] = 'Instructor';
-          }
-          for (const userClass of taClasses) {
-            rolesInClasses[userClass.id] = 'TA';
-          }
-          for (const userClass of studentClasses) {
-            if (!rolesInClasses[userClass.id]) { // Avoid overwriting if already set as 'Instructor' or 'TA'
-              rolesInClasses[userClass.id] = 'Student';
+    const currentUser = getCurrentUser()
+    console.log(currentUser)
+    if(!currentToken) {
+      navigate("/login")
+    }
+    if(currentUser.error) {
+      return;
+    }
+    currentUser.then(userObject => {
+      console.log(userObject)
+      if(userObject.status) {
+        if(userObject.status === 401) {
+          logout().then(res => {
+            if(res === true) {
+              navigate("/login")
             }
-          }
-          setUserRoleInClasses(rolesInClasses);
-          // Combine all classes...
-          const classes = [
-            ...instructorClasses,
-            ...studentClasses,
-            ...taClasses,
-          ];
-          setUserClasses(classes);
-        } else {
-          console.log("No such document in Firestore!");
+            else {
+              alert("something has gone wrong. pls close and try again")
+              return;
+            }
+          })
         }
-        setIsLoading(false); // Auth check completed
-      } else {
-        // No user is signed in.
-        navigate("/login");
       }
-    });
+      if(userObject.data && userObject.data.user) {
+        const currentUser = userObject.data.user
+        setUser(currentUser)
+        // get user's classes
+        getEnrolledCourses(currentUser._id).then(courses => {
+          setUserClasses(courses)
+          setIsLoading(false)
+        })
+      }
+      else if (userObject.message) {
+        console.log(userObject)
+        // if(userObject.error.response.data.error === "invalid auth") {
+        //   console.log("auth token has expired")
+        // }
+      }
+      // else {
+      //   navigate("/login")
+      // }
+    }).catch(e => console.log(e))
+}, [navigate, currentToken])
 
-    return () => unsubscribe(); // Clean up the subscription
-  }, [navigate]);
 
   const handleCreateClassSubmit = async (e) => {
     e.preventDefault();
 
     // Check if the user has the 'instructor' role before proceeding
-    if (userRole !== "instructor") {
+    if (user.role !== "instructor") {
       alert("Only instructors can create classes.");
       return;
     }
 
     try {
-      const classesCollection = collection(db, "classes");
-      await addDoc(classesCollection, {
-        className: className,
-        classDescription: classDescription,
-        createdBy: userEmail,
-        classCode: classCode,
-        instructor: auth.currentUser.uid, // Set the instructor field to the current user's ID
-        students: [],
-        TAs: [],
-      });
+      createClass(className, classDescription, classCode,  user.email, user._id).then((result) => {
+        console.log(result)
+      })
 
       // Reset input fields after successful submission
       setClassName("");
@@ -145,41 +92,19 @@ const Dashboard = () => {
   const handleJoinClassSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      // Query the classes collection to find the document with the matching class code
-      const q = query(
-        collection(db, "classes"),
-        where("classCode", "==", joinClassCode)
-      );
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        querySnapshot.forEach(async (classDoc) => {
-          // const classData = classDoc.data();
-
-          // Update user document with the class joined
-          const userRef = doc(db, "users", auth.currentUser.uid);
-          await updateDoc(userRef, {
-            classes: arrayUnion(classDoc.id),
-          });
-
-          // Update class document with the student joined
-          await updateDoc(classDoc.ref, {
-            students: arrayUnion(auth.currentUser.uid),
-          });
-
-          alert("You have successfully joined the class! Refreshing...");
-          window.location.reload();// force automatic reload to see the joined class
-        });
-      } else {
-        alert("Class not found. Please check the code and try again.");
+    joinClass(joinClassCode, user._id, "student").then((result) => {// all users are added to a course as a student at first
+      if(result === true) {
+        alert("You have successfully joined the class! Refreshing...");
+        window.location.reload();// force automatic reload to see the joined class
       }
-
+      else {
+            alert("Class not found. Please check the code and try again.");
+      }
       setJoinClassCode("");
-    } catch (error) {
+    }).catch (error => {
       console.error("Error joining class:", error);
       alert("Failed to join class. Please try again.");
-    }
+    })
   };
 
   if (isLoading) {
@@ -226,23 +151,28 @@ const Dashboard = () => {
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-4 ">Your Classes</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {userClasses.map((userClass) => (
-              <Link key={userClass.id} to={`/class/${userClass.id}`} className="">
-                <div className="p-4 bg-indigo-200 mb-6 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48 hover:bg-indigo-300">
-                  <div>
-                    <h3 className="font-bold text-lg mb-2">{userClass.className}</h3>
-                    <p className="text-gray-700 flex-grow">{userClass.classDescription}</p>
+            {
+            ["TA", "instructor", "student"].map((role) => {
+              const coursesAsRole = userClasses[role]
+               return coursesAsRole.map((course) => (
+                <Link key={course._id} to={`/class/${course._id}`} className="">
+                  <div className="p-4 bg-indigo-200 mb-6 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48 hover:bg-indigo-300">
+                    <div>
+                      <h3 className="font-bold text-lg mb-2">{course.className}</h3>
+                      <p className="text-gray-700 flex-grow">{course.classDescription}</p>
+                    </div>
+                    <span className="inline-block bg-indigo-100 text-indigo-800 py-1 px-3 rounded-full text-sm font-semibold mt-4 self-start">
+                      {role}
+                    </span>
                   </div>
-                  <span className="inline-block bg-indigo-100 text-indigo-800 py-1 px-3 rounded-full text-sm font-semibold mt-4 self-start">
-                    {userRoleInClasses[userClass.id]}
-                  </span>
-                </div>
-              </Link>
-            ))}
+                </Link>
+               ))
+            })
+          }
           </div>
         </div>
 
-        {!isLoading && userRole === "instructor" ? (
+        {!isLoading && user.role === "instructor" ? (
           <form onSubmit={handleCreateClassSubmit} className="mb-6 flex items-center font-mono mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
             <label htmlFor="classCode" className="mr-2 font-bold">
               Create A Class:
@@ -285,7 +215,7 @@ const Dashboard = () => {
         ) : null}
 
 
-        {!isLoading && userRole === "student" ? (
+        {!isLoading && user.role === "student" ? (
           <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200 ">
             <label htmlFor="joinClassCode" className="mr-2 font-bold ">
               Join a Class:
@@ -306,7 +236,7 @@ const Dashboard = () => {
             </button>
           </form>
         ) : null}
-        {/* <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6">
 
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -314,10 +244,13 @@ const Dashboard = () => {
           >
             Go to Classroom
           </button>
-        </div> */}
+        </div>
       </div>
     </div>
   );
+  // return (<>
+  // hi
+  // </>)
 };
 
 export default Dashboard;

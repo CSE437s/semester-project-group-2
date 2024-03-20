@@ -1,22 +1,26 @@
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../firebase";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {getUser, getCurrentUser} from "../UserUtils"
+import axios from "axios"
+axios.defaults.withCredentials = true
+
 
 const Login = () => {
     const navigate = useNavigate();
     const [checkingAuth, setCheckingAuth] = useState(true);
-    const [email, setEmail] = useState("");
+    const currentToken = localStorage.getItem("token")
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCheckingAuth(false);
-            if (user) {
-                navigate('/dashboard');
-            }
-        });
-        return unsubscribe;
-    }, [navigate]);
+        if(currentToken) {
+            getCurrentUser().then(user => {
+                setCheckingAuth(false);
+                if (user) {
+                    navigate('/dashboard');
+                }
+            });
+        }
+        setCheckingAuth(false)
+    }, [navigate, currentToken]);
 
     const performLogin = (e) => {
         e.preventDefault();
@@ -30,31 +34,16 @@ const Login = () => {
         }
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
-
-        signInWithEmailAndPassword(auth, email, pass)
-            .then((credentials) => {
-                console.log("Success!");
-                localStorage.setItem("userID", credentials.user.uid);
-                navigate('/dashboard'); // Navigate to the dashboard route
-            })
-            .catch((error) => {
-                if (error.code === "auth/invalid-credential") {
-                    alert("Incorrect password");
-                } else if (error.code === "auth/invalid-email") {
-                    alert("Invalid Email");
-                }
-            });
+        getUser(email, pass).then(userResult => {
+            if(userResult.error) {
+                console.log("something went wrong", userResult.error)
+            }
+            navigate("/dashboard")
+        }).catch(e => console.log(e))
     };
 
     const handleForgotPassword = () => {
-        console.log("resetting password...")
-        sendPasswordResetEmail(auth, email).then(() => {
-            alert("An email to reset your password has been sent!")
-        }).catch((e) => {
-            if (e.code === "auth/invalid-email") {
-                alert("Please enter a valid email and then click \"forgot password?\"");
-            }
-        });
+        navigate("/forgotPassword")
     };
 
     if (checkingAuth) {
@@ -84,7 +73,6 @@ const Login = () => {
                             id="email"
                             type="text"
                             name="email"
-                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Email"
                         />
                     </div>

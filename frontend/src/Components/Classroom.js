@@ -1,103 +1,83 @@
 import { useState, useEffect } from "react";
 import LogoutButton from './LogoutButton';
-import { db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import NewRoom from "./NewRoom";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from "axios";
 import OHschedule from "./OHSchedule";
+import { getCurrentUser, findUser, getAllUserHours, addUserHours } from "../UserUtils";
+// import { getClassByCode, getClassByID } from "../ClassUtils";
+
 
 const Classroom = () => {
-    const DEBUGGING = false;
+    const DEBUGGING = true;
     const base_url = "https://carefully-certain-swift.ngrok-free.app";
-    const debugging_url = "http://localhost:3001";
+    const debugging_url = "http://localhost:5050";
     const api_url = DEBUGGING ? debugging_url : base_url;
     const [room, createRoom] = useState(undefined);
     // eslint-disable-next-line
     const [name, setName] = useState("");
-    const [roomURL, setRoomURL] = useState("");
+    const [roomURL, setRoomURL] = useState("")
+    const [user, setCurrentUser] = useState(null);
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
+    const [isOwner, setIsOwner] = useState(false);
     const { classId, TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
-    const currentUser = localStorage.getItem("userID");
-    const isOwner = currentUser === TAid; // Determine if current user is the owner of the classroom
+    const currentToken = localStorage.getItem("token");
+    // const isOwner = currentUser._id === TAid; // Determine if current user is the owner of the classroom
     const [isLoading, setIsLoading] = useState(true);
     // const [roomOnline, setOnline] = useState(false)
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (currentUser) {
-            const userDocRef = doc(db, "users", currentUser);
-            if (userDocRef) {
-                getDoc(userDocRef).then((d) => {
-                    const docData = d.data();
-                    setName(docData.email);
-                }).catch((error) => {
-                    console.log(error);
+        if (currentToken) {
+            getCurrentUser().then(user => {
+                const u = user.data.user
+                setCurrentUser(u)
+                setName(u.firstName + " " + u.lastName)
+                if(u._id === TAid) {
+                    setIsOwner(true)
+                }
+            })
+            if(user) {
+                const data = {
+                    "creator": user._id,
+                    "url": ""
+                }
+                axios.post(api_url + "/api/sendVideoURL", data, {
+                    headers: {
+                        "content-type": "application/json",
+                    },
                 });
             }
             // wipe any old calls on entering classroom
-            const data = {
-                "creator": localStorage.getItem("userID"),
-                "url": ""
-            }
-            console.log(data)
-            axios.post(api_url + "/api/sendVideoURL", data, {
-                headers: {
-                    "content-type": "application/json",
-                },
-            });
         }
-    }, [currentUser, api_url]);
+    }, [currentToken, api_url, TAid, user]);
 
     useEffect(() => {
         console.log("Fetching TA's name...");
-        const taDocRef = doc(db, "users", TAid); // Assuming TA information is stored in "users" collection
-
-        getDoc(taDocRef)
-            .then((taDoc) => {
-                if (taDoc.exists()) {
-                    const taData = taDoc.data();
-                    setTaName(taData.firstName); // Assuming TA's name is stored in "name" field
-                } else {
-                    console.log("TA document does not exist");
-                }
-            })
-            .catch((error) => {
-                console.log("Error getting TA document:", error);
-            });
+        findUser(TAid).then(TA => {
+            if(TA !== null) {
+                setTaName(TA.firstName)
+            }
+            else {
+                console.log("TA was unable to be found")
+            }
+        }).catch(e => console.log(e))
     }, [TAid]); // Dependency: TAid
 
     useEffect(() => {
-        console.log("looking for hours...");
-        const taRef = doc(db, "classes", classId, "TAs", TAid);
-
-        if (!taRef) {
-            console.log("Cannot find TA document with that TA ID");
-            return;
-        }
-
-        getDoc(taRef)
-            .then((taDoc) => {
-                if (taDoc.exists()) {
-                    const taData = taDoc.data();
-
-                    if (taData.OHtimes) {
-                        setOHSchedule(taData.OHtimes);
-                        setIsLoading(false);
-                    } else {
-                        setIsLoading(false);
-                        console.log("TA's office hours data is missing");
-                    }
-                } else {
-                    console.log("TA document does not exist");
-                }
-            })
-            .catch((error) => {
-                console.log("Error getting TA document:", error);
-            });
-
+        getAllUserHours(TAid).then(hours => {
+            if (hours) {
+                setOHSchedule(hours);
+                setIsLoading(false);
+            } else {
+                setIsLoading(false);
+                console.log("TA's office hours data is missing");
+            }
+        }).catch((error) => {
+            console.log("Error getting TA document:", error);
+        });
     }, [classId, TAid]); // Dependencies: classId and TAid
 
     const handleSubmit = (e) => {
@@ -157,48 +137,29 @@ const Classroom = () => {
         console.log(dates);
     };
 
-    const sendTimeInformation = (e) => {
+    const sendTimeInformation =  async (e) => {
         e.preventDefault();
         const start_time = e.target.start_time.value;
         const end_time = e.target.end_time.value;
-
-        const userRef = doc(db, "classes", classId, "TAs", currentUser);
-
-        if (!userRef) {
-            console.log("cannot find user document with that user ID");
-        }
-
-        setDoc(userRef, {
-            OHtimes: {
-                days: dates,
-                start: start_time,
-                end: end_time
+         for(var i in dates) {
+            const date = dates[i]
+            const status = await addUserHours(user._id, "", classId, {
+                day: date,
+                startTime: start_time,
+                endTime: end_time
+            })
+            if(status === true) {
+                alert("success")
             }
-        }, { merge: true }).then(() => {
-            console.log("successfully updated office hours schedule");
-            window.location.reload();
-        }).catch(e => console.log(e));
-        // TODO after MVP, move API requests to backend/
-        // axios.post("/api/updateOHTime", officeHours, {
-        //     headers: {
-        //         "content-type": "application/json"
-        //     }
-        // }).then(() => {
-        //     console.log("sent!")
-        // }).catch((res) => {
-        //     console.log(res)
-        //     if(res.response.status === 404) {
-        //         console.log("!! ERROR: user not found" + res.error)
-        //     }
-        //     else if (res.response.status === 400) {
-        //         console.log("!! ERROR:", res.systemerror)
-        //     }
-        // })
+            else {
+                alert("Something went wrong please try again")
+            }
+        }
         dates = [];
     };
 
     let render;
-
+    let timeCard;
     if (isOwner === false) {
         if (roomURL) {
             render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />;
@@ -209,6 +170,7 @@ const Classroom = () => {
                 render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
             }
         
+            timeCard = <></>
         }
     }
     else {
@@ -221,98 +183,97 @@ const Classroom = () => {
                         <input id="roomtype" type="text" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                         <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
                     </form>
-                </div>
-
-                {/* Time Information Form Card */}
-                <div className="flex-1 justify-center rounded-lg shadow-md p-8 bg-indigo-200" >
-                    <form onSubmit={sendTimeInformation}>
-                        <label className="block mb-4 text-center font-bold">When would you like to host your office hours?</label>
-                        <div className="flex justify-between mb-4">
-                            <label htmlFor="start_time" className="mr-2">from</label>
-                            <select id="start_time" name="start_time">
-                                <option value="08:00">8:00 AM</option>
-                                <option value="08:30">8:30 AM</option>
-                                <option value="09:00">9:00 AM</option>
-                                <option value="09:30">9:30 AM</option>
-                                <option value="10:00">10:00 AM</option>
-                                <option value="10:30">10:30 AM</option>
-                                <option value="11:00">11:00 AM</option>
-                                <option value="11:30">11:30 AM</option>
-                                <option value="12:00">12:00 PM</option>
-                                <option value="12:30">12:30 PM</option>
-                                <option value="13:00">1:00 PM</option>
-                                <option value="13:30">1:30 PM</option>
-                                <option value="14:00">2:00 PM</option>
-                                <option value="14:30">2:30 PM</option>
-                                <option value="15:00">3:00 PM</option>
-                                <option value="15:30">3:30 PM</option>
-                                <option value="16:00">4:00 PM</option>
-                                <option value="16:30">4:30 PM</option>
-                                <option value="17:00">5:00 PM</option>
-                                <option value="17:30">5:30 PM</option>
-                                <option value="18:00">6:00 PM</option>
-                                <option value="18:30">6:30 PM</option>
-                                <option value="19:00">7:00 PM</option>
-                                <option value="19:30">7:30 PM</option>
-                                <option value="20:00">8:00 PM</option>
-                                <option value="20:30">8:30 PM</option>
-                                <option value="21:00">9:00 PM</option>
-                                <option value="21:30">9:30 PM</option>
-                                <option value="22:00">10:00 PM</option>
-                            </select>
-                        </div>
-                        <div className="flex justify-between mb-4">
-                            <label htmlFor="end_time" className="mr-2">until</label>
-                            <select id="end_time" name="end_time">
-                                <option value="08:00">8:00 AM</option>
-                                <option value="08:30">8:30 AM</option>
-                                <option value="09:00">9:00 AM</option>
-                                <option value="09:30">9:30 AM</option>
-                                <option value="10:00">10:00 AM</option>
-                                <option value="10:30">10:30 AM</option>
-                                <option value="11:00">11:00 AM</option>
-                                <option value="11:30">11:30 AM</option>
-                                <option value="12:00">12:00 PM</option>
-                                <option value="12:30">12:30 PM</option>
-                                <option value="13:00">1:00 PM</option>
-                                <option value="13:30">1:30 PM</option>
-                                <option value="14:00">2:00 PM</option>
-                                <option value="14:30">2:30 PM</option>
-                                <option value="15:00">3:00 PM</option>
-                                <option value="15:30">3:30 PM</option>
-                                <option value="16:00">4:00 PM</option>
-                                <option value="16:30">4:30 PM</option>
-                                <option value="17:00">5:00 PM</option>
-                                <option value="17:30">5:30 PM</option>
-                                <option value="18:00">6:00 PM</option>
-                                <option value="18:30">6:30 PM</option>
-                                <option value="19:00">7:00 PM</option>
-                                <option value="19:30">7:30 PM</option>
-                                <option value="20:00">8:00 PM</option>
-                                <option value="20:30">8:30 PM</option>
-                                <option value="21:00">9:00 PM</option>
-                                <option value="21:30">9:30 PM</option>
-                                <option value="22:00">10:00 PM</option>
-                            </select>
-                        </div>
-
-                        <div className="flex justify-center space-x-4">
-                            <button onClick={handleDayPicker} value="M">M </button>
-                            <button onClick={handleDayPicker} value="T">T </button>
-                            <button onClick={handleDayPicker} value="W">W </button>
-                            <button onClick={handleDayPicker} value="Th">Th </button>
-                            <button onClick={handleDayPicker} value="F">F </button>
-                            <button onClick={handleDayPicker} value="S">S </button>
-                            <button onClick={handleDayPicker} value="Su">Su</button>
-                        </div>
-                        <div className="flex justify-center"> {/* Centered horizontally */}
-                            <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
-                        </div>
-                    </form>
-                </div>
+                </div> 
             </div>
-        );
+        )
+        timeCard =  <div className="flex-1 justify-center rounded-lg shadow-md p-8 bg-indigo-200" >
+            <form onSubmit={sendTimeInformation}>
+                <label className="block mb-4 text-center font-bold">When would you like to host your office hours?</label>
+                <div className="flex justify-between mb-4">
+                    <label htmlFor="start_time" className="mr-2">from</label>
+                    <select id="start_time" name="start_time">
+                        <option value="08:00">8:00 AM</option>
+                        <option value="08:30">8:30 AM</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="09:30">9:30 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="10:30">10:30 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="11:30">11:30 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="12:30">12:30 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="13:30">1:30 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="14:30">2:30 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="15:30">3:30 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="16:30">4:30 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="17:30">5:30 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                        <option value="18:30">6:30 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                        <option value="19:30">7:30 PM</option>
+                        <option value="20:00">8:00 PM</option>
+                        <option value="20:30">8:30 PM</option>
+                        <option value="21:00">9:00 PM</option>
+                        <option value="21:30">9:30 PM</option>
+                        <option value="22:00">10:00 PM</option>
+                    </select>
+                </div>
+                <div className="flex justify-between mb-4">
+                    <label htmlFor="end_time" className="mr-2">until</label>
+                    <select id="end_time" name="end_time">
+                        <option value="08:00">8:00 AM</option>
+                        <option value="08:30">8:30 AM</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="09:30">9:30 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="10:30">10:30 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="11:30">11:30 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="12:30">12:30 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="13:30">1:30 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="14:30">2:30 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="15:30">3:30 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="16:30">4:30 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="17:30">5:30 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                        <option value="18:30">6:30 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                        <option value="19:30">7:30 PM</option>
+                        <option value="20:00">8:00 PM</option>
+                        <option value="20:30">8:30 PM</option>
+                        <option value="21:00">9:00 PM</option>
+                        <option value="21:30">9:30 PM</option>
+                        <option value="22:00">10:00 PM</option>
+                    </select>
+                </div>
+
+                <div className="flex justify-center space-x-4">
+                    <button onClick={handleDayPicker} value="M">M </button>
+                    <button onClick={handleDayPicker} value="T">T </button>
+                    <button onClick={handleDayPicker} value="W">W </button>
+                    <button onClick={handleDayPicker} value="Th">Th </button>
+                    <button onClick={handleDayPicker} value="F">F </button>
+                    <button onClick={handleDayPicker} value="S">S </button>
+                    <button onClick={handleDayPicker} value="Su">Su</button>
+                </div>
+                <div className="flex justify-center"> {/* Centered horizontally */}
+                    <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
+                </div>
+            </form>
+        </div>
     }
+// );
 
     return (
         <div className="font-mono">
@@ -346,6 +307,7 @@ const Classroom = () => {
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
                 {render}
+                {timeCard}
                 {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
             </div>
         </div>
