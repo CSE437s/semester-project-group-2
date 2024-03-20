@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-// import axios from "axios";
 import { useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
+import { getCurrentUser, updateUserName } from "../UserUtils";
 
 // const cleanFileName = (fileName) => {
 //     var newFileName = ""
@@ -29,15 +29,15 @@ const UserDetails = () => {
     const [lastName, setLastName] = useState("");
     const [editingFirstName, setEditingFirstName] = useState(false);
     const [editingLastName, setEditingLastName] = useState(false);
-
-    const performReset = () => {
-        sendPasswordResetEmail(auth, user.email).then(() => {
-            console.log(user.email)
-            alert("Email has been sent to " + user.email)
-        }).catch((e) => {
-            console.log(e)
-        })
-    }
+    const currentToken = localStorage.getItem("token")
+    // const performReset = () => {
+    //     sendPasswordResetEmail(auth, user.email).then(() => {
+    //         console.log(user.email)
+    //         alert("Email has been sent to " + user.email)
+    //     }).catch((e) => {
+    //         console.log(e)
+    //     })
+    // }
 
     const handleFirstNameBlur = () => {
         setEditingFirstName(false);
@@ -69,26 +69,23 @@ const UserDetails = () => {
     // }
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-            if (currentUser) {
-                setUser(currentUser);
-                const userDocRef = doc(db, "users", currentUser.uid);
-                getDoc(userDocRef).then((d) => {
-                    const docData = d.data();
-                    setRole(docData.role);
-                    setStatus(docData.status);
-                    setFirstName(docData.firstName); // Set first name from database
-                    setLastName(docData.lastName); // Set last name from database
-                }).catch((error) => {
-                    console.log(error);
-                });
-            } else {
-                // If no user is signed in, navigate to the login page
-                navigate("/login");
-            }
-        });
-
-        return () => unsubscribe();
+        if(currentToken) {
+            getCurrentUser().then(u => {
+                const user = u.data.user
+                if(user) {
+                    setUser(user);
+                    setRole(user.role);
+                    setStatus(user.status);
+                    setFirstName(user.firstName); // Set first name from database
+                    setLastName(user.lastName); // Set last name from database
+                }
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+        else {
+            navigate("/login")
+        }
     }, [navigate]);
 
 
@@ -106,17 +103,12 @@ const UserDetails = () => {
         }
 
         try {
-            await updateProfile(auth.currentUser, {
-                displayName: `${firstName} ${lastName}`,
-            });
-
-            const userDocRef = doc(db, "users", user.uid);
-            await updateDoc(userDocRef, {
-                firstName: firstName,
-                lastName: lastName,
-            });
-
-            // alert("User information updated successfully.");
+            updateUserName(user._id, firstName, lastName).then(res => {
+                console.log(res)
+                if(res === true) {
+                    alert("success")
+                }
+            }).catch(e => console.log(e))
             navigate("/me");
         } catch (error) {
             console.error("Error updating user information:", error);
@@ -238,7 +230,7 @@ const UserDetails = () => {
                         /> */}
                     </div>
                     <div className="flex mt-4">
-                        <button onClick={performReset} className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2">
+                        <button onClick={() => navigate("/forgotPassword")} className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2">
                             Reset Password
                         </button>
                        

@@ -202,3 +202,23 @@ export function changeRoleInClass(userId, classId, oldRole, newRole) {
         return false
     }).catch(e => false)
 }
+
+/**
+ * helper to chcange a user's name
+ * @param userId 
+ * @param firstName 
+ * @param lastName 
+ * @returns true if successful, false if something happens, error if one is caught
+ */
+export function updateUserName(userId, firstName, lastName) {
+    return axios.post(url + "/api/updateUserName", {
+        id: userId,
+        firstName: firstName,
+        lastName: lastName
+    }).then(res => {
+        if(res.data.message === "updated successfully") {
+            return true
+        }
+        return false
+    }).catch(e => e)
+}

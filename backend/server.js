@@ -498,6 +498,24 @@ app.post("/api/changeRoleInClass", (req, res) => {
     }).catch(e => res.status(500).send({error: e}))
 })
 
+app.post("/api/updateUserName", (req, res) => {
+    userModel.findByIdAndUpdate(req.body.id, {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName
+    }).then(r => {
+        console.log(r)
+        if(r) {
+            res.status(201).send({message: "updated successfully"})
+        }
+        else {
+            res.status(500).send({message: "unable to update"})
+        }
+    }).catch(e => {
+        console.log(e)
+        res.status(500).send({error: e})
+    })
+})
+
 // serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
 
