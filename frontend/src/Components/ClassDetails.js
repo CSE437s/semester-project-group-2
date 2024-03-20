@@ -1,8 +1,8 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
-import { db, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayRemove, arrayUnion, collection, setDoc } from 'firebase/firestore';
+import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
+import { getClassByID } from '../ClassUtils';
 
 
 const ClassDetails = () => {
@@ -10,116 +10,142 @@ const ClassDetails = () => {
     const [classDetails, setClassDetails] = useState(null);
     const [students, setStudents] = useState([]);
     const [teachingAssistants, setTeachingAssistants] = useState([]);
+    // eslint-disable-next-line
     const [taSchedules, setTASchedules] = useState([]);
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [instructorName, setInstructorName] = useState("")
     const [instructorId, setInstructorId] = useState("");
     const [isLoading, setIsLoading] = useState(true);
 
-
+    const token = localStorage.getItem("token")
 
     useEffect(() => {
+        if(!token) {
+            logout().then(status => {
+                if(status === true) {
+                    navigate("/login")
+                }
+                else {
+                    console.log("ruh roh")
+                    return
+                }
+            }).catch(e => {
+                navigate("/home")
+            })
+        }
+        getCurrentUser().then(user => {
+            if(user) {
+                setUser(user.data.user)
+            }
+        }).catch(e => console.log(e))
+        //eslint-disable-next-line
         const fetchUsersDetails = async (userIds) => {
-            const userDetails = await Promise.all(userIds.map(async (userId) => {
-                const userRef = doc(db, 'users', userId);
-                const userSnap = await getDoc(userRef);
-                return userSnap.exists() ? { id: userId, ...userSnap.data() } : null;
-            }));
-            return userDetails.filter(Boolean);
+            const userDetails = await Promise.all(userIds.map(async (id) => {
+                findUser(id).then(user => {
+                    if(user) {
+                        return {id: user._id, ...user}
+                    }
+                    return null
+                }).catch(e => console.log(e))
+            }))
+            return userDetails.filter(Boolean)
         };
 
         // eslint-disable-next-line
         const fetchClassDetailsAndUsers = async () => {
-            const classRef = doc(db, 'classes', classId);
-            const classSnapshot = await getDoc(classRef);
-
-            if (classSnapshot.exists()) {
-                const classData = classSnapshot.data();
-                setClassDetails(classData);
-
-                if (classData.students) {
-                    const studentDetails = await fetchUsersDetails(classData.students);
-                    setStudents(studentDetails);
+            getClassByID(classId).then(classObject => {
+                if(classObject) {
+                    setClassDetails(classObject)
                 }
-                if (classData.TAs) {
-                    const taDetails = await fetchUsersDetails(classData.TAs);
-                    setTeachingAssistants(taDetails);
+                if(classObject.students) {
+                    setStudents(classObject.students)
                 }
-
-                const instructorRef = doc(db, 'users', classData.instructor);
-                const instructorSnapshot = await getDoc(instructorRef);
-
-                if (instructorSnapshot.exists()) {
-                    setUser(instructorSnapshot.data());
-                    setInstructorId(classData.instructor);
+                if(classObject.TAs) {
+                    setTeachingAssistants(classObject.TAs)
+                    // also get TA schedules
                 }
-                if (classData.TAs) {
-                    await fetchTASchedules(classData.TAs);
-                }
-            };
+                const instructorId = classObject.instructorId
+                findUser(instructorId).then(instructor => {
+                    if(instructor) {
+                        setInstructorId(instructorId)
+                        setInstructorName(instructor.firstName + " " + instructor.lastName)
+                    }
+                })
+            })
             setIsLoading(false);
         }
         fetchClassDetailsAndUsers();
-        // eslint-disable-next-line
-    }, [classId]);
+    }, [classId, navigate, token]);
 
+    //eslint-disable-next-line
     const fetchTASchedules = async (taIds) => {
-        try {
-            const schedules = await Promise.all(taIds.map(async (TAid) => {
-                const taRef = doc(db, "classes", classId, "TAs", TAid);
+        // try {
+        //     const schedules = await Promise.all(taIds.map(async (TAid) => {
+        //         const taRef = doc(db, "classes", classId, "TAs", TAid);
 
-                const taDoc = await getDoc(taRef);
-                if (taDoc.exists()) {
-                    const taData = taDoc.data();
-                    if (taData.OHtimes) {
-                        return { taId: TAid, ohTimes: taData.OHtimes };
-                    } else {
-                        console.log(`TA with ID ${TAid} has no office hours data.`);
-                        return null;
-                    }
-                } else {
-                    console.log(`TA document with ID ${TAid} does not exist.`);
-                    return null;
-                }
-            }));
+        //         const taDoc = await getDoc(taRef);
+        //         if (taDoc.exists()) {
+        //             const taData = taDoc.data();
+        //             if (taData.OHtimes) {
+        //                 return { taId: TAid, ohTimes: taData.OHtimes };
+        //             } else {
+        //                 console.log(`TA with ID ${TAid} has no office hours data.`);
+        //                 return null;
+        //             }
+        //         } else {
+        //             console.log(`TA document with ID ${TAid} does not exist.`);
+        //             return null;
+        //         }
+        //     }));
 
-            setTASchedules(schedules.filter(Boolean));
-        } catch (error) {
-            console.error("Error fetching TA schedules:", error);
-        }
+        //     setTASchedules(schedules.filter(Boolean));
+        // } catch (error) {
+        //     console.error("Error fetching TA schedules:", error);
+        // }
     };
 
     const promoteToTA = async (studentId) => {
-        if (instructorId && auth.currentUser.uid !== instructorId) {
+        console.log(user._id === instructorId, instructorId, user._id)
+        if (instructorId && user._id !== instructorId) {
             alert('Only instructors can promote students to TAs.');
             return;
         }
 
-        const classRef = doc(db, 'classes', classId);
-        const classSnapshot = await getDoc(classRef);
-
-        if (classSnapshot.exists()) {
-            const studentList = classSnapshot.data().students;
-            const taList = classSnapshot.data().TAs;
-
-            if (studentList.includes(studentId) && !taList.includes(studentId)) {
-                // Promote the student to TA by removing them from the students list and adding them to the TAs list.
-                await updateDoc(classRef, {
-                    students: arrayRemove(studentId),
-                    TAs: arrayUnion(studentId)
-                });
-
-                // Add the student to the TAs subcollection within the class document.
-                const taRef = collection(classRef, 'TAs');
-                await setDoc(doc(taRef, studentId), {
-                    // You can add any additional fields for the TA document here.
-                });
-
-                setStudents(studentList.filter(id => id !== studentId));
-                setClassDetails({ ...classDetails, TAs: [...taList, studentId] });
-                window.location.reload();
+        changeRoleInClass(studentId, classId, "student", "TA").then(res => {
+            if(res === true) {
+                alert("success")
+                // window.location.reload()
             }
-        }
+            else {
+                alert("error")
+            }
+        })
+        // const classRef = doc(db, 'classes', classId);
+        // const classSnapshot = await getDoc(classRef);
+
+        // if (classSnapshot.exists()) {
+        //     const studentList = classSnapshot.data().students;
+        //     const taList = classSnapshot.data().TAs;
+
+        //     if (studentList.includes(studentId) && !taList.includes(studentId)) {
+        //         // Promote the student to TA by removing them from the students list and adding them to the TAs list.
+        //         await updateDoc(classRef, {
+        //             students: arrayRemove(studentId),
+        //             TAs: arrayUnion(studentId)
+        //         });
+
+        //         // Add the student to the TAs subcollection within the class document.
+        //         const taRef = collection(classRef, 'TAs');
+        //         await setDoc(doc(taRef, studentId), {
+        //             // You can add any additional fields for the TA document here.
+        //         });
+
+        //         setStudents(studentList.filter(id => id !== studentId));
+        //         setClassDetails({ ...classDetails, TAs: [...taList, studentId] });
+        //         window.location.reload();
+        //     }
+        // }
     };
 
 
@@ -236,7 +262,7 @@ const ClassDetails = () => {
                                 <p className="text-lg mb-4 text-gray-700">{classDetails.classDescription}</p>
                                 <div className="border-t border-gray-300 pt-4">
                                     <p className="text-black font-semibold">Professor:</p>
-                                    <p className="text-gray-700">{user?.firstName+" "+user?.lastName}</p>
+                                    <p className="text-gray-700">{instructorName}</p>
                                 </div>
                             </div>
 
@@ -246,31 +272,39 @@ const ClassDetails = () => {
                                 <h2 className="text-3xl font-bold mb-6">Teaching Assistants</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                                     {teachingAssistants.map((ta) => {
-                                        const taSchedule = taSchedules.find(schedule => schedule.taId === ta.id);
-                                        const isOHNow = taSchedule && isCurrentlyOH(taSchedule.ohTimes, currentTime);
-                                        return (
-                                            <div key={ta.id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
-                                                <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
-                                                {taSchedule && (
-                                                    <div className="text-center mb-4">
-                                                        <p className="font-semibold">Office Hours:</p>
-                                                        {taSchedule.ohTimes.days.map((day, index) => (
-                                                            <p key={index}>
-                                                                {day}: {formatTime24to12(taSchedule.ohTimes.start)} - {formatTime24to12(taSchedule.ohTimes.end)}
-                                                            </p>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                                <button
-                                                    // Change the color if you don't like it...
-                                                    className={`mt-auto ${isOHNow ? 'bg-green-500 hover:bg-green-700' : 'bg-indigo-500 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
-                                                    value={ta.id}
-                                                    onClick={rerouteToClassroom}
-                                                >
-                                                    {isOHNow ? 'Join Office Hours Now' : 'View Virtual Classroom'}
-                                                </button>
-                                            </div>
-                                        );
+                                        // console.log(ta)
+                                        if(ta) {
+                                            const taSchedule = taSchedules.find(schedule => schedule.taId === ta._id);
+                                            const isOHNow = taSchedule && isCurrentlyOH(taSchedule.ohTimes, currentTime);
+                                            return (
+                                                <div key={ta._id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
+                                                    <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
+                                                    {taSchedule && (
+                                                        <div className="text-center mb-4">
+                                                            <p className="font-semibold">Office Hours:</p>
+                                                            {taSchedule.ohTimes.days.map((day, index) => (
+                                                                <p key={index}>
+                                                                    {day}: {formatTime24to12(taSchedule.ohTimes.start)} - {formatTime24to12(taSchedule.ohTimes.end)}
+                                                                </p>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    <button
+                                                        // Change the color if you don't like it...
+                                                        className={`mt-auto ${isOHNow ? 'bg-green-500 hover:bg-green-700' : 'bg-indigo-500 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
+                                                        value={ta._id}
+                                                        onClick={rerouteToClassroom}
+                                                    >
+                                                        {isOHNow ? 'Join Office Hours Now' : 'View Virtual Classroom'}
+                                                    </button>
+                                                </div>
+                                            );
+                                        }
+                                        else {
+                                            return (<>
+                                            error
+                                            </>)
+                                        }
                                     })}
                                 </div>
                             </div>
@@ -281,12 +315,12 @@ const ClassDetails = () => {
                                 <h2 className="text-2xl font-bold mb-4">Students</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                     {students.map((student) => (
-                                        <div key={student.id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center">
+                                        <div key={student._id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center">
                                             <span className="text-center text-xl font-bold mb-4">{student.firstName} {student.lastName}</span>
-                                            {auth.currentUser?.uid === instructorId && (
+                                            {user?._id === instructorId && (
                                                 <button
                                                     className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                                                    onClick={() => promoteToTA(student.id)}
+                                                    onClick={() => promoteToTA(student._id)}
                                                 >
                                                     Promote to TA
                                                 </button>

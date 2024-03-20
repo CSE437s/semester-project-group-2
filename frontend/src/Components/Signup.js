@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import axios from "axios"
+import { getUser } from '../UserUtils';
 
 const Signup = () => {
     const [email, setEmail] = useState("");
@@ -11,50 +10,44 @@ const Signup = () => {
     const [lastName, setLastName] = useState("");
     const [role, setRole] = useState("student");
     const navigate = useNavigate();
-    const [checkingAuth, setCheckingAuth] = useState(true);
+    // const [checkingAuth, setCheckingAuth] = useState(true);
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCheckingAuth(false);
-            if (user) {
-                navigate('/dashboard');
-            }
-        });
-        return unsubscribe;
-    }, [navigate]);
+    // useEffect(() => {
+    //     const unsubscribe = auth.onAuthStateChanged(user => {
+    //         setCheckingAuth(false);
+    //         if (user) {
+    //             navigate('/dashboard');
+    //         }
+    //     });
+    //     return unsubscribe;
+    // }, [navigate]);
 
     const handleSignup = async (e) => {
         e.preventDefault();
-
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            console.log("Signup Success:", userCredential.user);
-            const userDocRef = doc(db, "users", userCredential.user.uid);
-
-            await setDoc(userDocRef, {
-                email: email,
-                firstName: firstName,
-                lastName: lastName,
-                role: role,
-                status: role === "instructor" ? "pending" : "approved",
-                id: userCredential.user.uid
-            });
-
-            // For instructors, check the status
-            if (role === "instructor") {
-                navigate('/pending-approval');
-            } else {
-                navigate('/dashboard');
+        axios.post("http://localhost:5050/api/signup", {
+            "email": email,
+            "password": password, 
+            "firstName": firstName,
+            "lastName": lastName,
+            "role": role,
+            "status": "approved" // TODO create approval system and remove hard coded value
+        }).then((data) => {
+            if(data.data.user) {
+                getUser(email, password).then(res => {
+                    if(!res.error) {
+                        navigate("/dashboard")
+                    }
+                })
             }
-        } catch (error) {
-            console.error("Signup Error:", error);
-            alert(error.message); // Show error message to the user
-        }
+            else if(data.error) {
+                alert("something went wrong. please try again")
+            }
+        }).catch(e => console.log(e))
     };
 
-    if (checkingAuth) {
-        return <div>Loading...</div>;
-    }
+    // if (checkingAuth) {
+    //     return <div>Loading...</div>;
+    // }
 
 
     return (
