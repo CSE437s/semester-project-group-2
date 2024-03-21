@@ -6,6 +6,7 @@ import axios from "axios";
 import OHschedule from "./OHSchedule";
 import { getCurrentUser, findUser, getAllUserHours, addUserHours } from "../UserUtils";
 // import { getClassByCode, getClassByID } from "../ClassUtils";
+import Whiteboard from "./Whiteboard";
 
 
 const Classroom = () => {

@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const multer  = require('multer')
 const path = require("path")
-const http = require("http")
 const passport = require("passport")
 const mongoose = require("mongoose")
 const session = require("express-session")
@@ -14,7 +13,6 @@ const JWTextract = require("passport-jwt").ExtractJwt
 const userModel = require("./database/models/userModel")
 const tokenModel = require("./database/models/tokenModel")
 const classModel = require("./database/models/classModel")
-const hoursModel = require("./database/models/hoursModel")
 const JWT = require("jsonwebtoken")
 const sendEmail = require("./sendEmail")
 const cors = require('cors')
@@ -51,7 +49,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        sameSite: "none"
+        sameSite: "strict"
     }
 }))
 
@@ -587,8 +585,8 @@ const printIDs = (connections) => {
 }
 io.on("connect", (socket) => {
     connections.push(socket) // keep track of all connected sockets
-    console.log("connected sockets:", printIDs(connections))
     console.log("Socket:", socket.id, "has connected")
+    console.log("connected sockets:", printIDs(connections))
     socket.on("begin-draw", (data) => {
         connections.forEach((listeningSocket)=>{
             if(listeningSocket.id !== socket.id) { // only draw the new points on the canvas' that DONT belong to original socket
