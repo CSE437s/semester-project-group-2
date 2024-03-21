@@ -7,7 +7,11 @@ const Whiteboard = (props) => {
     const [isConnected, setConnected] = useState(false)
     const canvasRef = useRef(null)
     const [context, setContext] = useState(null)
-    const socket = io("http://localhost:5050", {
+    const DEBUGGING = false;
+    const base_url = "https://carefully-certain-swift.ngrok-free.app";
+    const debugging_url = "http://localhost:5050";
+    const url = DEBUGGING ? debugging_url : base_url;
+    const socket = io(url, {
         autoConnect: false
     })
     const editWidth = (e) => {
