@@ -12,7 +12,10 @@ const Whiteboard = (props) => {
     const debugging_url = "http://localhost:5050";
     const url = DEBUGGING ? debugging_url : base_url;
     const socket = io(url, {
-        autoConnect: false
+        autoConnect: false,
+        extraHeaders: {
+            "ngrok-skip-browser-warning": true
+        }
     })
     const editWidth = (e) => {
         const percentage = e.target.value
