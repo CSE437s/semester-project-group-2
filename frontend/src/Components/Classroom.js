@@ -31,7 +31,7 @@ const Classroom = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (currentToken) {
+        if (currentToken && !user) {
             getCurrentUser().then(user => {
                 const u = user.data.user
                 setCurrentUser(u)
@@ -40,21 +40,21 @@ const Classroom = () => {
                     setIsOwner(true)
                 }
             })
-            if(user) {
-                const data = {
-                    "creator": user._id,
-                    "url": ""
-                }
-                axios.post(api_url + "/api/sendVideoURL", data, {
-                    headers: {
-                        "content-type": "application/json",
-                        Authorization: "Bearer " + currentToken,
-                        "ngrok-skip-browser-warning": true
-                    },
-                });
-            }
             // wipe any old calls on entering classroom
         }
+        // if(user) {
+        //     const data = {
+        //         "creator": user._id,
+        //         "url": ""
+        //     }
+        //     axios.post(api_url + "/api/sendVideoURL", data, {
+        //         headers: {
+        //             "content-type": "application/json",
+        //             Authorization: "Bearer " + currentToken,
+        //             "ngrok-skip-browser-warning": true
+        //         },
+        //     });
+        // }
     }, [currentToken, api_url, TAid, user]);
 
     useEffect(() => {
