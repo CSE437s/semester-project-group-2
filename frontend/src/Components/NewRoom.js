@@ -1,14 +1,19 @@
 import { JitsiMeeting } from '@jitsi/react-sdk';
-
+import {useNavigate} from "react-router-dom"
 import axios from "axios";
 
 const NewRoom = (props) => {
     // const api = useRef();
     console.log(props)
-    const DEBUGGING = true
+    const navigate = useNavigate()
+    const DEBUGGING = false
     const base_url = "https://carefully-certain-swift.ngrok-free.app"
     const debugging_url ="http://localhost:3001"
     const api_url = DEBUGGING ? debugging_url : base_url
+    const token = localStorage.getItem("token")
+    if(!token) {
+        navigate("/login")
+    }
     return (<>
     <JitsiMeeting
                 roomName = { props.roomName }
@@ -32,6 +37,7 @@ const NewRoom = (props) => {
                         axios.post(api_url + "/api/sendVideoURL", data, {
                             headers: {
                                 "content-type": "application/json",
+                                Authorization: "Bearer " + token
                             },
                         });
                     }
