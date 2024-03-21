@@ -162,6 +162,7 @@ const Whiteboard = (props) => {
         return () => {
             socket.disconnect()
         }
+        // eslint-disable-next-line
     }, [context, props.height, props.width])
     return(<>
         <p>{isConnected}</p>

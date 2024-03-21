@@ -85,8 +85,16 @@ export function getCurrentUser() {
  * @returns an object containing the user's classes or null if there was an error
  */
 export function getEnrolledCourses(userId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/userClasses", {
         id: userId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then((res) => {
         const classes = res.data.classes
         return classes
@@ -116,8 +124,16 @@ export function logout() {
  * @returns user object if user exists, null otherwise
  */
 export function findUser(userId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/findUser", {
         id: userId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then(res => {
         const user = res.data.user
         if(user) {
@@ -133,8 +149,16 @@ export function findUser(userId) {
  * @returns array of hour objects if successful, null otherwise
  */
 export function getAllUserHours(userId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/getHours", {
         userId: userId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then(res => {
         if(res.error) {
             return null;
@@ -166,11 +190,19 @@ export function getUserHoursForClass(userId, classId) {
  * @returns true if successful, false otherwise
  */
 export function addUserHours(userId, className, classId, hours) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/addHours", {
         classId: classId,
         className: className,
         userId: userId,
         hours: hours
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then(res => {
         if(res.status === 200) {
             return true
@@ -190,11 +222,19 @@ export function addUserHours(userId, className, classId, hours) {
  * @returns true if successful, false otherwise
  */
 export function changeRoleInClass(userId, classId, oldRole, newRole) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/changeRoleInClass", {
         userId: userId, 
         classId: classId,
         oldRole: oldRole,
         newRole: newRole
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then(res => {
         if(res.data.message === "successfully updated") {
             return true
@@ -211,10 +251,18 @@ export function changeRoleInClass(userId, classId, oldRole, newRole) {
  * @returns true if successful, false if something happens, error if one is caught
  */
 export function updateUserName(userId, firstName, lastName) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/updateUserName", {
         id: userId,
         firstName: firstName,
         lastName: lastName
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then(res => {
         if(res.data.message === "updated successfully") {
             return true

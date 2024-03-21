@@ -13,12 +13,20 @@ const url = DEBUGGING_MODE ? "http://localhost:5050" : "INSERTREALURL"
  * @returns true if course was created, error otherwise
  */
 export function createClass(className, classDescription, classCode, creator, instructorId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/createClass", {
         className: className,
         classDescription: classDescription,
         classCode: classCode,
         createdBy: creator,
         instructorId: instructorId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     })
     .then((res) => {
         console.log("created course successfully")
@@ -42,10 +50,18 @@ export function createClass(className, classDescription, classCode, creator, ins
  * @returns true if successfully joined, error otherwise
  */
 export function joinClass(classCode, userId, newRole) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/enrollInCourse", {
         id: userId,
         courseId: classCode,
         newRole: newRole
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then(res => {
         return true
     }).catch(e => {
@@ -59,8 +75,16 @@ export function joinClass(classCode, userId, newRole) {
  * @returns classObject if successfully found, null otherwise
  */
 export function getClassByCode(classCode) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/getClass", {
         classCode: classCode
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then(res => {
         if(res.data.class) {
             return res.data.class
@@ -77,8 +101,16 @@ export function getClassByCode(classCode) {
  * @returns class if found, null otherwise
  */
 export function getClassByID(classId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
     return axios.post(url + "/api/getClassById", {
         classId: classId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token
+        }
     }).then(res => {
         if(res.data.class) {
             return res.data.class

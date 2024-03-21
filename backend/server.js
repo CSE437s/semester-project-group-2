@@ -274,225 +274,324 @@ app.get('/api/profile', (req, res) => {
 })
 
 app.post("/api/findUser", (req, res) => {
-    userModel.findById(req.body.id).then(user => {
-        if(user) {
-            res.status(200).send({user: user})
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
         }
         else {
-            res.status(404).send({message: "user not found"})
+            userModel.findById(req.body.id).then(user => {
+                if(user) {
+                    res.status(200).send({user: user})
+                }
+                else {
+                    res.status(404).send({message: "user not found"})
+                }
+            }).catch(e => res.status(500).send({error: e}))
         }
-    }).catch(e => res.status(500).send({error: e}))
+    })(req, res)
 })
 
 app.post("/api/userClasses", (req, res) => {
-    const userId = req.body.id
-    userModel.findById(userId).then(user => {
-        if(!user) {
-            res.status(404).send({error: "user not found"})
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
         }
         else {
-            const instructorClasses = user.classesAsInstructor
-            const TAclasses = user.classesAsTA
-            const studentClasses = user.classesAsStudent
+            const userId = req.body.id
+            userModel.findById(userId).then(user => {
+                if(!user) {
+                    res.status(404).send({error: "user not found"})
+                }
+                else {
+                    const instructorClasses = user.classesAsInstructor
+                    const TAclasses = user.classesAsTA
+                    const studentClasses = user.classesAsStudent
 
-            // const classes = [
-            //     ...instructorClasses,
-            //     ...TAclasses,
-            //     ...studentClasses
-            // ]
-            const classes = {
-                instructor: instructorClasses,
-                TA: TAclasses,
-                student: studentClasses
-            }
-            res.status(200).send({classes: classes})
+                    // const classes = [
+                    //     ...instructorClasses,
+                    //     ...TAclasses,
+                    //     ...studentClasses
+                    // ]
+                    const classes = {
+                        instructor: instructorClasses,
+                        TA: TAclasses,
+                        student: studentClasses
+                    }
+                    res.status(200).send({classes: classes})
+                }
+            }).catch(e => res.status(500).send(e))
         }
-    }).catch(e => res.status(500).send(e))
+    })(req, res)
 })
 
 app.post("/api/enrollInCourse", (req, res) => {
-    const userId = req.body.id
-    const classCode = req.body.courseId
-    const roleInCourse = req.body.newRole
-    classModel.findOne({ classCode: classCode }).then(classToEnroll => {
-        if(!classToEnroll) {
-            res.status(404).send({message: "couldn't find course with this code"})
-            return
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
         }
-        const tempRole = roleInCourse.charAt(0).toUpperCase() + roleInCourse.substring(1)
-        userModel.findByIdAndUpdate(userId, {
-            $push: {["classesAs" + tempRole] : classToEnroll }
-        }).then((oldObject) => {
-            classToEnroll.updateOne({
-                $push: {[roleInCourse + "s"] : oldObject }
-            }).then(oldClass => {
-                res.status(201).send({message: "successfully updated"})
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            const userId = req.body.id
+            const classCode = req.body.courseId
+            const roleInCourse = req.body.newRole
+            classModel.findOne({ classCode: classCode }).then(classToEnroll => {
+                if(!classToEnroll) {
+                    res.status(404).send({message: "couldn't find course with this code"})
+                    return
+                }
+                const tempRole = roleInCourse.charAt(0).toUpperCase() + roleInCourse.substring(1)
+                userModel.findByIdAndUpdate(userId, {
+                    $push: {["classesAs" + tempRole] : classToEnroll }
+                }).then((oldObject) => {
+                    classToEnroll.updateOne({
+                        $push: {[roleInCourse + "s"] : oldObject }
+                    }).then(oldClass => {
+                        res.status(201).send({message: "successfully updated"})
+                    }).catch(e => res.status(500).send(e))
+                }).catch(e => res.status(500).send(e))
             }).catch(e => res.status(500).send(e))
-        }).catch(e => res.status(500).send(e))
-    }).catch(e => res.status(500).send(e))
+        }
+    })(req, res)
 })
 
 app.post("/api/createClass", (req, res) => {
-    const body = req.body
-    classModel.create({
-        className: body.className,
-        classDescription: body.classDescription,
-        classCode: body.classCode,
-        createdBy: body.createdBy,
-        instructorId: body.instructorId,
-    }).then((createdCourse) => {
-        if(createdCourse) {
-            res.status(200).send({createdClass: createdCourse})
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
         }
-    }).catch(e => {
-        console.log(e)
-        if(e.code === 11000) {
-            res.status(501).send({error: "class already exists"})
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
         }
         else {
-            res.status(500).send({error: e})
+            const body = req.body
+            classModel.create({
+                className: body.className,
+                classDescription: body.classDescription,
+                classCode: body.classCode,
+                createdBy: body.createdBy,
+                instructorId: body.instructorId,
+            }).then((createdCourse) => {
+                if(createdCourse) {
+                    res.status(200).send({createdClass: createdCourse})
+                }
+            }).catch(e => {
+                console.log(e)
+                if(e.code === 11000) {
+                    res.status(501).send({error: "class already exists"})
+                }
+                else {
+                    res.status(500).send({error: e})
+                }
+            })
         }
-    })
+    })(req, res)
 })
 
 app.post("/api/getClass", (req, res) => {
-    const classCode = req.body.classCode
-    classModel.findOne({ classCode : classCode }).then(classObject => {
-        if(classObject) {
-            res.status(200).send({class: classObject})
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
         }
-    }).catch(e => res.status(500).send(e))
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            const classCode = req.body.classCode
+            classModel.findOne({ classCode : classCode }).then(classObject => {
+                if(classObject) {
+                    res.status(200).send({class: classObject})
+                }
+            }).catch(e => res.status(500).send(e))
+        }
+    })(req, res)
 })
 
 app.post("/api/getClassById", (req, res) => {
-    const classId = req.body.classId
-    classModel.findById(classId).then(classObject => {
-        if(classObject) {
-            res.status(200).send({class: classObject})
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
         }
-    }).catch(e => res.status(500).send(e))
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            const classId = req.body.classId
+            classModel.findById(classId).then(classObject => {
+                if(classObject) {
+                    res.status(200).send({class: classObject})
+                }
+            }).catch(e => res.status(500).send(e))
+        }
+    })(req, res)
 })
 
 app.post("/api/addHours", (req, res) => {
-    userModel.findById(req.body.userId).then(user => {
-        var changed = false
-        if(user) {
-            const hours = user.hours
-            for(var i in hours) {
-                const hoursObject = hours[i]
-                if(hoursObject.classId === req.body.classId) {
-                    hours[i].hours.push({
-                        startTime: req.body.hours.startTime,
-                        endTime: req.body.hours.endTime,
-                        day: req.body.hours.day
-                    })
-                    changed = true
-                    // res.status(200).send({message: "successfully pushed new time"})
-                    // return
-                }
-            }
-            if(changed === false) {
-                hours.push({
-                    classId: req.body.classId,
-                    hours: [
-                        {
-                            startTime: req.body.hours.startTime,
-                            endTime: req.body.hours.endTime,
-                            day: req.body.hours.day
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findById(req.body.userId).then(user => {
+                var changed = false
+                if(user) {
+                    const hours = user.hours
+                    for(var i in hours) {
+                        const hoursObject = hours[i]
+                        if(hoursObject.classId === req.body.classId) {
+                            hours[i].hours.push({
+                                startTime: req.body.hours.startTime,
+                                endTime: req.body.hours.endTime,
+                                day: req.body.hours.day
+                            })
+                            changed = true
+                            // res.status(200).send({message: "successfully pushed new time"})
+                            // return
                         }
-                    ]
-                })
-            }
-            user.updateOne({hours: hours}).then(something => {
+                    }
+                    if(changed === false) {
+                        hours.push({
+                            classId: req.body.classId,
+                            hours: [
+                                {
+                                    startTime: req.body.hours.startTime,
+                                    endTime: req.body.hours.endTime,
+                                    day: req.body.hours.day
+                                }
+                            ]
+                        })
+                    }
+                    user.updateOne({hours: hours}).then(something => {
 
-                res.status(200).send({message: "created new class object"})
+                        res.status(200).send({message: "created new class object"})
+                    })
+                }
+                // res.status(500).send({error: "not"})
             })
         }
-        // res.status(500).send({error: "not"})
-    })
+    })(req, res)
 })
 
 app.post("/api/getHours",  (req, res) => {
-    const hours = []
-    userModel.findById(req.body.userId).then(async user => {
-        if(user) {
-           res.status(200).send({hours: user.hours})
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
         }
         else {
-            res.status(404).send({message: "could not locate user"})
+            userModel.findById(req.body.userId).then(async user => {
+                if(user) {
+                res.status(200).send({hours: user.hours})
+                }
+                else {
+                    res.status(404).send({message: "could not locate user"})
+                }
+            }).catch(e => res.status(500).send({error: e}))
         }
-    }).catch(e => res.status(500).send({error: e}))
+    })(req, res)
 })
 
 app.post("/api/changeRoleInClass", (req, res) => {
-    userModel.findById(req.body.userId).then(user => {
-        classModel.findById(req.body.classId).then(async course => {
-            if(user && course) {
-                const oldRole = req.body.oldRole
-                const newRole = req.body.newRole
-                var classesToSearch;
-                if(oldRole === "student") {
-                    classesToSearch = user.classesAsStudent
-                }
-                else if (oldRole === "TA") {
-                    classesToSearch = user.classesAsTA
-                }
-                else {
-                    classesToSearch = user.classesAsInstructor
-                }
-                var classesToAdd;
-                if(newRole === "student") {
-                    classesToAdd = user.classesAsStudent
-                }
-                else if (newRole === "TA") {
-                    classesToAdd = user.classesAsTA
-                }
-                else {
-                    classesToAdd = user.classesAsInstructor
-                }
-                const arrayWithOldRoleRemoved = classesToSearch.filter((c) => c._id.toString() !== req.body.classId)
-                classesToAdd.push(course)
-                const tempOldRole = oldRole.charAt(0).toUpperCase() + oldRole.substring(1)
-                const tempRole = newRole.charAt(0).toUpperCase() + newRole.substring(1)
-                const status = await user.updateOne({
-                    ["classesAs" + tempOldRole]: arrayWithOldRoleRemoved,
-                    ["classesAs" + tempRole]: classesToAdd
-                })
-                userModel.findById(req.body.userId).then(async newUser => {
-                    const removedRoster = course[oldRole + "s"].filter((u) => u._id.toString() !== req.body.userId)
-                    const updatedRoster = course[newRole + "s"]
-                    updatedRoster.push(newUser)
-                    const classStatus = await course.updateOne({
-                        [oldRole + "s"]: removedRoster,
-                        [newRole + "s"]: updatedRoster
-                    })
-                    if(classStatus && classStatus.acknowledged === true) {
-                        res.status(200).send({message: "successfully updated"})
-                    }
-                    else {
-                        res.status(500).send({message: "updating course failed"})
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findById(req.body.userId).then(user => {
+                classModel.findById(req.body.classId).then(async course => {
+                    if(user && course) {
+                        const oldRole = req.body.oldRole
+                        const newRole = req.body.newRole
+                        var classesToSearch;
+                        if(oldRole === "student") {
+                            classesToSearch = user.classesAsStudent
+                        }
+                        else if (oldRole === "TA") {
+                            classesToSearch = user.classesAsTA
+                        }
+                        else {
+                            classesToSearch = user.classesAsInstructor
+                        }
+                        var classesToAdd;
+                        if(newRole === "student") {
+                            classesToAdd = user.classesAsStudent
+                        }
+                        else if (newRole === "TA") {
+                            classesToAdd = user.classesAsTA
+                        }
+                        else {
+                            classesToAdd = user.classesAsInstructor
+                        }
+                        const arrayWithOldRoleRemoved = classesToSearch.filter((c) => c._id.toString() !== req.body.classId)
+                        classesToAdd.push(course)
+                        const tempOldRole = oldRole.charAt(0).toUpperCase() + oldRole.substring(1)
+                        const tempRole = newRole.charAt(0).toUpperCase() + newRole.substring(1)
+                        const status = await user.updateOne({
+                            ["classesAs" + tempOldRole]: arrayWithOldRoleRemoved,
+                            ["classesAs" + tempRole]: classesToAdd
+                        })
+                        userModel.findById(req.body.userId).then(async newUser => {
+                            const removedRoster = course[oldRole + "s"].filter((u) => u._id.toString() !== req.body.userId)
+                            const updatedRoster = course[newRole + "s"]
+                            updatedRoster.push(newUser)
+                            const classStatus = await course.updateOne({
+                                [oldRole + "s"]: removedRoster,
+                                [newRole + "s"]: updatedRoster
+                            })
+                            if(classStatus && classStatus.acknowledged === true) {
+                                res.status(200).send({message: "successfully updated"})
+                            }
+                            else {
+                                res.status(500).send({message: "updating course failed"})
+                            }
+                        }).catch(e => res.status(500).send({error: e}))
                     }
                 }).catch(e => res.status(500).send({error: e}))
-            }
-        }).catch(e => res.status(500).send({error: e}))
-    }).catch(e => res.status(500).send({error: e}))
+            }).catch(e => res.status(500).send({error: e}))
+        }
+    })(req, res)
 })
 
 app.post("/api/updateUserName", (req, res) => {
-    userModel.findByIdAndUpdate(req.body.id, {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName
-    }).then(r => {
-        if(r) {
-            res.status(201).send({message: "updated successfully"})
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
         }
         else {
-            res.status(500).send({message: "unable to update"})
+            userModel.findByIdAndUpdate(req.body.id, {
+                firstName: req.body.firstName,
+                lastName: req.body.lastName
+            }).then(r => {
+                if(r) {
+                    res.status(201).send({message: "updated successfully"})
+                }
+                else {
+                    res.status(500).send({message: "unable to update"})
+                }
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({error: e})
+            })
         }
-    }).catch(e => {
-        console.log(e)
-        res.status(500).send({error: e})
-    })
+    })(req, res)
 })
 
 // serve profile pictures statically 
@@ -503,20 +602,40 @@ app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles'))
 const URLs = new Map()
 
 app.post("/api/sendVideoURL", (req, res) => {
-    const callCreatedBy = req.body.creator
-    const url = req.body.url
-    URLs.set(callCreatedBy, url)
-    res.sendStatus(201)
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            const callCreatedBy = req.body.creator
+            const url = req.body.url
+            URLs.set(callCreatedBy, url)
+            res.sendStatus(201)
+        }
+    })(req, res)
 })
 
 app.post("/api/getVideoURL", (req, res) => {
-    const user = req.body.creator
-    if(URLs.has(user) == true) {
-        res.json({"url": URLs.get(user)})
-    }
-    else {
-        res.json({"error": "couldn't find a URL associated with user:"+user})
-    }
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            const user = req.body.creator
+            if(URLs.has(user) == true) {
+                res.json({"url": URLs.get(user)})
+            }
+            else {
+                res.json({"error": "couldn't find a URL associated with user:"+user})
+            }
+        }
+    })(req, res)
 })
 
 app.get("/api/logout", (req, res) => {
@@ -528,32 +647,6 @@ app.get("/api/logout", (req, res) => {
             res.status(200).send({message: "successfully logged out. be sure to remove the token from LS"})
         }
     })
-})
-
-app.post("/api/updateOHTime", (req, res)=> {
-    // TODO after MVP, move API requests to database to the backend
-    // const user = req.body.user
-    // const days = req.body.days
-    // const start = req.body.start
-    // const end = req.body.end
-    // console.log(user)
-    // const userRef = doc(db, "users", user);
-    // if(!userRef) {
-    //     res.json({"error": "cannot find user document with that user ID"})
-    //     res.sendStatus(404)
-    // }
-    // setDoc(userRef, {
-    //     OHtimes: {
-    //         days: days,
-    //         start: start,
-    //         end: end
-    //     }
-    // }, { merge: true }).then(()=>{
-    //     res.sendStatus(201)
-    // }).catch((e) => {
-    //     res.json({"systemerror": e})
-    //     res.sendStatus(400)
-    // })
 })
 
 // route for file upload
