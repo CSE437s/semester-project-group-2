@@ -13,8 +13,6 @@ export function getUser(email, pass) {
     return axios.post(url + "/api/login", {
         email: email,
         password: pass,
-    }, {
-        withCredentials: true
     })
     .then((res) => {
         if(res.data.error ===  "\"incorrect password\"") {
@@ -23,7 +21,6 @@ export function getUser(email, pass) {
         else {
             localStorage.setItem("token", res.data.token)
             return axios.get(url + "/api/profile", {
-                withCredentials: true,
                 headers: {
                     Authorization: "Bearer " + res.data.token
                 }
@@ -54,7 +51,6 @@ export function getCurrentUser() {
         return {"error": "token is not stored"}
     }
     return axios.get(url + "/api/profile", {
-        withCredentials: true,
         headers: {
             Authorization: "Bearer " + token
         }

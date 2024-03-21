@@ -31,7 +31,7 @@ const url = DEBUGGING ? "http://localhost:3000" : "https://main--437ohproject.ne
 app.use(cors({ credentials: true, origin: url}));
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
     res.header("Access-Control-Allow-Origin", url); 
-    res.header("Access-Control-Allow-Methods", "*"); 
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); 
     res.header("Access-Control-Allow-Credentials", true)
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     next();
@@ -661,7 +661,7 @@ const port = process.env.PORT || 3001
 const server = app.listen(port, () => console.log("Listening on port " + port));
 const io = require("socket.io")(server, {
     cors: {
-        "origin": "http://localhost:3000"
+        "origin": url
     }
 }) // communicate over the httpServer
 
