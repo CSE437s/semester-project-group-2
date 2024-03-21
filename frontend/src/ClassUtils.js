@@ -25,7 +25,8 @@ export function createClass(className, classDescription, classCode, creator, ins
         instructorId: instructorId
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     })
     .then((res) => {
@@ -60,7 +61,8 @@ export function joinClass(classCode, userId, newRole) {
         newRole: newRole
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(res => {
         return true
@@ -83,7 +85,8 @@ export function getClassByCode(classCode) {
         classCode: classCode
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(res => {
         if(res.data.class) {
@@ -109,7 +112,8 @@ export function getClassByID(classId) {
         classId: classId
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(res => {
         if(res.data.class) {

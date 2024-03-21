@@ -37,7 +37,8 @@ const NewRoom = (props) => {
                         axios.post(api_url + "/api/sendVideoURL", data, {
                             headers: {
                                 "content-type": "application/json",
-                                Authorization: "Bearer " + token
+                                Authorization: "Bearer " + token,
+                                "ngrok-skip-browser-warning": true
                             },
                         });
                     }

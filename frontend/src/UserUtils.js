@@ -22,7 +22,8 @@ export function getUser(email, pass) {
             localStorage.setItem("token", res.data.token)
             return axios.get(url + "/api/profile", {
                 headers: {
-                    Authorization: "Bearer " + res.data.token
+                    Authorization: "Bearer " + res.data.token,
+                    "ngrok-skip-browser-warning": true
                 }
             }).then(profileRes => {
                 if(profileRes) {
@@ -52,7 +53,8 @@ export function getCurrentUser() {
     }
     return axios.get(url + "/api/profile", {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(profileRes => {
         if(profileRes) {
@@ -89,7 +91,8 @@ export function getEnrolledCourses(userId) {
         id: userId
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then((res) => {
         const classes = res.data.classes
@@ -128,7 +131,8 @@ export function findUser(userId) {
         id: userId
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(res => {
         const user = res.data.user
@@ -153,7 +157,8 @@ export function getAllUserHours(userId) {
         userId: userId
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(res => {
         if(res.error) {
@@ -197,7 +202,8 @@ export function addUserHours(userId, className, classId, hours) {
         hours: hours
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(res => {
         if(res.status === 200) {
@@ -229,7 +235,8 @@ export function changeRoleInClass(userId, classId, oldRole, newRole) {
         newRole: newRole
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(res => {
         if(res.data.message === "successfully updated") {
@@ -257,7 +264,8 @@ export function updateUserName(userId, firstName, lastName) {
         lastName: lastName
     }, {
         headers: {
-            Authorization: "Bearer " + token
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
         }
     }).then(res => {
         if(res.data.message === "updated successfully") {

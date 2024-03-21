@@ -1,16 +1,23 @@
 import axios from "axios"
 
 const ResetPassword = () => {
+    const DEBUGGING_MODE = false
+    const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
+
     const onFormSubmit = (e) => {
         e.preventDefault()
         const URLsearcher = new URLSearchParams(window.location.search)
         const token = URLsearcher.get("token")
         const userID = URLsearcher.get("user")
         const newPassword = e.target.newPassword.value
-        axios.post("http://localhost:5050/api/resetPassword", {
+        axios.post(url + "/api/resetPassword", {
             id: userID,
             token: token,
             newPassword: newPassword
+        }, {
+            headers: {
+                "ngrok-skip-browser-warning": true
+            }
         }).then(res => console.log(res)).catch(e => console.log(e))
     }
     return (<>

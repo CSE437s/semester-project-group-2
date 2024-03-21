@@ -10,6 +10,9 @@ const Signup = () => {
     const [lastName, setLastName] = useState("");
     const [role, setRole] = useState("student");
     const navigate = useNavigate();
+    const DEBUGGING_MODE = false
+    const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
+
     // const [checkingAuth, setCheckingAuth] = useState(true);
 
     // useEffect(() => {
@@ -24,13 +27,17 @@ const Signup = () => {
 
     const handleSignup = async (e) => {
         e.preventDefault();
-        axios.post("http://localhost:5050/api/signup", {
+        axios.post(url +"/api/signup", {
             "email": email,
             "password": password, 
             "firstName": firstName,
             "lastName": lastName,
             "role": role,
             "status": "approved" // TODO create approval system and remove hard coded value
+        }, {
+            headers: {
+                "ngrok-skip-browser-warning": true
+            }
         }).then((data) => {
             if(data.data.user) {
                 getUser(email, password).then(res => {

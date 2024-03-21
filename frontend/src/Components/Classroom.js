@@ -48,6 +48,7 @@ const Classroom = () => {
                 axios.post(api_url + "/api/sendVideoURL", data, {
                     headers: {
                         "content-type": "application/json",
+                        "ngrok-skip-browser-warning": true
                     },
                 });
             }
@@ -90,6 +91,7 @@ const Classroom = () => {
         axios.post(api_url + "/api/getVideoURL", { "creator": roomOwner }, {
             headers: {
                 "content-type": "application/json",
+                "ngrok-skip-browser-warning": true
             },
         }).then((res) => {
             if(res.data.url !== "") {
