@@ -18,49 +18,51 @@ const Dashboard = () => {
 
 
   useEffect(() => {
-    const currentUser = getCurrentUser()
-    console.log(currentUser)
-    if(!currentToken) {
-      navigate("/login")
-    }
-    if(currentUser.error) {
-      return;
-    }
-    currentUser.then(userObject => {
-      console.log(userObject)
-      if(userObject.status) {
-        if(userObject.status === 401) {
-          logout().then(res => {
-            if(res === true) {
-              navigate("/login")
-            }
-            else {
-              alert("something has gone wrong. pls close and try again")
-              return;
-            }
+    if(!user) {
+      const currentUser = getCurrentUser()
+      console.log(currentUser)
+      if(!currentToken) {
+        navigate("/login")
+      }
+      if(currentUser.error) {
+        return;
+      }
+      currentUser.then(userObject => {
+        console.log(userObject)
+        if(userObject.status) {
+          if(userObject.status === 401) {
+            logout().then(res => {
+              if(res === true) {
+                navigate("/login")
+              }
+              else {
+                alert("something has gone wrong. pls close and try again")
+                return;
+              }
+            })
+          }
+        }
+        if(userObject.data && userObject.data.user) {
+          const currentUser = userObject.data.user
+          setUser(currentUser)
+          // get user's classes
+          getEnrolledCourses(currentUser._id).then(courses => {
+            setUserClasses(courses)
+            setIsLoading(false)
           })
         }
-      }
-      if(userObject.data && userObject.data.user) {
-        const currentUser = userObject.data.user
-        setUser(currentUser)
-        // get user's classes
-        getEnrolledCourses(currentUser._id).then(courses => {
-          setUserClasses(courses)
-          setIsLoading(false)
-        })
-      }
-      else if (userObject.message) {
-        console.log(userObject)
-        // if(userObject.error.response.data.error === "invalid auth") {
-        //   console.log("auth token has expired")
+        else if (userObject.message) {
+          console.log(userObject)
+          // if(userObject.error.response.data.error === "invalid auth") {
+          //   console.log("auth token has expired")
+          // }
+        }
+        // else {
+        //   navigate("/login")
         // }
-      }
-      // else {
-      //   navigate("/login")
-      // }
-    }).catch(e => console.log(e))
-}, [navigate, currentToken])
+      }).catch(e => console.log(e))
+    }
+}, [navigate, currentToken, user])
 
 
   const handleCreateClassSubmit = async (e) => {

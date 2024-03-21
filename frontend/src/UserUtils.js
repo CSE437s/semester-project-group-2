@@ -1,7 +1,8 @@
 import axios from "axios"
 
 const DEBUGGING_MODE = false
-const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
+// const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
+const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://old-books-spend.loca.lt"
 
 /**
  * getUser helper function
