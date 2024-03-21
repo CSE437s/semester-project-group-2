@@ -11,7 +11,7 @@ const Whiteboard = (props) => {
     const base_url = "https://carefully-certain-swift.ngrok-free.app";
     const debugging_url = "http://localhost:5050";
     const url = DEBUGGING ? debugging_url : base_url;
-    const socket = io(url, {
+    const socket = io({
         autoConnect: false
     })
     const editWidth = (e) => {
