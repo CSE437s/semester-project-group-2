@@ -9,7 +9,7 @@ const Whiteboard = (props) => {
     const [context, setContext] = useState(null)
     const DEBUGGING = false;
     // const base_url = "wss://carefully-certain-swift.ngrok-free.app";
-    const base_url = "https://old-books-spend.loca.lt"
+    const base_url = "https://silly-ads-taste.loca.lt"
     const debugging_url = "http://localhost:5050";
     const url = DEBUGGING ? debugging_url : base_url;
     const socket = io(url, {
