@@ -8,7 +8,7 @@ import Home from "./Components/Home"
 import Dashboard from './Components/Dashboard';
 import UserDetails from './Components/UserDetails';
 import ClassDetails from './Components/ClassDetails';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Classroom from "./Components/Classroom"
 import CreateClassForm from "./Components/CreateClassForm";
 import Whiteboard from './Components/Whiteboard';

@@ -8,11 +8,6 @@ axios.defaults.withCredentials = true
 const Login = () => {
     const navigate = useNavigate();
     const [checkingAuth, setCheckingAuth] = useState(true);
-    const [email, setEmail] = useState("");
-    const DEBUGGING = false
-    const url = "https://carefully-certain-swift.ngrok-free.app"
-    const debugging_url = "http://localhost:3001"
-    const base_url = DEBUGGING ? debugging_url : url
     const currentToken = localStorage.getItem("token")
 
     useEffect(() => {
