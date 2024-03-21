@@ -48,6 +48,7 @@ const Classroom = () => {
                 axios.post(api_url + "/api/sendVideoURL", data, {
                     headers: {
                         "content-type": "application/json",
+                        Authorization: "Bearer " + currentToken,
                         "ngrok-skip-browser-warning": true
                     },
                 });
