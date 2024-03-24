@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import LogoutButton from './LogoutButton';
 import NewRoom from "./NewRoom";
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -7,21 +7,26 @@ import OHschedule from "./OHSchedule";
 import { getCurrentUser, findUser, getAllUserHours, addUserHours } from "../UserUtils";
 // import { getClassByCode, getClassByID } from "../ClassUtils";
 import Whiteboard from "./Whiteboard";
+import Header from "./Header";
+import Draggable, {DraggableCore} from "react-draggable";
 
 
 const Classroom = () => {
-    const DEBUGGING = false;
+    const DEBUGGING = process.env.REACT_APP_DEBUGGING;
     const base_url = "https://carefully-certain-swift.ngrok-free.app";
     const debugging_url = "http://localhost:5050";
     const api_url = DEBUGGING ? debugging_url : base_url;
     const [room, createRoom] = useState(undefined);
     // eslint-disable-next-line
     const [name, setName] = useState("");
+    const [editMode, setEditMode] = useState(false)
     const [roomURL, setRoomURL] = useState("")
     const [user, setCurrentUser] = useState(null);
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
     const [isOwner, setIsOwner] = useState(false);
-    const { classId, TAid } = useParams();
+    const whiteboardRef = useRef(null)
+    const [elementsCoordinates, setElementsCoordinates] = useState([{ name: "Whiteboard", x: 0, y: 0}, {name: "VideoCall", x: 0, y:0}])
+    const {  TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
     const currentToken = localStorage.getItem("token");
     // const isOwner = currentUser._id === TAid; // Determine if current user is the owner of the classroom
@@ -30,6 +35,14 @@ const Classroom = () => {
 
     const navigate = useNavigate();
 
+
+    const findCoordinates = (name) => {
+        for(var i in elementsCoordinates) {
+            if(elementsCoordinates[i].name === name) {
+                return elementsCoordinates[i]
+            }
+        }
+    }
     useEffect(() => {
         if (currentToken && !user) {
             getCurrentUser().then(user => {
@@ -81,7 +94,7 @@ const Classroom = () => {
         }).catch((error) => {
             console.log("Error getting TA document:", error);
         });
-    }, [classId, TAid]); // Dependencies: classId and TAid
+    }, [TAid]); // Dependencies: classId and TAid
 
     const handleSubmit = (e) => {
         const newRoomName = Math.random() * 1000 + "." + Date.now();
@@ -147,17 +160,18 @@ const Classroom = () => {
         const end_time = e.target.end_time.value;
          for(var i in dates) {
             const date = dates[i]
-            const status = await addUserHours(user._id, "", classId, {
-                day: date,
-                startTime: start_time,
-                endTime: end_time
-            })
-            if(status === true) {
-                alert("success")
-            }
-            else {
-                alert("Something went wrong please try again")
-            }
+            // figure out how to get class id if classroom is just for TA 
+            // const status = await addUserHours(user._id, "", classId, {
+            //     day: date,
+            //     startTime: start_time,
+            //     endTime: end_time
+            // })
+            // if(status === true) {
+            //     alert("success")
+            // }
+            // else {
+            //     alert("Something went wrong please try again")
+            // }
         }
         dates = [];
     };
@@ -277,44 +291,47 @@ const Classroom = () => {
             </form>
         </div>
     }
-// );
 
+    const handleDrag = (e) => {
+        console.log(e)
+
+    }
     return (
         <div className="font-mono">
-            <header className="bg-indigo-300 p-0 py-5">
-                <div className="container flex justify-between items-center max-w-full">
-                    <Link to="/home">
-                        <div className="flex items-center">
-                            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
-                        </div>
-                    </Link>
-                    <div>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/dashboard")}
-                        >
-                            Back to Dashboard
-                        </button>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/me")}
-                        >
-                            My Profile
-                        </button>
-
-                        <LogoutButton />
-                    </div>
-                </div>
-            </header>
-
+            <Header user={user} />
+            <button onClick={() => {
+                setEditMode(!editMode)
+            }}> { editMode === true ? "done" : "edit" }</button>
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
-                {render}
-                <Whiteboard width={1000} height={500}/>
+                <Draggable 
+                    defaultPosition={{x: 5, y: 5}}
+                    // handle=".handle"
+                    disabled={!editMode}
+                    grid={[20, 20]}
+                   
+                > 
+                    <div className="handle">
+                        {render}
+                    </div> 
+                </Draggable>
+                <Draggable  
+                    defaultPosition={{x: 10, y:30}}
+                    disabled={!editMode}
+                    handle="#handle"
+                    grid={[20, 20]}
+                    onDrag={handleDrag}
+                >
+                    <div ref={whiteboardRef}>
+                        <div id="handle" className="bg-gray-500 p-3 w-full">
+
+                        </div>
+                        <Whiteboard width={1000} height={500}/>
+                    </div>
+                </Draggable>
                 {timeCard}
                 {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
-            </div>
+             </div>
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import {useRef, useEffect, useState} from "react"
+import {useRef, useEffect, useState, Component} from "react"
 import { io } from "socket.io-client"
 //BOY did a lot of things help me with this
 //canvas help: https://www.w3schools.com/html/html5_canvas.asp
@@ -7,7 +7,7 @@ const Whiteboard = (props) => {
     const [isConnected, setConnected] = useState(false)
     const canvasRef = useRef(null)
     const [context, setContext] = useState(null)
-    const DEBUGGING = false;
+    const DEBUGGING = process.env.REACT_APP_DEBUGGING;;
     const base_url = "wss://carefully-certain-swift.ngrok-free.app";
     const debugging_url = "http://localhost:5050";
     const url = DEBUGGING ? debugging_url : base_url;
@@ -69,21 +69,22 @@ const Whiteboard = (props) => {
     }
     useEffect(()=>{
         const canvasObject = canvasRef.current  
+        const topOffset = props.y
+        const leftOffset = props.x
         const localContext = canvasObject.getContext("2d")
         if(context === null) {
             setContext(canvasObject.getContext("2d"))
         }
         canvasObject.width = props.width
         canvasObject.height = props.height
-        const xOffset = canvasRef.current.offsetLeft
-        const yOffset = canvasRef.current.offsetTop
         let mouseDown = false
         if(!canvasObject || canvasObject === null) {
             return
         }
         window.onmousedown = (e) => {
-            var x = e.pageX - xOffset  // get starting coordinates
-            var y = e.pageY - yOffset 
+            var x = e.offsetX //  get starting coordinates
+            var y =  e.offsetY 
+            console.log(x,y )
             mouseDown = true // mark that we have placed the pen down
             if(x >= 0 && x < props.width && y >= 0 && y < props.height) {
 
@@ -105,8 +106,8 @@ const Whiteboard = (props) => {
         }
         window.onmousemove = (e) => {
             if(mouseDown === true) {
-                var x = e.pageX - xOffset  // get starting coordinates
-                var y = e.pageY - yOffset
+                var x = e.offsetX  // get starting coordinates
+                var y = e.offsetY
                 if(x < 0) {
                     x = 0
                 }
@@ -172,14 +173,15 @@ const Whiteboard = (props) => {
         // eslint-disable-next-line
     }, [context, props.height, props.width])
     return(<>
-        <p>{isConnected}</p>
-        <canvas ref={canvasRef} />
-        <button onClick={getChangeColor} value="red">red </button>
-        <button onClick={getChangeColor} value="blue">blue </button>
-        <button onClick={getChangeColor} value="black">black </button>
-        <button onClick={getChangeColor} value="erase">erase</button>
-        <button onClick={clear} value="clear">clear</button>
-        <input type="range" min="1" max="100" onChange={editWidth}/>
+    <div className="border-8 border-gray-300 p-2 rounded block w-fit h-fit">
+        <canvas ref={canvasRef} width={props.width} height={props.height}/>
+        <button onClick={getChangeColor} value="red" className="border-2 rounded-full bg-red-600 p-3 m-2"> </button>
+        <button onClick={getChangeColor} value="blue" className="border-2 rounded-full bg-blue-600 p-3 m-2"> </button>
+        <button onClick={getChangeColor} value="black" className="border-2 rounded-full bg-black p-3 m-2"></button>
+        <button onClick={getChangeColor} value="erase" className="bg-eraser p-4 bg-no-repeat bg-cover m-2"></button>
+        <button onClick={clear} value="clear" className="bg-clear p-3 bg-no-repeat bg-cover m-2"></button>
+        <input type="range" min="1" max="100" className="m-2" onChange={editWidth}/>
+    </div>
     </>)
 }
 

@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const ForgotPassword = () => {
-    const DEBUGGING_MODE = false
+    const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING;
     const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
 
     const initiateReset = (e) => {

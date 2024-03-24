@@ -10,7 +10,7 @@ const Signup = () => {
     const [lastName, setLastName] = useState("");
     const [role, setRole] = useState("student");
     const navigate = useNavigate();
-    const DEBUGGING_MODE = false
+    const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING;
     const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
 
     // const [checkingAuth, setCheckingAuth] = useState(true);
