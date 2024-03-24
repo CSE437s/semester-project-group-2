@@ -4,6 +4,7 @@ import LogoutButton from "./LogoutButton";
 import { Link } from "react-router-dom";
 import { getCurrentUser, getEnrolledCourses, logout } from "../UserUtils"
 import {createClass, joinClass} from "../ClassUtils"
+import Header from "./Header";
 
 const Dashboard = () => {
   const [className, setClassName] = useState("");
@@ -13,9 +14,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [userClasses, setUserClasses] = useState([]);
+  const [hasClassroom, setHasClassroom] = useState(false)
   const [user, setUser] = useState(null)
   const currentToken = localStorage.getItem("token")
-
 
   useEffect(() => {
     if(!user) {
@@ -29,7 +30,7 @@ const Dashboard = () => {
       }
       currentUser.then(userObject => {
         console.log(userObject)
-        if(userObject.status) {
+        if(userObject.status) { // if there was an error in the backend
           if(userObject.status === 401) {
             logout().then(res => {
               if(res === true) {
@@ -44,6 +45,11 @@ const Dashboard = () => {
         }
         if(userObject.data && userObject.data.user) {
           const currentUser = userObject.data.user
+
+          if(currentUser.classesAsTA.length > 0 || currentUser.classesAsInstructor.length > 0) {
+            setHasClassroom(true)
+          }
+
           setUser(currentUser)
           // get user's classes
           getEnrolledCourses(currentUser._id).then(courses => {
@@ -53,13 +59,7 @@ const Dashboard = () => {
         }
         else if (userObject.message) {
           console.log(userObject)
-          // if(userObject.error.response.data.error === "invalid auth") {
-          //   console.log("auth token has expired")
-          // }
         }
-        // else {
-        //   navigate("/login")
-        // }
       }).catch(e => console.log(e))
     }
 }, [navigate, currentToken, user])
@@ -126,26 +126,7 @@ const Dashboard = () => {
 
   return (
     <div className="font-mono">
-      <header className="bg-indigo-300 p-0 py-5">
-        <div className="container flex justify-between items-center max-w-full">
-
-          <Link to="/home"><div className="flex items-center">
-            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
-            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
-          </div></Link>
-
-          <div>
-            <button
-              className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-              onClick={() => navigate("/me")}
-            >
-              My Profile
-            </button>
-            <LogoutButton />
-
-          </div>
-        </div>
-      </header>
+      <Header user={user} />
 
       <div className="font-mono container mx-auto mt-6 p-10 ">
 

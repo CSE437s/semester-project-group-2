@@ -1,12 +1,14 @@
 import { JitsiMeeting } from '@jitsi/react-sdk';
 import {useNavigate} from "react-router-dom"
 import axios from "axios";
+// import Draggable, {DraggableCore} from "react-draggable";
+
 
 const NewRoom = (props) => {
     // const api = useRef();
     console.log(props)
     const navigate = useNavigate()
-    const DEBUGGING = false
+    const DEBUGGING = process.env.REACT_APP_DEBUGGING;
     const base_url = "https://carefully-certain-swift.ngrok-free.app"
     const debugging_url ="http://localhost:3001"
     const api_url = DEBUGGING ? debugging_url : base_url

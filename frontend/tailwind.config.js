@@ -4,7 +4,12 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        "eraser": "url('../public/eraser.svg')",
+        "clear": "url('../public/clear.svg')"
+      }
+    },
   },
   plugins: [],
 }
