@@ -4,7 +4,7 @@ import NewRoom from "./NewRoom";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from "axios";
 import OHschedule from "./OHSchedule";
-import { getCurrentUser, findUser, getAllUserHours, addUserHours } from "../UserUtils";
+import { getCurrentUser, findUser, getAllUserHours, addUserHours, getClassroomComponents } from "../UserUtils";
 // import { getClassByCode, getClassByID } from "../ClassUtils";
 import Whiteboard from "./Whiteboard";
 import Header from "./Header";
@@ -24,8 +24,7 @@ const Classroom = () => {
     const [user, setCurrentUser] = useState(null);
     const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
     const [isOwner, setIsOwner] = useState(false);
-    const whiteboardRef = useRef(null)
-    const [elementsCoordinates, setElementsCoordinates] = useState([{ name: "Whiteboard", x: 0, y: 0}, {name: "VideoCall", x: 0, y:0}])
+    const [elements, setElements] = useState([])
     const {  TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
     const currentToken = localStorage.getItem("token");
@@ -35,14 +34,6 @@ const Classroom = () => {
 
     const navigate = useNavigate();
 
-
-    const findCoordinates = (name) => {
-        for(var i in elementsCoordinates) {
-            if(elementsCoordinates[i].name === name) {
-                return elementsCoordinates[i]
-            }
-        }
-    }
     useEffect(() => {
         if (currentToken && !user) {
             getCurrentUser().then(user => {
@@ -53,21 +44,13 @@ const Classroom = () => {
                     setIsOwner(true)
                 }
             })
-            // wipe any old calls on entering classroom
+            if(elements.length === 0) {
+                getClassroomComponents().then(components => {
+                    console.log(components)
+                    setElements(components)
+                })
+            }
         }
-        // if(user) {
-        //     const data = {
-        //         "creator": user._id,
-        //         "url": ""
-        //     }
-        //     axios.post(api_url + "/api/sendVideoURL", data, {
-        //         headers: {
-        //             "content-type": "application/json",
-        //             Authorization: "Bearer " + currentToken,
-        //             "ngrok-skip-browser-warning": true
-        //         },
-        //     });
-        // }
     }, [currentToken, api_url, TAid, user]);
 
     useEffect(() => {
@@ -115,19 +98,6 @@ const Classroom = () => {
             console.log(e);
         });
     };
-    if (isLoading) {
-        return (
-          <div className="flex justify-center items-center h-screen">
-            <div className="flex justify-center items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
-              </svg>
-            </div>
-          </div>
-        );
-      }
-
     var dates = [];
     const removeElement = (element) => {
         const newDates = [];
@@ -175,6 +145,19 @@ const Classroom = () => {
         }
         dates = [];
     };
+    if (isLoading) {
+        return (
+          <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center">
+              <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
+              </svg>
+            </div>
+          </div>
+        );
+      }
+
 
     let render;
     let timeCard;
@@ -304,7 +287,27 @@ const Classroom = () => {
             }}> { editMode === true ? "done" : "edit" }</button>
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
-                <Draggable 
+                { 
+                    elements.map((element) => {
+                        console.log(element)
+                        if(element.name === "Whiteboard") {
+                            return <Draggable defaultPosition={{x: element.x, y:element.y}} disabled={!editMode && isOwner} grid={[20,20]} handle="#handle">
+                                <div>
+                                    <div id="handle" className="bg-gray-500 p-3 w-full">
+
+                                    </div>
+                                    <Whiteboard width={element.width} height={element.height}/>
+                                </div>
+                            </Draggable>
+                        }
+                        else {
+                            return <Draggable defaultPosition={{x: element.x, y:element.y}} disabled={!editMode && isOwner} grid={[20,20]}>
+                                {render}
+                            </Draggable>
+                        }
+                    })
+                }
+                {/* <Draggable 
                     defaultPosition={{x: 5, y: 5}}
                     // handle=".handle"
                     disabled={!editMode}
@@ -330,7 +333,7 @@ const Classroom = () => {
                     </div>
                 </Draggable>
                 {timeCard}
-                {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>}
+                {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>} */}
              </div>
         </div>
     );

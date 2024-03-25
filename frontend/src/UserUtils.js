@@ -276,3 +276,55 @@ export function updateUserName(userId, firstName, lastName) {
         return false
     }).catch(e => e)
 }
+
+/**
+ *  adds a classroom to users account
+ * @param type 
+ * @param x 
+ * @param y 
+ * @param width 
+ * @param height 
+ * @returns true if successful, false otherwise
+ */
+export function addClassroomComponent(type, x, y, width, height) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/addClassroomComponent", {
+        componentName: type,
+        x: x, 
+        y: y,
+        width: width,
+        height: height
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.data.status === 200) {
+            return true
+        }
+        return false
+    }).catch(e => false)
+}
+
+/**
+ * gets all components in a users classrooms
+ * @returns components if successful, error object otherwise
+ */
+export function getClassroomComponents() {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "no auth token available"}
+    }
+    return axios.get(url + "/api/getClassroomComponents", {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        return result.data.components
+    }).catch(e => e)
+}

@@ -24,8 +24,6 @@ var store = multer.diskStorage({
     }
 });
 
-console.log(process.env)
-
 const upload = multer({ store: store } )
 const DEBUGGING = process.env.DEBUGGING
 const url = DEBUGGING ? "http://localhost:3000" : "https://main--437ohproject.netlify.app" // where the request is coming from (frontend)
@@ -591,6 +589,47 @@ app.post("/api/updateUserName", (req, res) => {
                 console.log(e)
                 res.status(500).send({error: e})
             })
+        }
+    })(req, res)
+})
+
+app.post("/api/addClassroomComponent", (req, res) => {
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findByIdAndUpdate(user._id, {
+                $push: {
+                    classroomComponents: {
+                        name: req.body.componentName,
+                        x: req.body.x,
+                        y: req.body.y,
+                        width: req.body.width,
+                        height: req.body.height
+                    }
+                }
+            }).then(r => {
+                console.log("success")
+                res.sendStatus(200)
+            }).catch(e => res.status(500).send({error: e}))
+        }
+    })(req, res)
+})
+
+app.get("/api/getClassroomComponents", (req, res) => {
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            res.status(200).send({components: user.classroomComponents})
         }
     })(req, res)
 })
