@@ -569,6 +569,7 @@ app.post("/api/changeRoleInClass", (req, res) => {
 })
 
 app.post("/api/updateUserName", (req, res) => {
+    console.log("we get to server.js");
     passport.authenticate("jwt", {session: false}, (error, user) => {
         if(error) {
             res.status(500).send({error: error})
@@ -580,6 +581,33 @@ app.post("/api/updateUserName", (req, res) => {
             userModel.findByIdAndUpdate(req.body.id, {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName
+            }).then(r => {
+                if(r) {
+                    res.status(201).send({message: "updated successfully"})
+                }
+                else {
+                    res.status(500).send({message: "unable to update"})
+                }
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({error: e})
+            })
+        }
+    })(req, res)
+})
+
+app.post("/api/updateUserBio", (req, res) => {
+    console.log("we get to server.js");
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findByIdAndUpdate(req.body.id, {
+                bio: req.body.bio
             }).then(r => {
                 if(r) {
                     res.status(201).send({message: "updated successfully"})
@@ -649,6 +677,7 @@ app.get("/api/logout", (req, res) => {
         }
     })
 })
+
 
 // route for file upload
 app.post("/api/fileUpload", upload.single('myFile'), (req, res, next) => {

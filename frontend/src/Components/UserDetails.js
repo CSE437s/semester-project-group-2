@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
-import { getCurrentUser, updateUserName } from "../UserUtils";
+import { getCurrentUser, updateUserName, updateUserBio } from "../UserUtils";
 
 // const cleanFileName = (fileName) => {
 //     var newFileName = ""
@@ -52,7 +52,11 @@ const UserDetails = () => {
             // await updateDoc(userDocRef, {
             //     "profileDetails.bio": bio
             // });
+            console.log(bio);
             setEditingBio(false);
+            updateBio();
+            
+
         } catch (error) {
             console.error("Error updating bio:", error);
             alert("Failed to update bio. Please try again.");
@@ -164,6 +168,21 @@ const UserDetails = () => {
             alert("Failed to update user information. Please try again.");
         }
     };
+
+    const updateBio = async () => {
+        try {
+            updateUserBio(user._id, bio).then(res => {
+                console.log(res)
+                if (res === true) {
+                    alert("success")
+                }
+            }).catch(e => console.log(e))
+            navigate("/me");
+        } catch (error) {
+            console.error("Error updating user bio:", error);
+            alert("Failed to update user bio. Please try again.");
+        }
+    }
 
     return (
         <div className="font-mono">
