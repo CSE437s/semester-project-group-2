@@ -1,7 +1,6 @@
 import axios from "axios"
 
 const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING
-console.log(process.env)
 const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
 // const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://silly-ads-taste.loca.lt"
 
@@ -314,12 +313,14 @@ export function addClassroomComponent(type, x, y, width, height) {
  * gets all components in a users classrooms
  * @returns components if successful, error object otherwise
  */
-export function getClassroomComponents() {
+export function getClassroomComponents(userId) {
     const token = localStorage.getItem("token")
     if(!token) {
         return {error: "no auth token available"}
     }
-    return axios.get(url + "/api/getClassroomComponents", {
+    return axios.post(url + "/api/getClassroomComponents", {
+        userId: userId
+    }, {
         headers: {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true
@@ -327,4 +328,30 @@ export function getClassroomComponents() {
     }).then(result => {
         return result.data.components
     }).catch(e => e)
+}
+
+/**
+ * reset user components to new array
+ * @param  newComponents 
+ * @returns true if successful, false otherwise
+ */
+export function setClassroomComponents(newComponents) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/setClassroomComponents", {
+        newComponents: newComponents
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        console.log(result)
+        if(result.status === 200) {
+            return true
+        }
+        return false
+    }).catch(e => false)
 }

@@ -1,4 +1,4 @@
-import {useRef, useEffect, useState, Component} from "react"
+import {useRef, useEffect, useState} from "react"
 import { io } from "socket.io-client"
 //BOY did a lot of things help me with this
 //canvas help: https://www.w3schools.com/html/html5_canvas.asp
@@ -69,8 +69,6 @@ const Whiteboard = (props) => {
     }
     useEffect(()=>{
         const canvasObject = canvasRef.current  
-        const topOffset = props.y
-        const leftOffset = props.x
         const localContext = canvasObject.getContext("2d")
         if(context === null) {
             setContext(canvasObject.getContext("2d"))
@@ -84,9 +82,8 @@ const Whiteboard = (props) => {
         window.onmousedown = (e) => {
             var x = e.offsetX //  get starting coordinates
             var y =  e.offsetY 
-            console.log(x,y )
             mouseDown = true // mark that we have placed the pen down
-            if(x >= 0 && x < props.width && y >= 0 && y < props.height) {
+            if(e.target.id === "canvas" && x >= 0 && x < props.width && y >= 0 && y < props.height) {
 
                 localContext.moveTo(x, y) // start our drawing at current coordinates
                 localContext.beginPath()
@@ -108,26 +105,19 @@ const Whiteboard = (props) => {
             if(mouseDown === true) {
                 var x = e.offsetX  // get starting coordinates
                 var y = e.offsetY
-                if(x < 0) {
-                    x = 0
+                console.log("!!", x, y)
+                if(x < 0 || x > props.width || y > props.height || y < 0) {
+                    mouseDown = false
+                    return
                 }
-                else if(x > props.width) {
-                    x = props.width
-                }
-                if(y < 0) {
-                    y = 0
-                }
-                else if(y > props.height) {
-                    y = props.height
-                }
-                if(y >= 0 && y <= props.height) {
+                // if(y >= 0 && y <= props.height) {
                     socket.emit("end-draw", { // alert all of the other sockets that we have drawn something and have them display it
                         "x": x,
                         "y": y,
                     })
                     localContext.lineTo(x, y);
                     localContext.stroke()
-                }
+                // }
             }
             else {
                 socket.emit("closePath")
@@ -173,15 +163,15 @@ const Whiteboard = (props) => {
         // eslint-disable-next-line
     }, [context, props.height, props.width])
     return(<>
-    <div className="border-8 border-gray-300 p-2 rounded block w-fit h-fit">
-        <canvas ref={canvasRef} width={props.width} height={props.height}/>
-        <button onClick={getChangeColor} value="red" className="border-2 rounded-full bg-red-600 p-3 m-2"> </button>
-        <button onClick={getChangeColor} value="blue" className="border-2 rounded-full bg-blue-600 p-3 m-2"> </button>
-        <button onClick={getChangeColor} value="black" className="border-2 rounded-full bg-black p-3 m-2"></button>
-        <button onClick={getChangeColor} value="erase" className="bg-eraser p-4 bg-no-repeat bg-cover m-2"></button>
-        <button onClick={clear} value="clear" className="bg-clear p-3 bg-no-repeat bg-cover m-2"></button>
-        <input type="range" min="1" max="100" className="m-2" onChange={editWidth}/>
-    </div>
+        {isConnected ? <div className="border-8 border-gray-300 rounded block w-fit h-fit">
+            <canvas id="canvas" ref={canvasRef} width={props.width} height={props.height}/>
+            <button onClick={getChangeColor} value="red" className="border-2 rounded-full bg-red-600 p-3 m-2"> </button>
+            <button onClick={getChangeColor} value="blue" className="border-2 rounded-full bg-blue-600 p-3 m-2"> </button>
+            <button onClick={getChangeColor} value="black" className="border-2 rounded-full bg-black p-3 m-2"></button>
+            <button onClick={getChangeColor} value="erase" className="bg-eraser p-4 bg-no-repeat bg-cover m-2"></button>
+            <button onClick={clear} value="clear" className="bg-clear p-3 bg-no-repeat bg-cover m-2"></button>
+            <input type="range" min="1" max="100" className="m-2" onChange={editWidth}/>
+        </div> : <> Loading </>}
     </>)
 }
 

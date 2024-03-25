@@ -620,7 +620,7 @@ app.post("/api/addClassroomComponent", (req, res) => {
     })(req, res)
 })
 
-app.get("/api/getClassroomComponents", (req, res) => {
+app.post("/api/getClassroomComponents", (req, res) => {
     passport.authenticate("jwt", {session: false}, (error, user) => {
         if(error) {
             res.status(500).send({error: error})
@@ -629,7 +629,27 @@ app.get("/api/getClassroomComponents", (req, res) => {
             res.status(401).send({error: "invalid auth"})
         }
         else {
-            res.status(200).send({components: user.classroomComponents})
+            userModel.findById(req.body.userId).then(TAuser => {       
+                res.status(200).send({components: TAuser.classroomComponents})
+            }).catch(e => res.status(500).send({error: e}))
+        }
+    })(req, res)
+})
+
+app.post("/api/setClassroomComponents", (req, res) => {
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findByIdAndUpdate(user._id, {
+                classroomComponents: req.body.newComponents
+            }).then(r => {
+                res.status(200).send({message: "updated"})
+            }).catch(e => res.status(500).send({error: e}))
         }
     })(req, res)
 })
