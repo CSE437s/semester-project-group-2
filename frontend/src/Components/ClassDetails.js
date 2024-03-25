@@ -3,6 +3,7 @@ import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
 import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
+import SimpleModal from './SimpleModal';
 
 
 const ClassDetails = () => {
@@ -19,11 +20,30 @@ const ClassDetails = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     const token = localStorage.getItem("token")
-
+    const [isInstructor, setIsInstructor] = useState(false);
     useEffect(() => {
-        if(!token) {
+        setIsInstructor(user?.role === 'instructor');
+    }, [user]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const toggleModal = () => setIsModalOpen(!isModalOpen);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredTeachingAssistants = teachingAssistants.filter(ta =>
+        ta.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ta.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ta.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredStudents = students.filter(student =>
+        student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    useEffect(() => {
+        if (!token) {
             logout().then(status => {
-                if(status === true) {
+                if (status === true) {
                     navigate("/login")
                 }
                 else {
@@ -35,7 +55,7 @@ const ClassDetails = () => {
             })
         }
         getCurrentUser().then(user => {
-            if(user) {
+            if (user) {
                 setUser(user.data.user)
             }
         }).catch(e => console.log(e))
@@ -43,8 +63,8 @@ const ClassDetails = () => {
         const fetchUsersDetails = async (userIds) => {
             const userDetails = await Promise.all(userIds.map(async (id) => {
                 findUser(id).then(user => {
-                    if(user) {
-                        return {id: user._id, ...user}
+                    if (user) {
+                        return { id: user._id, ...user }
                     }
                     return null
                 }).catch(e => console.log(e))
@@ -55,19 +75,19 @@ const ClassDetails = () => {
         // eslint-disable-next-line
         const fetchClassDetailsAndUsers = async () => {
             getClassByID(classId).then(classObject => {
-                if(classObject) {
+                if (classObject) {
                     setClassDetails(classObject)
                 }
-                if(classObject.students) {
+                if (classObject.students) {
                     setStudents(classObject.students)
                 }
-                if(classObject.TAs) {
+                if (classObject.TAs) {
                     setTeachingAssistants(classObject.TAs)
                     // also get TA schedules
                 }
                 const instructorId = classObject.instructorId
                 findUser(instructorId).then(instructor => {
-                    if(instructor) {
+                    if (instructor) {
                         setInstructorId(instructorId)
                         setInstructorName(instructor.firstName + " " + instructor.lastName)
                     }
@@ -105,22 +125,48 @@ const ClassDetails = () => {
         // }
     };
 
+    const demoteToStudent = async (taId) => {
+        if (instructorId && user._id !== instructorId) {
+            alert('Only instructors can demote TAs to students.');
+            return;
+        }
+        setIsLoading(true);
+        changeRoleInClass(taId, classId, "TA", "student").then(res => {
+            if (res === true) {
+                setTeachingAssistants(prevTAs => prevTAs.filter(ta => ta._id !== taId));
+                setStudents(prevStudents => [...prevStudents, teachingAssistants.find(ta => ta._id === taId)]);
+
+                alert("TA successfully demoted to student.");
+            } else {
+                alert("There was an error demoting the TA.");
+            }
+        }).finally(() => {
+            setIsLoading(false);
+        });
+    };
+
     const promoteToTA = async (studentId) => {
         console.log(user._id === instructorId, instructorId, user._id)
         if (instructorId && user._id !== instructorId) {
             alert('Only instructors can promote students to TAs.');
             return;
         }
+        setIsLoading(true);
 
         changeRoleInClass(studentId, classId, "student", "TA").then(res => {
-            if(res === true) {
+            if (res === true) {
+                setStudents(prevStudents => prevStudents.filter(student => student._id !== studentId));
+                setTeachingAssistants(prevTAs => [...prevTAs, students.find(student => student._id === studentId)]);
+
                 alert("success")
                 // window.location.reload()
             }
             else {
                 alert("error")
             }
-        })
+        }).finally(() => {
+            setIsLoading(false);
+        });
         // const classRef = doc(db, 'classes', classId);
         // const classSnapshot = await getDoc(classRef);
 
@@ -210,16 +256,16 @@ const ClassDetails = () => {
 
     if (isLoading) {
         return (
-          <div className="flex justify-center items-center h-screen">
-            <div className="flex justify-center items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
-              </svg>
+            <div className="flex justify-center items-center h-screen">
+                <div className="flex justify-center items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
+                    </svg>
+                </div>
             </div>
-          </div>
         );
-      }
+    }
 
     return (
         <div className="font-mono">
@@ -238,6 +284,21 @@ const ClassDetails = () => {
                         >
                             Back to Dashboard
                         </button>
+                        {isInstructor === true ? (
+                            <button
+                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                                onClick={toggleModal}
+                            >
+                                Manage Students
+                            </button>
+                        ) : (
+                            <button
+                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                                onClick={toggleModal}
+                            >
+                                View Classmates
+                            </button>
+                        )}
                         <button
                             className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
                             onClick={() => navigate("/me")}
@@ -273,7 +334,7 @@ const ClassDetails = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                                     {teachingAssistants.map((ta) => {
                                         // console.log(ta)
-                                        if(ta) {
+                                        if (ta) {
                                             const taSchedule = taSchedules.find(schedule => schedule.taId === ta._id);
                                             const isOHNow = taSchedule && isCurrentlyOH(taSchedule.ohTimes, currentTime);
                                             return (
@@ -302,7 +363,7 @@ const ClassDetails = () => {
                                         }
                                         else {
                                             return (<>
-                                            error
+                                                error
                                             </>)
                                         }
                                     })}
@@ -310,25 +371,66 @@ const ClassDetails = () => {
                             </div>
 
 
-                            {/* students */}
-                            <div className="mb-6">
-                                <h2 className="text-2xl font-bold mb-4">Students</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                    {students.map((student) => (
-                                        <div key={student._id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center">
-                                            <span className="text-center text-xl font-bold mb-4">{student.firstName} {student.lastName}</span>
-                                            {user?._id === instructorId && (
-                                                <button
-                                                    className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
-                                                    onClick={() => promoteToTA(student._id)}
-                                                >
-                                                    Promote to TA
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
+                            <SimpleModal isOpen={isModalOpen} close={toggleModal}>
+                                <div className="bg-white p-6 rounded-lg shadow-lg space-y-6">
+                                    <input
+                                        type="text"
+                                        placeholder="Search by name or email"
+                                        className="mt-4 mb-6 px-4 py-2 border rounded w-full"
+                                        onChange={e => setSearchTerm(e.target.value)}
+                                    />
+
+                                    <h2 className="text-2xl font-bold text-indigo-600">Teaching Assistants</h2>
+                                    <ul className="space-y-3">
+                                        {filteredTeachingAssistants.map((ta) => (
+                                            <li key={ta._id} className="flex items-center justify-between space-x-3">
+                                                <div className="flex-1">
+                                                    <div className="font-medium text-gray-900">{ta.firstName} {ta.lastName}</div>
+                                                    <div className="text-gray-500">{ta.email}</div>
+                                                </div>
+                                                {isInstructor && (
+                                                    <button
+                                                        className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded whitespace-nowrap"
+                                                        onClick={() => demoteToStudent(ta._id)}
+                                                    >
+                                                        Demote to Student
+                                                    </button>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <h2 className="text-2xl font-bold text-indigo-600">Students</h2>
+                                    <ul className="space-y-3">
+                                        {filteredStudents.map((student) => (
+                                            <li key={student._id} className="flex items-center justify-between space-x-3">
+                                                <div className="flex-1">
+                                                    <div className="font-medium text-gray-900">{student.firstName} {student.lastName}</div>
+                                                    <div className="text-gray-500">{student.email}</div>
+                                                </div>
+                                                {isInstructor && (
+                                                    <button
+                                                        className="px-4 py-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold rounded whitespace-nowrap"
+                                                        onClick={() => promoteToTA(student._id)}
+                                                    >
+                                                        Promote to TA
+                                                    </button>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <div className="flex justify-center">
+                                        <button
+                                            className="mt-4 px-6 py-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold rounded"
+                                            onClick={toggleModal}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            </SimpleModal>
+
 
 
                         </div>
@@ -341,3 +443,4 @@ const ClassDetails = () => {
 };
 
 export default ClassDetails;
+
