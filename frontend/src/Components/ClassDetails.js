@@ -258,7 +258,7 @@ const ClassDetails = () => {
                                                         {ta.firstName} {ta.lastName}
                                                     </Link>
                                                     
-                                                    <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
+                                                    <h3 className="text-xl font-bold mb-4"></h3>
                                                     {taSchedule && (
                                                         <div className="text-center mb-4">
                                                             <p className="font-semibold">Office Hours:</p>
@@ -296,7 +296,10 @@ const ClassDetails = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                     {students.map((student) => (
                                         <div key={student._id} className="p-5 bg-indigo-200 rounded-lg shadow-lg flex flex-col justify-center items-center">
-                                            <span className="text-center text-xl font-bold mb-4">{student.firstName} {student.lastName}</span>
+                                             <Link to={`/users/${student._id}`} className="text-xl font-bold mb-4">
+                                                        {student.firstName} {student.lastName}
+                                                    </Link>
+                                            <span className="text-center text-xl font-bold mb-4"></span>
                                             {user?._id === instructorId && (
                                                 <button
                                                     className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
