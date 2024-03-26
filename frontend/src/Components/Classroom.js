@@ -26,7 +26,7 @@ const Classroom = () => {
     const [isOwner, setIsOwner] = useState(false);
     const [elements, setElements] = useState([])
     const [showDropdown, setShowDropdown] = useState(false)
-    const [newComponentName, setNewComponentName] = useState("")
+    const [newComponentName, setNewComponentName] = useState("whiteboard")
     const {  TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
     const currentToken = localStorage.getItem("token");
@@ -175,7 +175,6 @@ const Classroom = () => {
 
 
     let render;
-    // let timeCard;
     if (isOwner === false) {
         if (roomURL) {
             render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />;
@@ -185,8 +184,6 @@ const Classroom = () => {
             if(!roomURL) {
                 render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
             }
-        
-            // timeCard = <></>
         }
     }
     else {
@@ -212,7 +209,6 @@ const Classroom = () => {
         const y = rectangle.y
         console.log(x, y)
         const widgetName = element.id.substring(0, element.id.indexOf("handle"))
-        console.log(widgetName)
         const targetElement = findElement(widgetName)
         if(targetElement) {
             console.log("MOVED: x:", targetElement.x - x, "y:", targetElement.y - y)
@@ -220,9 +216,22 @@ const Classroom = () => {
             targetElement.y = y
             console.log(elements)   
         }
-        setClassroomComponents(elements).then(result => {
-            // window.location.reload()
-        })
+        
+    }
+
+    const removeFromArray = (elementToRemove) => {
+        const newArray = []
+        for(var i in elements) {
+            if(elements[i].name !== elementToRemove) {
+                newArray.push(elements[i])
+            }
+        }
+        setElements(newArray)
+    }
+
+    const handleDelete = (e) => {
+        console.log("you clicked delete on", e.target.id)
+        removeFromArray(e.target.id)
     }
     return (
         <div className="font-mono">
@@ -230,17 +239,20 @@ const Classroom = () => {
             {isOwner? <>
             <button onClick={() => {
                 if(editMode === true) {
+                    setClassroomComponents(elements).then(_ => {
+                        // window.location.reload()
+                    }).catch(e => console.log(e))
                 }
                 setEditMode(!editMode)
             }}> { editMode === true ? "save" : "edit" }</button>
             <br></br>
-            <button onClick={() => {
+            {editMode === true ? <button onClick={() => {
                 setShowDropdown(!showDropdown)
             }}> 
                  {showDropdown ? 
                     <>
-                    x
-                    <label for="dropdown">Select a new element:</label>
+                    x   
+                    <label for="dropdown">  Select a new element:  </label>
                     </>
                     :
                     <>
@@ -248,7 +260,7 @@ const Classroom = () => {
                     </>
 
                  }
-            </button>
+            </button> : <></> }
             {showDropdown ? 
                 <>
                     <select name="components" id="select-components" onChange={(e)=>{
@@ -282,7 +294,9 @@ const Classroom = () => {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
                                 {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
                                 <div>
-                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> </div>
+                                    <button onClick={handleDelete} id={element.name}> x </button>
+                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> 
+                                    </div>
                                     <Whiteboard width={element.width} height={element.height}/>
                                 </div> 
                             </Draggable> : <Whiteboard width={element.width} height={element.height}/>}
@@ -292,7 +306,9 @@ const Classroom = () => {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
                              {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}-handle`} onStop={handleDrag} key="handle">
                                 <div>
-                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> </div>
+                                    <button onClick={handleDelete} id={element.name}> x </button>
+                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> 
+                                    </div>
                                     {render}
                                 </div>  
                             </Draggable> : render} 
@@ -300,8 +316,6 @@ const Classroom = () => {
                         }
                     })
                 }
-                {/* {timeCard}
-                {schedule.days ? <OHschedule dates={schedule.days} start={schedule.start} end={schedule.end} /> : <></>} */}
              </div>
         </div>
     );
