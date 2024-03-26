@@ -41,7 +41,7 @@ const Header = (props) => {
                     </div>
 
                     {isNavOpen && (
-                        <div className="MOBILE-MENU absolute top-0 right-0 px-8 py-8 bg-white font-mono">
+                        <div className="MOBILE-MENU absolute top-0 right-0 px-8 py-8 bg-indigo-200 font-mono">
                             <div className="CROSS-ICON" onClick={() => setIsNavOpen(false)}>
                                 <svg
                                     className="h-8 w-8 text-gray-600"

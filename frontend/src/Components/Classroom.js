@@ -9,7 +9,13 @@ import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setC
 import Whiteboard from "./Whiteboard";
 import Header from "./Header";
 import Draggable from "react-draggable";
+// import ChatBoxReciever from "./ChatBox";
+// import { ChatBoxSender } from "./ChatBox";
+// import InputText from "./InputText";
+import ChatContainer from "./ChatContainer";
+import InputText from './InputText';
 
+// thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
 const Classroom = () => {
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
@@ -27,7 +33,7 @@ const Classroom = () => {
     const [elements, setElements] = useState([])
     const [showDropdown, setShowDropdown] = useState(false)
     const [newComponentName, setNewComponentName] = useState("whiteboard")
-    const {  TAid } = useParams();
+    const { TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
     const currentToken = localStorage.getItem("token");
     // const isOwner = currentUser._id === TAid; // Determine if current user is the owner of the classroom
@@ -42,11 +48,11 @@ const Classroom = () => {
                 const u = user.data.user
                 setCurrentUser(u)
                 setName(u.firstName + " " + u.lastName)
-                if(u._id === TAid) {
+                if (u._id === TAid) {
                     setIsOwner(true)
                 }
             })
-            if(elements.length === 0) {
+            if (elements.length === 0) {
                 getClassroomComponents(TAid).then(components => {
                     console.log(components)
                     setElements(components)
@@ -58,7 +64,7 @@ const Classroom = () => {
     useEffect(() => {
         console.log("Fetching TA's name...");
         findUser(TAid).then(TA => {
-            if(TA !== null) {
+            if (TA !== null) {
                 setTaName(TA.firstName)
             }
             else {
@@ -88,7 +94,7 @@ const Classroom = () => {
 
     const getNewUrl = (roomOwner) => {
         const token = localStorage.getItem("token")
-        if(!token) {
+        if (!token) {
             navigate("/login")
         }
         axios.post(api_url + "/api/getVideoURL", { "creator": roomOwner }, {
@@ -98,7 +104,7 @@ const Classroom = () => {
                 "ngrok-skip-browser-warning": true
             },
         }).then((res) => {
-            if(res.data.url !== "") {
+            if (res.data.url !== "") {
                 setRoomURL(res.data.url);
             }
         }).catch(e => {
@@ -117,8 +123,8 @@ const Classroom = () => {
     // };
 
     const findElement = (elementName) => {
-        for(var i in elements) {
-            if(elements[i].name === elementName) {
+        for (var i in elements) {
+            if (elements[i].name === elementName) {
                 return elements[i]
             }
         }
@@ -162,16 +168,16 @@ const Classroom = () => {
     // };
     if (isLoading) {
         return (
-          <div className="flex justify-center items-center h-screen">
-            <div className="flex justify-center items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
-              </svg>
+            <div className="flex justify-center items-center h-screen">
+                <div className="flex justify-center items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
+                    </svg>
+                </div>
             </div>
-          </div>
         );
-      }
+    }
 
 
     let render;
@@ -181,7 +187,7 @@ const Classroom = () => {
         }
         else {
             getNewUrl(TAid);
-            if(!roomURL) {
+            if (!roomURL) {
                 render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
             }
         }
@@ -196,7 +202,7 @@ const Classroom = () => {
                         <input id="roomtype" type="text" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                         <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
                     </form>
-                </div> 
+                </div>
             </div>
         )
 
@@ -210,19 +216,19 @@ const Classroom = () => {
         console.log(x, y)
         const widgetName = element.id.substring(0, element.id.indexOf("handle"))
         const targetElement = findElement(widgetName)
-        if(targetElement) {
+        if (targetElement) {
             console.log("MOVED: x:", targetElement.x - x, "y:", targetElement.y - y)
             targetElement.x = x
             targetElement.y = y
-            console.log(elements)   
+            console.log(elements)
         }
-        
+
     }
 
     const removeFromArray = (elementToRemove) => {
         const newArray = []
-        for(var i in elements) {
-            if(elements[i].name !== elementToRemove) {
+        for (var i in elements) {
+            if (elements[i].name !== elementToRemove) {
                 newArray.push(elements[i])
             }
         }
@@ -236,87 +242,93 @@ const Classroom = () => {
     return (
         <div className="font-mono">
             <Header user={user} />
-            {isOwner? <>
-            <button onClick={() => {
-                if(editMode === true) {
-                    setClassroomComponents(elements).then(_ => {
-                        // window.location.reload()
-                    }).catch(e => console.log(e))
-                }
-                setEditMode(!editMode)
-            }}> { editMode === true ? "save" : "edit" }</button>
-            <br></br>
-            {editMode === true ? <button onClick={() => {
-                setShowDropdown(!showDropdown)
-            }}> 
-                 {showDropdown ? 
-                    <>
-                    x   
-                    <label for="dropdown">  Select a new element:  </label>
-                    </>
-                    :
-                    <>
-                        +
-                    </>
-
-                 }
-            </button> : <></> }
-            {showDropdown ? 
-                <>
-                    <select name="components" id="select-components" onChange={(e)=>{
-                            setNewComponentName(e.target.value)
-                    }}>
-                        <option value="whiteboard">Whiteboard</option>
-                        <option value="videocall">Video Call</option>
-                    </select>
-                    <button onClick={()=>{
-                        console.log("adding", newComponentName, "to user classroom")
-                        addClassroomComponent(newComponentName, 50, 50, 500, 500).then(result => {
-                            console.log(result)
-                            if(result === true) {
-                                window.location.reload()
-                            }
-                            else {
-                                console.log("An error occured")
-                            }
+            {isOwner ? <>
+                <button onClick={() => {
+                    if (editMode === true) {
+                        setClassroomComponents(elements).then(_ => {
+                            // window.location.reload()
                         }).catch(e => console.log(e))
-                    }}>add</button>
-                </>
-                : <></>}
+                    }
+                    setEditMode(!editMode)
+                }}> {editMode === true ? "save" : "edit"}</button>
+                <br></br>
+                {editMode === true ? <button onClick={() => {
+                    setShowDropdown(!showDropdown)
+                }}>
+                    {showDropdown ?
+                        <>
+                            x
+                            <label for="dropdown">  Select a new element:  </label>
+                        </>
+                        :
+                        <>
+                            +
+                        </>
+
+                    }
+                </button> : <></>}
+                {showDropdown ?
+                    <>
+                        <select name="components" id="select-components" onChange={(e) => {
+                            setNewComponentName(e.target.value)
+                        }}>
+                            <option value="whiteboard">Whiteboard</option>
+                            <option value="videocall">Video Call</option>
+                        </select>
+                        <button onClick={() => {
+                            console.log("adding", newComponentName, "to user classroom")
+                            addClassroomComponent(newComponentName, 50, 50, 500, 500).then(result => {
+                                console.log(result)
+                                if (result === true) {
+                                    window.location.reload()
+                                }
+                                else {
+                                    console.log("An error occured")
+                                }
+                            }).catch(e => console.log(e))
+                        }}>add</button>
+                    </>
+                    : <></>}
             </>
-            : <></>}
+                : <></>}
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
-                { 
+                {
                     elements.map((element) => {
                         console.log(element)
-                        if(element.name.indexOf("whiteboard") >= 0) {
-                            return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                                {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
-                                <div>
-                                    <button onClick={handleDelete} id={element.name}> x </button>
-                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> 
+                        if (element.name.indexOf("whiteboard") >= 0) {
+                            return <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
+                                {editMode && isOwner ? <Draggable grid={[20, 20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
+                                    <div>
+                                        <button onClick={handleDelete} id={element.name}> x </button>
+                                        <div id={`${element.name}handle`} className="bg-gray-500 p-3">
+                                        </div>
+                                        <Whiteboard width={element.width} height={element.height} />
                                     </div>
-                                    <Whiteboard width={element.width} height={element.height}/>
-                                </div> 
-                            </Draggable> : <Whiteboard width={element.width} height={element.height}/>}
+                                </Draggable> : <Whiteboard width={element.width} height={element.height} />}
                             </div>
                         }
                         else {
-                            return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                             {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}-handle`} onStop={handleDrag} key="handle">
-                                <div>
-                                    <button onClick={handleDelete} id={element.name}> x </button>
-                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> 
+                            return <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
+                                {editMode && isOwner ? <Draggable grid={[20, 20]} handle={`#${element.name}-handle`} onStop={handleDrag} key="handle">
+                                    <div>
+                                        <button onClick={handleDelete} id={element.name}> x </button>
+                                        <div id={`${element.name}handle`} className="bg-gray-500 p-3">
+                                        </div>
+                                        {render}
                                     </div>
-                                    {render}
-                                </div>  
-                            </Draggable> : render} 
+                                </Draggable> : render}
                             </div>
                         }
                     })
                 }
-             </div>
+            </div>
+            {/* chat */}
+            <div style={{ backgroundColor: "#ece5dd", height: "max-content", margin:"200px", padding: "20px" }}>
+
+                <ChatContainer />
+            </div>
+
         </div>
     );
 }
