@@ -75,7 +75,7 @@ const Header = (props) => {
                         </div>
                     )}
                 </div>
-                
+
                 {/* normal menu */}
 
                 <nav className="hidden lg:flex mr-10">
@@ -97,6 +97,15 @@ const Header = (props) => {
                     >
                         Back to Dashboard
                     </button>
+
+
+                    <button
+                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                        onClick={() => navigate("/my-room")}
+                    >
+                        My Classroom
+                    </button>
+
                     <button
                         className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
                         onClick={() => navigate("/me")}

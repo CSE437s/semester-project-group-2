@@ -291,8 +291,11 @@ const Classroom = () => {
                     : <></>}
             </>
                 : <></>}
-            <div className="container mx-auto px-4 py-8">
+             <div className="container mx-auto py-8">
+                <div className = "bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-7 mb-4 bg-indigo-200">
                 <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
+                </div>
+                
                 {
                     elements.map((element) => {
                         console.log(element)
@@ -324,7 +327,7 @@ const Classroom = () => {
                 }
             </div>
             {/* chat */}
-            <div className="bg-indigo-200" style={{height: "max-content", margin:"200px", padding: "20px" }}>
+            <div className="container mx-auto px-4 py-8 bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-8 mb-4 bg-indigo-200">
 
                 <ChatContainer />
             </div>
