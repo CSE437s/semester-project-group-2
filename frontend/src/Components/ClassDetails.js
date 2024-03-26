@@ -10,7 +10,7 @@ import {
 import { getClassByID } from "../ClassUtils";
 import SimpleModal from "./SimpleModal";
 import ScheduleModal from "./ScheduleModal";
-import axios from "axios";
+import { getUserHoursForClass } from "../UserUtils";
 
 const ClassDetails = () => {
   const { classId } = useParams();
