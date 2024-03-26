@@ -272,7 +272,7 @@ const Classroom = () => {
                     </select>
                     <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
                         console.log("adding", newComponentName, "to user classroom")
-                        addClassroomComponent(newComponentName, 50, 50, 500, 500).then(result => {
+                        addClassroomComponent(newComponentName, 100, 100, 500, 500).then(result => {
                             console.log(result)
                             if(result === true) {
                                 window.location.reload()
@@ -295,8 +295,8 @@ const Classroom = () => {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
                                 {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
                                 <div>
-                                    <button onClick={handleDelete} id={element.name}> X </button>
-                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> 
+                                    <button onClick={handleDelete} id={element.name}> Remove </button>
+                                    <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
                                     </div>
                                     <Whiteboard width={element.width} height={element.height}/>
                                 </div> 
@@ -307,8 +307,8 @@ const Classroom = () => {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
                              {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="handle">
                                 <div>
-                                    <button onClick={handleDelete} id={element.name}> X </button>
-                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> 
+                                    <button onClick={handleDelete} id={element.name}> Remove </button>
+                                    <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
                                     </div>
                                     {render}
                                 </div>  
