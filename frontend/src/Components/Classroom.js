@@ -324,7 +324,7 @@ const Classroom = () => {
                 }
             </div>
             {/* chat */}
-            <div style={{ backgroundColor: "#ece5dd", height: "max-content", margin:"200px", padding: "20px" }}>
+            <div className="bg-indigo-200" style={{height: "max-content", margin:"200px", padding: "20px" }}>
 
                 <ChatContainer />
             </div>

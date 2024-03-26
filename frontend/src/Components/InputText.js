@@ -1,31 +1,5 @@
 import React, { useState } from 'react';
 
-const styles = {
-    button: {
-        width: '10%',
-        height: 50,
-        fontWeight: 'bold',
-        borderRadius: 10,
-        fontSize: 18,
-        backgroundColor: '#34b7f1',
-        borderWidth: 0,
-        color: '#fff'
-    },
-    textarea: {
-        width: '60%',
-        height: 50,
-        borderRadius: 10,
-        borderWidth: 0,
-        padding: 10,
-        fontSize: 18
-    },
-    textContainer: {
-        display: 'flex',
-        justifyContent: 'space-evenly',
-        alignItems: 'center'
-    }
-};
-
 export default function InputText({ addMessage }) {
     const [message, setMessage] = useState('');
 
@@ -37,16 +11,18 @@ export default function InputText({ addMessage }) {
     }
 
     return (
-        <div style={styles.textContainer}>
+        <div className="flex justify-center items-center">
             <textarea
-                style={styles.textarea}
-                rows={6}
-                placeholder="Write something... "
+                className="w-3/5 rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm focus:outline-none text-gray-700 py-2 px-4 block"
+                placeholder="Write something..."
                 value={message}
                 onChange={e => setMessage(e.target.value)}
             ></textarea>
-            <button onClick={addAMessage} style={styles.button}>
-                ENTER
+            <button
+                className="ml-5 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                onClick={addAMessage}
+            >
+                Enter
             </button>
         </div>
     );
