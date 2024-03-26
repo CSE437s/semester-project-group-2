@@ -364,6 +364,10 @@ const UserDetails = () => {
                                     setBackgroundColor("grey");
                                     saveBackgroundColor("grey");
                                 }} role="menuitem">Grey</button>
+                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
+                                    setBackgroundColor("white");
+                                    saveBackgroundColor("white");
+                                }} role="menuitem">White</button>
                             </div>
                         </div>
                     </div>

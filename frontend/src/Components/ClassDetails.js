@@ -213,7 +213,7 @@ const ClassDetails = () => {
                 setTeachingAssistants(prevTAs => [...prevTAs, students.find(student => student._id === studentId)]);
 
                 alert("success")
-                // window.location.reload()
+                window.location.reload()
             }
             else {
                 alert("error")
@@ -221,31 +221,6 @@ const ClassDetails = () => {
         }).finally(() => {
             setIsLoading(false);
         });
-        // const classRef = doc(db, 'classes', classId);
-        // const classSnapshot = await getDoc(classRef);
-
-        // if (classSnapshot.exists()) {
-        //     const studentList = classSnapshot.data().students;
-        //     const taList = classSnapshot.data().TAs;
-
-        //     if (studentList.includes(studentId) && !taList.includes(studentId)) {
-        //         // Promote the student to TA by removing them from the students list and adding them to the TAs list.
-        //         await updateDoc(classRef, {
-        //             students: arrayRemove(studentId),
-        //             TAs: arrayUnion(studentId)
-        //         });
-
-        //         // Add the student to the TAs subcollection within the class document.
-        //         const taRef = collection(classRef, 'TAs');
-        //         await setDoc(doc(taRef, studentId), {
-        //             // You can add any additional fields for the TA document here.
-        //         });
-
-        //         setStudents(studentList.filter(id => id !== studentId));
-        //         setClassDetails({ ...classDetails, TAs: [...taList, studentId] });
-        //         window.location.reload();
-        //     }
-        // }
     };
 
 
