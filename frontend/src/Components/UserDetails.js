@@ -157,7 +157,7 @@ const UserDetails = () => {
             updateUserName(user._id, firstName, lastName).then(res => {
                 console.log(res)
                 if (res === true) {
-                    alert("success")
+                    console.log("success")
                 }
             }).catch(e => console.log(e))
             navigate("/me");
@@ -172,7 +172,7 @@ const UserDetails = () => {
             updateUserBio(user._id, bio).then(res => {
                 console.log(res)
                 if (res === true) {
-                    alert("success")
+                    console.log("success")
                 }
             }).catch(e => console.log(e))
             navigate("/me");
@@ -188,7 +188,7 @@ const UserDetails = () => {
             updateUserBGColor(user._id, color).then(res => {
                 console.log(res)
                 if (res === true) {
-                    alert("success")
+                    console.log("success")
                 }
             }).catch(e => console.log(e))
             navigate("/me");
