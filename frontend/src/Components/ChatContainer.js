@@ -45,7 +45,7 @@ export default function ChatContainer() {
             })
         
         }
-    }, [currentToken,  userId]);
+    }, [userId, name]);
 
   
  

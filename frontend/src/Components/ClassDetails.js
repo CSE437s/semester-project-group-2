@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react';
 import LogoutButton from "./LogoutButton"
 import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
-import Header from "./Header";
-import ProfilePage from './ProfilePage';
 import SimpleModal from './SimpleModal';
 import ScheduleModal from './ScheduleModal';
 import axios from 'axios';

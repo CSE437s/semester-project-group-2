@@ -9,11 +9,7 @@ import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setC
 import Whiteboard from "./Whiteboard";
 import Header from "./Header";
 import Draggable from "react-draggable";
-// import ChatBoxReciever from "./ChatBox";
-// import { ChatBoxSender } from "./ChatBox";
-// import InputText from "./InputText";
 import ChatContainer from "./ChatContainer";
-import InputText from './InputText';
 
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
@@ -32,7 +28,6 @@ const Classroom = () => {
     const [showDropdown, setShowDropdown] = useState(false)
     const [newComponentName, setNewComponentName] = useState("whiteboard")
     const { TAid } = useParams();
-    const [taName, setTaName] = useState(""); // State to store TA's name
     const currentToken = localStorage.getItem("token");
     // const isOwner = currentUser._id === TAid; // Determine if current user is the owner of the classroom
     const [isLoading, setIsLoading] = useState(true);
@@ -62,10 +57,7 @@ const Classroom = () => {
     useEffect(() => {
         console.log("Fetching TA's name...");
         findUser(TAid).then(TA => {
-            if (TA !== null) {
-                setTaName(TA.firstName)
-            }
-            else {
+            if (TA === null) {
                 console.log("TA was unable to be found")
             }
         }).catch(e => console.log(e))
