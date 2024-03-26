@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
-import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
+import { changeRoleInClass, findUser, getCurrentUser, logout, addUserHours } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
 import SimpleModal from './SimpleModal';
 import ScheduleModal from './ScheduleModal';
@@ -31,9 +31,9 @@ const ClassDetails = () => {
     const [showScheduleModal, setShowScheduleModal] = useState(false);
 
     const toggleScheduleModal = () => {
-        console.log('Toggling Schedule Modal');
-        setShowScheduleModal(!showScheduleModal);
-    };
+    console.log('Toggling Schedule Modal');
+    setShowScheduleModal(!showScheduleModal);
+};
 
     const filteredTeachingAssistants = teachingAssistants.filter(ta =>
         ta.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,7 +80,7 @@ const ClassDetails = () => {
             return userDetails.filter(Boolean)
         };
 
-
+        
         // eslint-disable-next-line
         const fetchClassDetailsAndUsers = async () => {
             getClassByID(classId).then(classObject => {
@@ -93,7 +93,7 @@ const ClassDetails = () => {
                 if (classObject.TAs) {
                     setTeachingAssistants(classObject.TAs)
                     // also get TA schedules
-
+                    
                 }
                 const instructorId = classObject.instructorId
                 findUser(instructorId).then(instructor => {
@@ -319,17 +319,21 @@ const ClassDetails = () => {
                             </button>
                         )}
 
-                        {isTA && (
-                            <button
-                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                                onClick={toggleScheduleModal}
-                            >
-                                Set Office Hours
-                            </button>
-                        )}
-                        {showScheduleModal && (
-                            <ScheduleModal onClose={toggleScheduleModal} />
-                        )}
+        {isTA && (
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={toggleScheduleModal}
+                        >
+                            Set Office Hours
+                        </button>
+                    )}
+                    {showScheduleModal && (
+                        <ScheduleModal
+                        onClose={toggleScheduleModal}
+                        userId={user._id}
+                        className={classDetails.className}
+                        classId={classId} />
+                    )}
                         <button
                             className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
                             onClick={() => navigate("/me")}

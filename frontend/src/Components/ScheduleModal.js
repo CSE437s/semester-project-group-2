@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { addUserHours } from '../UserUtils';
 
-const ScheduleModal = ({ onClose }) => {
+const ScheduleModal = ({ onClose, userId, className, classId  }) => {
   const [selectedSlots, setSelectedSlots] = useState(new Set());
 
   const handleSlotSelection = (day, slot) => {
@@ -16,15 +17,27 @@ const ScheduleModal = ({ onClose }) => {
     });
   };
 
-  const handleSubmit = () => {
-    console.log(Array.from(selectedSlots));
-    onClose();
-  };
+  const handleSubmit = async () => {
+    const selectedHours = Array.from(selectedSlots);
 
+    addUserHours(userId, className, classId, selectedHours)
+    .then(response => {
+      if (response) {
+        alert("Office hours updated successfully.");
+        onClose();
+      } else {
+        alert("Failed to update office hours.");
+      }
+    })
+    .catch(error => {
+      console.error("Error when adding user hours:", error);
+      alert("An error occurred while updating office hours.");
+    });
+  };
   const formatTime = (hour, minutes) => {
     const ampm = hour >= 12 ? 'PM' : 'AM';
     hour = hour % 12;
-    hour = hour ? hour : 12; // the hour '0' should be '12'
+    hour = hour ? hour : 12;
     return `${hour}:${minutes} ${ampm}`;
   };
 
