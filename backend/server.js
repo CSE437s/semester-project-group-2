@@ -623,6 +623,33 @@ app.post("/api/updateUserBio", (req, res) => {
     })(req, res)
 })
 
+app.post("/api/updateUserBGColor", (req, res) => {
+    console.log("we get to server.js");
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findByIdAndUpdate(req.body.id, {
+                bg_color: req.body.color
+            }).then(r => {
+                if(r) {
+                    res.status(201).send({message: "updated successfully"})
+                }
+                else {
+                    res.status(500).send({message: "unable to update"})
+                }
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({error: e})
+            })
+        }
+    })(req, res)
+})
+
 // serve profile pictures statically 
 app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
 

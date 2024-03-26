@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
-import { getCurrentUser, updateUserName, updateUserBio } from "../UserUtils";
+import { getCurrentUser, updateUserName, updateUserBio, updateUserBGColor } from "../UserUtils";
 
 // const cleanFileName = (fileName) => {
 //     var newFileName = ""
@@ -30,8 +30,8 @@ const UserDetails = () => {
     const [editingFirstName, setEditingFirstName] = useState(false);
     const [editingLastName, setEditingLastName] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false); //dropdown for color theme
-    const [selectedBackgroundColor, setSelectedBackgroundColor] = useState("");
-    const [backgroundColor, setBackgroundColor] = useState('');
+
+    const [backgroundColor, setBackgroundColor] = useState("");
     const [isTA, setIsTA] = useState(false);
     const [bio, setBio] = useState("");
     const [editingBio, setEditingBio] = useState(false);
@@ -48,14 +48,10 @@ const UserDetails = () => {
 
     const handleBioBlur = async () => {
         try {
-            // const userDocRef = doc(db, "users", user.uid);
-            // await updateDoc(userDocRef, {
-            //     "profileDetails.bio": bio
-            // });
             console.log(bio);
             setEditingBio(false);
             updateBio();
-            
+
 
         } catch (error) {
             console.error("Error updating bio:", error);
@@ -70,21 +66,19 @@ const UserDetails = () => {
 
     const saveBackgroundColor = async (color) => {
         try {
-            // const userDocRef = doc(db, "users", user.uid);
-            // await updateDoc(userDocRef, {
-            //     "profileDetails.background_color": color
-            // });
-
-            setSelectedBackgroundColor(color);
-
+            await updateColor(color);
+    
             document.body.style.backgroundColor = color;
-
+    
             setDropdownOpen(false);
+            setBackgroundColor(color);
+            
         } catch (error) {
             console.error("Error saving background color:", error);
             alert("Failed to save background color. Please try again.");
         }
     };
+    
 
     const handleFirstNameBlur = () => {
         setEditingFirstName(false);
@@ -125,19 +119,21 @@ const UserDetails = () => {
                     setStatus(user.status);
                     setFirstName(user.firstName);
                     setLastName(user.lastName);
-                    setBackgroundColor(user.profileDetails?.background_color || '');
                     setIsTA(user.isTA || false);
-                    setBio(user.profileDetails?.bio || '');
-
+                    setBio(user.bio || '');
+                    setBackgroundColor(user.bg_color || 'white');
+                    document.body.style.backgroundColor = user.bg_color || 'white';
                 }
             }).catch((error) => {
                 console.log(error);
+                
             });
+            
         }
         else {
             navigate("/login")
         }
-        document.body.style.backgroundColor = backgroundColor;
+    
     }, [navigate, currentToken]);
 
 
@@ -181,6 +177,22 @@ const UserDetails = () => {
         } catch (error) {
             console.error("Error updating user bio:", error);
             alert("Failed to update user bio. Please try again.");
+        }
+    }
+
+    const updateColor = async (color) => {
+        try {
+
+            updateUserBGColor(user._id, color).then(res => {
+                console.log(res)
+                if (res === true) {
+                    alert("success")
+                }
+            }).catch(e => console.log(e))
+            navigate("/me");
+        } catch (error) {
+            console.error("Error updating user bg color:", error);
+            alert("Failed to update user bg color. Please try again.");
         }
     }
 
@@ -348,10 +360,22 @@ const UserDetails = () => {
                         {/* Dropdown menu */}
                         <div className={`origin-top-right absolute right-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none ${dropdownOpen ? "block" : "hidden"}`} role="menu" aria-orientation="vertical">
                             <div className="py-1" role="none">
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => saveBackgroundColor("pink")} role="menuitem">Pink</button>
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => saveBackgroundColor("blue")} role="menuitem">Blue</button>
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => saveBackgroundColor("purple")} role="menuitem">Purple</button>
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => saveBackgroundColor("grey")} role="menuitem">Grey</button>
+                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
+                                    setBackgroundColor("pink");
+                                    saveBackgroundColor("pink");
+                                }} role="menuitem">Pink</button>
+                               <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
+                                    setBackgroundColor("blue");
+                                    saveBackgroundColor("blue");
+                                }} role="menuitem">Blue</button>
+                               <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
+                                    setBackgroundColor("purple");
+                                    saveBackgroundColor("purple");
+                                }} role="menuitem">Purple</button>
+                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
+                                    setBackgroundColor("grey");
+                                    saveBackgroundColor("grey");
+                                }} role="menuitem">Grey</button>
                             </div>
                         </div>
                     </div>

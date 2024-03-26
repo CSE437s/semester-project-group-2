@@ -302,3 +302,30 @@ export function updateUserBio(userId, bio) {
         return false
     }).catch(e => e)
 }
+
+// helper to change a user's bg color
+// @param userId
+// @param color
+
+export function updateUserBGColor(userId, color) {
+    //console.log("we get to UserUtils.js");
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/updateUserBGColor", {
+        id: userId,
+        color: color
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(res => {
+        if(res.data.message === "updated successfully") {
+            return true
+        }
+        return false
+    }).catch(e => e)
+}
+
