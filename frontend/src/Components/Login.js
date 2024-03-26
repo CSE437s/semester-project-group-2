@@ -55,7 +55,7 @@ const Login = () => {
                     <Link to="/home">
                         <div className="flex items-center">
                             <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
+                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OH</h1>
                         </div>
                     </Link>
                 </div>

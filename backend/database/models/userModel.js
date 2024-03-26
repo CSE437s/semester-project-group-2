@@ -65,6 +65,18 @@ const userSchema = new mongoose.Schema(
       required: false,
       unique: false,
       default: []
+    },
+    bio: {
+      type: String,
+      required: false,
+      unique: false,
+      default: ""
+    },
+    bg_color: {
+      type: String,
+      required: false,
+      unique: false,
+      default: "white"
     }
   },
   { timestamps: true }

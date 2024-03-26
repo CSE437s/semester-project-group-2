@@ -64,13 +64,13 @@ const Signup = () => {
                     <Link to="/home">
                         <div className="flex items-center">
                             <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
+                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OH</h1>
                         </div>
                     </Link>
                 </div>
             </header>
             <div className="flex justify-center mt-6 p-10 pb-4 ">
-                <form onSubmit={handleSignup} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
+                <form onSubmit={handleSignup} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
                             First Name
@@ -153,8 +153,9 @@ const Signup = () => {
                 </form>
             </div>
             <div className="flex justify-center">
-                Already have an account? <Link to="/login" className="font-semibold text-indigo-500 hover:underline ml-2 mr-2">Log in</Link> here!
-            </div>
+    Already have an account? <Link to="/login" className="font-semibold text-indigo-500 hover:underline ml-2 mr-2 sm:text-sm md:text-base">Log in</Link> here!
+</div>
+
         </div>
     );
 };
