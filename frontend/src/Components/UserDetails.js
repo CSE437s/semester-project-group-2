@@ -33,7 +33,7 @@ const UserDetails = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false); //dropdown for color theme
 
     const [backgroundColor, setBackgroundColor] = useState("");
-    const [isTA, setIsTA] = useState(false);
+    //const [isTA, setIsTA] = useState(false);
     const [bio, setBio] = useState("");
     const [editingBio, setEditingBio] = useState(false);
 
@@ -119,7 +119,7 @@ const UserDetails = () => {
                     setStatus(user.status);
                     setFirstName(user.firstName);
                     setLastName(user.lastName);
-                    setIsTA(user.isTA || false);
+                    //setIsTA(user.isTA || false);
                     setBio(user.bio || '');
                     setBackgroundColor(user.bg_color || 'white');
                    
