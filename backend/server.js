@@ -471,7 +471,7 @@ app.post("/api/addHours", (req, res) => {
             if (!hoursData) {
                 return res.status(404).send({ message: 'Hours not found' });
             }
-            res.json(hoursData);
+            res.status(200).send({hours: hoursData});
         })
         .catch(error => {
             res.status(500).send({ error: error.message });

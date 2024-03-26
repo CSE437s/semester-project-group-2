@@ -16,13 +16,11 @@ import { getCurrentUser} from "../UserUtils";
 // import InputText from "./InputText";
 
 
-const DEBUGGING = process.env.REACT_APP_DEBUGGING;
-const url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
-const currentToken = localStorage.getItem("token");
-
 export default function ChatContainer() {
-    
-    let socketio = socketIOClient(url, {
+    const currentToken = localStorage.getItem("token");
+    const DEBUGGING = process.env.REACT_APP_DEBUGGING;;
+    const url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
+    const socketio = socketIOClient(url, {
         autoConnect: false,
         extraHeaders: {
             "ngrok-skip-browser-warning": true
@@ -36,6 +34,9 @@ export default function ChatContainer() {
     useEffect(() => {
         socketio.on("connect", () => {
             console.log("socket connected")
+        })
+        socketio.on('connect_error', (e)=>{
+            console.log("error", e)
         })
         socketio.on("chat", senderChats => {
             setChats(senderChats)
@@ -54,6 +55,7 @@ export default function ChatContainer() {
             })
         
         }
+        return () => socketio.disconnect()
     }, [userId, name]);
 
   

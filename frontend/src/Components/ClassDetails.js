@@ -111,9 +111,9 @@ const ClassDetails = () => {
         .then((response) => {
           console.log(
             `Hours data for user ${userId} and class ${classId}:`,
-            response.data
+            response.data.hours
           );
-          return response.data; // Assuming the response has the hours data
+          return response.data.hours; // Assuming the response has the hours data
         })
         .catch((error) => {
           console.error("Error fetching hours for user and class: ", error);
