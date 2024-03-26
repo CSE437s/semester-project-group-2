@@ -214,6 +214,9 @@ const Classroom = () => {
             targetElement.y = y
             console.log(elements)   
         }
+        // setClassroomComponents(elements).then(_ => {
+        //     // window.location.reload()
+        // }).catch(e => console.log(e))
         
     }
 
@@ -235,39 +238,39 @@ const Classroom = () => {
         <div className="font-mono">
             <Header user={user} />
             {isOwner? <>
-            <button onClick={() => {
+            <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5" onClick={() => {
                 if(editMode === true) {
                     setClassroomComponents(elements).then(_ => {
                         // window.location.reload()
                     }).catch(e => console.log(e))
                 }
                 setEditMode(!editMode)
-            }}> { editMode === true ? "save" : "edit" }</button>
+            }}> { editMode === true ? "save changes" : "edit classroom" }</button>
             <br></br>
             {editMode === true ? <button onClick={() => {
                 setShowDropdown(!showDropdown)
             }}> 
                  {showDropdown ? 
-                    <>
+                    <div className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5">
                     x   
-                    <label for="dropdown">  Select a new element:  </label>
-                    </>
+                    {/* <label for="dropdown">  Select a new element:  </label> */}
+                    </div>
                     :
-                    <>
-                        +
-                    </>
+                    <div className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5">
+                        + add widget
+                    </div >
 
                  }
             </button> : <></> }
             {showDropdown ? 
-                <>
-                    <select name="components" id="select-components" onChange={(e)=>{
+                <span className="">
+                    <select className="mx-3" name="components" id="select-components" onChange={(e)=>{
                             setNewComponentName(e.target.value)
                     }}>
                         <option value="whiteboard">Whiteboard</option>
                         <option value="videocall">Video Call</option>
                     </select>
-                    <button onClick={()=>{
+                    <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
                         console.log("adding", newComponentName, "to user classroom")
                         addClassroomComponent(newComponentName, 50, 50, 500, 500).then(result => {
                             console.log(result)
@@ -278,8 +281,8 @@ const Classroom = () => {
                                 console.log("An error occured")
                             }
                         }).catch(e => console.log(e))
-                    }}>add</button>
-                </>
+                    }}> add</button>
+                </span>
                 : <></>}
             </>
             : <></>}
@@ -292,7 +295,7 @@ const Classroom = () => {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
                                 {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
                                 <div>
-                                    <button onClick={handleDelete} id={element.name}> x </button>
+                                    <button onClick={handleDelete} id={element.name}> X </button>
                                     <div id={`${element.name}handle`} className="bg-gray-500 p-3"> 
                                     </div>
                                     <Whiteboard width={element.width} height={element.height}/>
@@ -302,9 +305,9 @@ const Classroom = () => {
                         }
                         else {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                             {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}-handle`} onStop={handleDrag} key="handle">
+                             {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="handle">
                                 <div>
-                                    <button onClick={handleDelete} id={element.name}> x </button>
+                                    <button onClick={handleDelete} id={element.name}> X </button>
                                     <div id={`${element.name}handle`} className="bg-gray-500 p-3"> 
                                     </div>
                                     {render}

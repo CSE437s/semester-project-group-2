@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import LogoutButton from "./LogoutButton";
 import { useNavigate, Link } from 'react-router-dom';
+import { getCurrentUser } from "../UserUtils";
 
 
 const Header = (props) => {
@@ -12,15 +13,29 @@ const Header = (props) => {
     useEffect(() => {
         const { pathname } = window.location;
         // only run this if on dashboard-- was messing up the ability to use the header component on other pages TODO fix
-        if (pathname === '/dashboard') {
-            const user = props.user;
-            setId(user._id);
-            if (user.classesAsTA.length > 0 || user.classesAsInstructor.length > 0) {
-                setHasClassroom(true);
+        // if (pathname === '/dashboard') {
+            var user = props.user;
+            if(!user) {
+                const token = localStorage.getItem("token")
+                if(token) {
+                    getCurrentUser().then(u => {
+                        user = u.data.user
+                        console.log(user)
+                        setId(user._id)
+                    }).catch(e => console.log(e))
+                }
+                else {
+                    navigate("/login")
+                }
             }
-        }
+            else {
+                setId(user._id);
+                if (user.classesAsTA.length > 0 || user.classesAsInstructor.length > 0) {
+                    setHasClassroom(true);
+                }
+            }
+        // }
     }, [props.user]);
-
     return (
         <header className="bg-indigo-300 p-0 py-5 z-10">
 
@@ -87,7 +102,7 @@ const Header = (props) => {
                             >
                                 My Classroom
                             </button>
-                            : <></>
+                            : <>{hasClassroom}</>
                         }
 
                     </div>

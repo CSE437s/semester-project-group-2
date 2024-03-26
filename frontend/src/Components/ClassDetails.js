@@ -115,37 +115,12 @@ const ClassDetails = () => {
         changeRoleInClass(studentId, classId, "student", "TA").then(res => {
             if(res === true) {
                 alert("success")
-                // window.location.reload()
+                window.location.reload()
             }
             else {
                 alert("error")
             }
         })
-        // const classRef = doc(db, 'classes', classId);
-        // const classSnapshot = await getDoc(classRef);
-
-        // if (classSnapshot.exists()) {
-        //     const studentList = classSnapshot.data().students;
-        //     const taList = classSnapshot.data().TAs;
-
-        //     if (studentList.includes(studentId) && !taList.includes(studentId)) {
-        //         // Promote the student to TA by removing them from the students list and adding them to the TAs list.
-        //         await updateDoc(classRef, {
-        //             students: arrayRemove(studentId),
-        //             TAs: arrayUnion(studentId)
-        //         });
-
-        //         // Add the student to the TAs subcollection within the class document.
-        //         const taRef = collection(classRef, 'TAs');
-        //         await setDoc(doc(taRef, studentId), {
-        //             // You can add any additional fields for the TA document here.
-        //         });
-
-        //         setStudents(studentList.filter(id => id !== studentId));
-        //         setClassDetails({ ...classDetails, TAs: [...taList, studentId] });
-        //         window.location.reload();
-        //     }
-        // }
     };
 
 
@@ -224,32 +199,6 @@ const ClassDetails = () => {
     return (
         <div className="font-mono">
             <Header user={user} />
-            {/* <header className="bg-indigo-300 p-0 py-5">
-                <div className="container flex justify-between items-center max-w-full">
-                    <Link to="/home">
-                        <div className="flex items-center">
-                            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
-                        </div>
-                    </Link>
-                    <div>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/dashboard")}
-                        >
-                            Back to Dashboard
-                        </button>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/me")}
-                        >
-                            My Profile
-                        </button>
-
-                        <LogoutButton />
-                    </div>
-                </div>
-            </header> */}
 
             <div className="container mx-auto px-4 py-8">
 
@@ -296,7 +245,11 @@ const ClassDetails = () => {
                                                         value={ta._id}
                                                         onClick={rerouteToClassroom}
                                                     >
-                                                        {isOHNow ? 'Join Office Hours Now' : 'View Virtual Classroom'}
+                                                        {user._id !== ta._id ?
+                                                            isOHNow  ? 'Join Office Hours Now' : 'View Virtual Classroom'
+                                                            :
+                                                            "View Your Classroom"
+                                                        }
                                                     </button>
                                                 </div>
                                             );

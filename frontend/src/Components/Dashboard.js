@@ -211,14 +211,14 @@ const Dashboard = () => {
           </form>
         ) : null}
 
-        <div className="flex justify-between items-center mb-6">
+        {/* <div className="flex justify-between items-center mb-6">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => navigate("/my-room")}
           >
             Go to Classroom
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
