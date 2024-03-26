@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING
-const url = DEBUGGING_MODE ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
+const url = DEBUGGING_MODE === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
 
 /**
  * getUser helper function
@@ -10,7 +10,6 @@ const url = DEBUGGING_MODE ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : proce
  * @returns user profile object
  */
 export function getUser(email, pass) {
-    console.log("!!!", url, process.env)
     return axios.post(url + "/api/login", {
         email: email,
         password: pass,

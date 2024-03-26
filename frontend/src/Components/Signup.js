@@ -11,7 +11,7 @@ const Signup = () => {
     const [role, setRole] = useState("student");
     const navigate = useNavigate();
     const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING;
-    const url = DEBUGGING_MODE ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
+    const url = DEBUGGING_MODE === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
 
     // const [checkingAuth, setCheckingAuth] = useState(true);
 

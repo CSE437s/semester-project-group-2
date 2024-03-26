@@ -9,7 +9,7 @@ const NewRoom = (props) => {
     console.log(props)
     const navigate = useNavigate()
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
-    const api_url = DEBUGGING ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
+    const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const token = localStorage.getItem("token")
     if(!token) {
         navigate("/login")

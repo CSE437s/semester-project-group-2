@@ -4,12 +4,10 @@ import { io } from "socket.io-client"
 //canvas help: https://www.w3schools.com/html/html5_canvas.asp
 //canvas with react help: https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
 const Whiteboard = (props) => {
-    // const [isConnected, setConnected] = useState(false)
     const canvasRef = useRef(null)
     const [context, setContext] = useState(null)
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;;
-    // const base_url = "wss://carefully-certain-swift.ngrok-free.app";
-    const url = DEBUGGING ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL;
+    const url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const socket = io(url, {
         autoConnect: false,
         extraHeaders: {

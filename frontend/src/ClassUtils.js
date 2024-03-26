@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING
-const url = DEBUGGING_MODE ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
+const url = DEBUGGING_MODE === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
 
 /**
  *  Helper function to create a course in the DB

@@ -17,7 +17,7 @@ import { getCurrentUser} from "../UserUtils";
 
 
 const DEBUGGING = process.env.REACT_APP_DEBUGGING;
-const url = DEBUGGING ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
+const url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
 const currentToken = localStorage.getItem("token");
 
 export default function ChatContainer() {
