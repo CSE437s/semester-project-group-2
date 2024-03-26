@@ -602,6 +602,9 @@ const ClassDetails = () => {
                           key={ta._id}
                           className="p-6 bg-red-200 rounded-lg shadow-xl flex flex-col justify-center items-center"
                         >
+                           <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
+                              {ta.firstName} {ta.lastName}
+                          </Link>
                           <h3 className="text-xl font-bold mb-4">
                             Error: TA not found
                           </h3>
