@@ -278,6 +278,7 @@ const Classroom = () => {
                         }}>
                             <option value="whiteboard">Whiteboard</option>
                             <option value="videocall">Video Call</option>
+                            <option value="chat">Text Chat</option>
                         </select>
                         <button onClick={() => {
                             console.log("adding", newComponentName, "to user classroom")
@@ -312,6 +313,21 @@ const Classroom = () => {
                                 </Draggable> : <Whiteboard width={element.width} height={element.height} />}
                             </div>
                         }
+                        else if(element.name.indexOf("chat") >= 0) {
+                            return <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
+                                {editMode && isOwner ? <Draggable grid={[20, 20]} handle={`#${element.name}handle`} onStop={handleDrag} key="chat">
+                                    <div>
+                                        <button onClick={handleDelete} id={element.name}> x </button>
+                                        <div id={`${element.name}handle`} className="bg-gray-500 p-3">
+                                        </div>
+                                        <ChatContainer />
+                                    </div>
+                                </Draggable> 
+                                : 
+                                <ChatContainer />
+                                }
+                            </div>
+                        }
                         else {
                             return <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
                                 {editMode && isOwner ? <Draggable grid={[20, 20]} handle={`#${element.name}-handle`} onStop={handleDrag} key="handle">
@@ -326,11 +342,6 @@ const Classroom = () => {
                         }
                     })
                 }
-            </div>
-            {/* chat */}
-            <div className="container mx-auto px-4 py-8 bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-8 mb-4 bg-indigo-200">
-
-                <ChatContainer />
             </div>
 
         </div>
