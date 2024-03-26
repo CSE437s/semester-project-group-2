@@ -11,7 +11,6 @@ const Header = (props) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const { pathname } = window.location;
         // only run this if on dashboard-- was messing up the ability to use the header component on other pages TODO fix
         // if (pathname === '/dashboard') {
             var user = props.user;
@@ -35,7 +34,7 @@ const Header = (props) => {
                 }
             }
         // }
-    }, [props.user]);
+    }, [props.user, navigate]);
     return (
         <header className="bg-indigo-300 p-0 py-5 z-10">
 
