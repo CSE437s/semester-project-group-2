@@ -69,6 +69,9 @@ const Whiteboard = (props) => {
     }
     useEffect(()=>{
         const canvasObject = canvasRef.current  
+        if(!canvasObject) {
+            return
+        }
         const localContext = canvasObject.getContext("2d")
         if(context === null) {
             setContext(canvasObject.getContext("2d"))
@@ -163,7 +166,7 @@ const Whiteboard = (props) => {
         // eslint-disable-next-line
     }, [context, props.height, props.width])
     return(<>
-        {isConnected ? <div className="border-8 border-gray-300 rounded block w-fit h-fit">
+        <div className="border-8 border-gray-300 rounded block w-fit h-fit">
             <canvas id="canvas" ref={canvasRef} width={props.width} height={props.height}/>
             <button onClick={getChangeColor} value="red" className="border-2 rounded-full bg-red-600 p-3 m-2"> </button>
             <button onClick={getChangeColor} value="blue" className="border-2 rounded-full bg-blue-600 p-3 m-2"> </button>
@@ -171,7 +174,7 @@ const Whiteboard = (props) => {
             <button onClick={getChangeColor} value="erase" className="bg-eraser p-4 bg-no-repeat bg-cover m-2"></button>
             <button onClick={clear} value="clear" className="bg-clear p-3 bg-no-repeat bg-cover m-2"></button>
             <input type="range" min="1" max="100" className="m-2" onChange={editWidth}/>
-        </div> : <> Loading </>}
+        </div>
     </>)
 }
 

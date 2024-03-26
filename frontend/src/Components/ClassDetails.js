@@ -153,7 +153,7 @@ const ClassDetails = () => {
 
     const rerouteToClassroom = (e) => {
         const TAid = e.target.value;
-        navigate(`/classrooms/${classId}/${TAid}`);
+        navigate(`/classrooms/${TAid}`);
     };
 
     function formatTime24to12(time24) {

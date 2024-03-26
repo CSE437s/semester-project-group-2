@@ -593,6 +593,15 @@ app.post("/api/updateUserName", (req, res) => {
     })(req, res)
 })
 
+const contains = (array, element) => {
+    for(var i in array) {
+        if(array[i].name === element) {
+            return true
+        }
+    }
+    return false
+}
+
 app.post("/api/addClassroomComponent", (req, res) => {
     passport.authenticate("jwt", {session: false}, (error, user) => {
         if(error) {
@@ -602,20 +611,32 @@ app.post("/api/addClassroomComponent", (req, res) => {
             res.status(401).send({error: "invalid auth"})
         }
         else {
-            userModel.findByIdAndUpdate(user._id, {
-                $push: {
-                    classroomComponents: {
-                        name: req.body.componentName,
-                        x: req.body.x,
-                        y: req.body.y,
-                        width: req.body.width,
-                        height: req.body.height
-                    }
+            userModel.findById(user._id).then(user => {
+                var name = req.body.componentName
+                var i = 1
+                while(contains(user.classroomComponents, name)) {
+                    name = req.body.componentName + i
+                    i++
                 }
-            }).then(r => {
-                console.log("success")
-                res.sendStatus(200)
-            }).catch(e => res.status(500).send({error: e}))
+                console.log(name)
+                user.classroomComponents.push({
+                    name: name,
+                    x: req.body.x,
+                    y: req.body.y,
+                    width: req.body.width,
+                    height: req.body.height
+                })
+                userModel.updateOne(user).then(r => {
+                    console.log("success")
+                    res.sendStatus(200)
+                }).catch(e => {
+                    console.log(e)
+                    res.status(500).send({error: e})
+                })
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({error: e})
+            })
         }
     })(req, res)
 })

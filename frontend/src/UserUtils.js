@@ -302,7 +302,7 @@ export function addClassroomComponent(type, x, y, width, height) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.data.status === 200) {
+        if(result.status === 200) {
             return true
         }
         return false

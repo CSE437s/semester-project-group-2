@@ -4,7 +4,7 @@ import NewRoom from "./NewRoom";
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from "axios";
 // import OHschedule from "./OHSchedule";
-import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents } from "../UserUtils";
+import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent } from "../UserUtils";
 // import { getClassByCode, getClassByID } from "../ClassUtils";
 import Whiteboard from "./Whiteboard";
 import Header from "./Header";
@@ -23,9 +23,10 @@ const Classroom = () => {
     const [roomURL, setRoomURL] = useState("")
     const [user, setCurrentUser] = useState(null);
     // eslint-disable-next-line
-    const [schedule, setOHSchedule] = useState({ days: [], start: '', end: '' });
     const [isOwner, setIsOwner] = useState(false);
     const [elements, setElements] = useState([])
+    const [showDropdown, setShowDropdown] = useState(false)
+    const [newComponentName, setNewComponentName] = useState("")
     const {  TAid } = useParams();
     const [taName, setTaName] = useState(""); // State to store TA's name
     const currentToken = localStorage.getItem("token");
@@ -69,7 +70,7 @@ const Classroom = () => {
     useEffect(() => {
         getAllUserHours(TAid).then(hours => {
             if (hours) {
-                setOHSchedule(hours);
+                // setOHSchedule(hours);
                 setIsLoading(false);
             } else {
                 setIsLoading(false);
@@ -81,7 +82,7 @@ const Classroom = () => {
     }, [TAid]); // Dependencies: classId and TAid
 
     const handleSubmit = (e) => {
-        const newRoomName = Math.random() * 1000 + "." + Date.now();
+        const newRoomName = Math.random() * 10 + "." + Date.now();
         createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />);
     };
 
@@ -201,92 +202,7 @@ const Classroom = () => {
                 </div> 
             </div>
         )
-        // timeCard =  <div className="flex-1 justify-center rounded-lg shadow-md p-8 bg-indigo-200" >
-        //     <form onSubmit={sendTimeInformation}>
-        //         <label className="block mb-4 text-center font-bold">When would you like to host your office hours?</label>
-        //         <div className="flex justify-between mb-4">
-        //             <label htmlFor="start_time" className="mr-2">from</label>
-        //             <select id="start_time" name="start_time">
-        //                 <option value="08:00">8:00 AM</option>
-        //                 <option value="08:30">8:30 AM</option>
-        //                 <option value="09:00">9:00 AM</option>
-        //                 <option value="09:30">9:30 AM</option>
-        //                 <option value="10:00">10:00 AM</option>
-        //                 <option value="10:30">10:30 AM</option>
-        //                 <option value="11:00">11:00 AM</option>
-        //                 <option value="11:30">11:30 AM</option>
-        //                 <option value="12:00">12:00 PM</option>
-        //                 <option value="12:30">12:30 PM</option>
-        //                 <option value="13:00">1:00 PM</option>
-        //                 <option value="13:30">1:30 PM</option>
-        //                 <option value="14:00">2:00 PM</option>
-        //                 <option value="14:30">2:30 PM</option>
-        //                 <option value="15:00">3:00 PM</option>
-        //                 <option value="15:30">3:30 PM</option>
-        //                 <option value="16:00">4:00 PM</option>
-        //                 <option value="16:30">4:30 PM</option>
-        //                 <option value="17:00">5:00 PM</option>
-        //                 <option value="17:30">5:30 PM</option>
-        //                 <option value="18:00">6:00 PM</option>
-        //                 <option value="18:30">6:30 PM</option>
-        //                 <option value="19:00">7:00 PM</option>
-        //                 <option value="19:30">7:30 PM</option>
-        //                 <option value="20:00">8:00 PM</option>
-        //                 <option value="20:30">8:30 PM</option>
-        //                 <option value="21:00">9:00 PM</option>
-        //                 <option value="21:30">9:30 PM</option>
-        //                 <option value="22:00">10:00 PM</option>
-        //             </select>
-        //         </div>
-        //         <div className="flex justify-between mb-4">
-        //             <label htmlFor="end_time" className="mr-2">until</label>
-        //             <select id="end_time" name="end_time">
-        //                 <option value="08:00">8:00 AM</option>
-        //                 <option value="08:30">8:30 AM</option>
-        //                 <option value="09:00">9:00 AM</option>
-        //                 <option value="09:30">9:30 AM</option>
-        //                 <option value="10:00">10:00 AM</option>
-        //                 <option value="10:30">10:30 AM</option>
-        //                 <option value="11:00">11:00 AM</option>
-        //                 <option value="11:30">11:30 AM</option>
-        //                 <option value="12:00">12:00 PM</option>
-        //                 <option value="12:30">12:30 PM</option>
-        //                 <option value="13:00">1:00 PM</option>
-        //                 <option value="13:30">1:30 PM</option>
-        //                 <option value="14:00">2:00 PM</option>
-        //                 <option value="14:30">2:30 PM</option>
-        //                 <option value="15:00">3:00 PM</option>
-        //                 <option value="15:30">3:30 PM</option>
-        //                 <option value="16:00">4:00 PM</option>
-        //                 <option value="16:30">4:30 PM</option>
-        //                 <option value="17:00">5:00 PM</option>
-        //                 <option value="17:30">5:30 PM</option>
-        //                 <option value="18:00">6:00 PM</option>
-        //                 <option value="18:30">6:30 PM</option>
-        //                 <option value="19:00">7:00 PM</option>
-        //                 <option value="19:30">7:30 PM</option>
-        //                 <option value="20:00">8:00 PM</option>
-        //                 <option value="20:30">8:30 PM</option>
-        //                 <option value="21:00">9:00 PM</option>
-        //                 <option value="21:30">9:30 PM</option>
-        //                 <option value="22:00">10:00 PM</option>
-        //             </select>
-        //         </div>
 
-        //         <div className="flex justify-center space-x-4">
-        //             <button onClick={handleDayPicker} value="M">M </button>
-        //             <button onClick={handleDayPicker} value="T">T </button>
-        //             <button onClick={handleDayPicker} value="W">W </button>
-        //             <button onClick={handleDayPicker} value="Th">Th </button>
-        //             <button onClick={handleDayPicker} value="F">F </button>
-        //             <button onClick={handleDayPicker} value="S">S </button>
-        //             <button onClick={handleDayPicker} value="Su">Su</button>
-        //         </div>
-        //         <div className="flex justify-center"> {/* Centered horizontally */}
-        //             <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
-        //         </div>
-        //     </form>
-        // </div>
     }
 
     const handleDrag = (e) => {
@@ -295,13 +211,9 @@ const Classroom = () => {
         const x = rectangle.x
         const y = rectangle.y
         console.log(x, y)
-        var targetElement;
-        if(element.id === "WhiteboardHandle") {
-            targetElement = findElement('Whiteboard')
-        }
-        else {
-            targetElement = findElement("VideoCall")
-        }
+        const widgetName = element.id.substring(0, element.id.indexOf("handle"))
+        console.log(widgetName)
+        const targetElement = findElement(widgetName)
         if(targetElement) {
             console.log("MOVED: x:", targetElement.x - x, "y:", targetElement.y - y)
             targetElement.x = x
@@ -315,20 +227,62 @@ const Classroom = () => {
     return (
         <div className="font-mono">
             <Header user={user} />
-            {isOwner? <button onClick={() => {
+            {isOwner? <>
+            <button onClick={() => {
                 if(editMode === true) {
                 }
                 setEditMode(!editMode)
-            }}> { editMode === true ? "save" : "edit" }</button> : <></>}
+            }}> { editMode === true ? "save" : "edit" }</button>
+            <br></br>
+            <button onClick={() => {
+                setShowDropdown(!showDropdown)
+            }}> 
+                 {showDropdown ? 
+                    <>
+                    x
+                    <label for="dropdown">Select a new element:</label>
+                    </>
+                    :
+                    <>
+                        +
+                    </>
+
+                 }
+            </button>
+            {showDropdown ? 
+                <>
+                    <select name="components" id="select-components" onChange={(e)=>{
+                            setNewComponentName(e.target.value)
+                    }}>
+                        <option value="whiteboard">Whiteboard</option>
+                        <option value="videocall">Video Call</option>
+                    </select>
+                    <button onClick={()=>{
+                        console.log("adding", newComponentName, "to user classroom")
+                        addClassroomComponent(newComponentName, 50, 50, 500, 500).then(result => {
+                            console.log(result)
+                            if(result === true) {
+                                window.location.reload()
+                            }
+                            else {
+                                console.log("An error occured")
+                            }
+                        }).catch(e => console.log(e))
+                    }}>add</button>
+                </>
+                : <></>}
+            </>
+            : <></>}
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
                 { 
                     elements.map((element) => {
-                        if(element.name === "Whiteboard") {
+                        console.log(element)
+                        if(element.name.indexOf("whiteboard") >= 0) {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                                {editMode && isOwner ? <Draggable grid={[20,20]} handle="#WhiteboardHandle" onStop={handleDrag} key="whiteboard">
+                                {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
                                 <div>
-                                    <div id="WhiteboardHandle" className="bg-gray-500 p-3"> </div>
+                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> </div>
                                     <Whiteboard width={element.width} height={element.height}/>
                                 </div> 
                             </Draggable> : <Whiteboard width={element.width} height={element.height}/>}
@@ -336,12 +290,12 @@ const Classroom = () => {
                         }
                         else {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                                {editMode && isOwner? <Draggable grid={[20,20]} handle="#VideoCallHandle" onStop={handleDrag} key="handle">
+                             {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}-handle`} onStop={handleDrag} key="handle">
                                 <div>
-                                    <div id="VideoCallHandle" className="bg-gray-500 p-3"> </div>
+                                    <div id={`${element.name}handle`} className="bg-gray-500 p-3"> </div>
                                     {render}
-                                </div> 
-                            </Draggable> : {render}}
+                                </div>  
+                            </Draggable> : render} 
                             </div>
                         }
                     })
