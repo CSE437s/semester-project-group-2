@@ -400,18 +400,9 @@ const ClassDetails = () => {
       <a href={`/classrooms/${user._id}`}>My Classroom</a>
     </li>
   )}
-  {isTA && (
-    <li className="border-b border-gray-400 my-8 uppercase">
-      <button
-        onClick={() => {
-          toggleScheduleModal();
-          setIsNavOpen(false);
-        }}
-      >
-        Set Office Hours
-      </button>
-    </li>
-  )}
+  {/* {isTA && (
+    
+  )} */}
     {isInstructor ? (
                 <li className="border-b border-gray-400 my-8 uppercase">
                     <button
@@ -470,14 +461,14 @@ const ClassDetails = () => {
                             </button>
                         )}
 
-                        {isTA && (
+                        {/* {isTA && (
                             <button
                                 className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
                                 onClick={toggleScheduleModal}
                             >
                                 Set Office Hours
                             </button>
-                        )}
+                        )} */}
                       
                         <button
                             className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
@@ -537,7 +528,7 @@ const ClassDetails = () => {
 
                                         return (
                                             <div key={ta._id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
-                                                <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
+                                                <h3 className="text-xl font-bold mb-4"> {user._id === ta._id ? "You!" : ta.firstName + " " + ta.lastName}</h3>
                                                 {taSchedule && taSchedule.hours ? (
                                                     <div className="text-center mb-4">
                                                         <p className="font-semibold">Office Hours:</p>
@@ -556,13 +547,25 @@ const ClassDetails = () => {
                                                         <p>No office hours scheduled.</p>
                                                     </div>
                                                 )}
+                                                {user._id === ta._id ?
+                                                <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out"
+                                                  onClick={() => {
+                                                    toggleScheduleModal();
+                                                    setIsNavOpen(false);
+                                                  }}
+                                                >
+                                                  Change Office Hours
+                                                </button>
+                                                :
                                                 <button
                                                     className={`mt-auto ${isOHNow ? 'bg-green-500 hover:bg-green-700' : 'bg-indigo-500 hover:bg-indigo-700'} text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
                                                     value={ta._id}
                                                     onClick={rerouteToClassroom}
                                                 >
-                                                    {isOHNow ? 'Join Office Hours Now' : 'View Virtual Classroom'}
+                                                       
+                                                {isOHNow ? 'Join Office Hours Now' : 'View Virtual Classroom'}
                                                 </button>
+                                                }   
                                             </div>
 
 
