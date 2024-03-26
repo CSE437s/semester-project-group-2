@@ -466,6 +466,20 @@ app.post("/api/addHours", (req, res) => {
     })(req, res);
   });
 
+  app.get('/api/hours', (req, res) => {
+    const { userId, classId } = req.query;
+    hoursModel.findOne({ userId: userId, classId: classId })
+        .then(hoursData => {
+            if (!hoursData) {
+                return res.status(404).send({ message: 'Hours not found' });
+            }
+            res.json(hoursData);
+        })
+        .catch(error => {
+            res.status(500).send({ error: error.message });
+        });
+});
+
 app.post("/api/getHours",  (req, res) => {
     passport.authenticate("jwt", {session: false}, (error, user) => {
         if(error) {

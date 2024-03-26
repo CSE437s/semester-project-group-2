@@ -1,54 +1,68 @@
 import React, { useState } from 'react';
 import { addUserHours } from '../UserUtils';
 
-const ScheduleModal = ({ onClose, userId, className, classId  }) => {
-  const [selectedSlots, setSelectedSlots] = useState(new Set());
-
-  const handleSlotSelection = (day, slot) => {
-    const slotKey = `${day}-${slot}`;
-    setSelectedSlots(prevSelectedSlots => {
-      const newSelectedSlots = new Set(prevSelectedSlots);
-      if (newSelectedSlots.has(slotKey)) {
-        newSelectedSlots.delete(slotKey);
-      } else {
-        newSelectedSlots.add(slotKey);
+const ScheduleModal = ({ onClose, userId, className, classId, onScheduleSubmit }) => {
+    const [selectedSlots, setSelectedSlots] = useState(new Set());
+  
+    const handleSlotSelection = (day, slot) => {
+      const slotKey = `${day}-${slot}`;
+      setSelectedSlots((prevSelectedSlots) => {
+        const newSelectedSlots = new Set(prevSelectedSlots);
+        if (newSelectedSlots.has(slotKey)) {
+          newSelectedSlots.delete(slotKey);
+        } else {
+          newSelectedSlots.add(slotKey);
+        }
+        return newSelectedSlots;
+      });
+    };
+  
+    const handleSubmit = async () => {
+      // Convert selectedSlots into a 7x28 array
+      const selectedHoursArray = Array.from({ length: 7 }, () =>
+        Array.from({ length: 28 }, () => 0)
+      );
+      selectedSlots.forEach((slot) => {
+        const [day, time] = slot.split('-');
+        const dayIndex = days.indexOf(day);
+        const timeIndex = timeSlots.indexOf(time);
+        if (dayIndex !== -1 && timeIndex !== -1) {
+          selectedHoursArray[dayIndex][timeIndex] = 1;
+        }
+      });
+  
+      // Submit the selectedHoursArray to the backend
+      addUserHours(userId, className, classId, selectedHoursArray)
+        .then((response) => {
+          if (response) {
+            alert('Office hours updated successfully.');
+            onScheduleSubmit(classId, userId, selectedHoursArray);
+            onClose();
+          } else {
+            alert('Failed to update office hours.');
+          }
+        })
+        .catch((error) => {
+          console.error('Error when adding user hours:', error);
+          alert('An error occurred while updating office hours.');
+        });
+    };
+  
+    const formatTime = (hour, minutes) => {
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12;
+      hour = hour ? hour : 12;
+      return `${hour}:${minutes} ${ampm}`;
+    };
+  
+    const generateTimeSlots = () => {
+      const slots = [];
+      for (let hour = 8; hour < 22; hour++) {
+        slots.push(formatTime(hour, '00'));
+        slots.push(formatTime(hour, '30'));
       }
-      return newSelectedSlots;
-    });
-  };
-
-  const handleSubmit = async () => {
-    const selectedHours = Array.from(selectedSlots);
-
-    addUserHours(userId, className, classId, selectedHours)
-    .then(response => {
-      if (response) {
-        alert("Office hours updated successfully.");
-        onClose();
-      } else {
-        alert("Failed to update office hours.");
-      }
-    })
-    .catch(error => {
-      console.error("Error when adding user hours:", error);
-      alert("An error occurred while updating office hours.");
-    });
-  };
-  const formatTime = (hour, minutes) => {
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12;
-    hour = hour ? hour : 12;
-    return `${hour}:${minutes} ${ampm}`;
-  };
-
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 8; hour < 22; hour++) {
-      slots.push(formatTime(hour, '00'));
-      slots.push(formatTime(hour, '30'));
-    }
-    return slots;
-  };
+      return slots;
+    };
 
   const days = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
   const timeSlots = generateTimeSlots();
@@ -98,6 +112,7 @@ const ScheduleModal = ({ onClose, userId, className, classId  }) => {
             onClick={handleSubmit}
           >
             Submit
+            
           </button>
         </div>
       </div>

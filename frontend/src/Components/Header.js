@@ -13,7 +13,7 @@ const Header = (props) => {
         if(user.classesAsTA.length > 0 || user.classesAsInstructor.length > 0) {
             setHasClassroom(true)
         }
-    })
+    }, [props.user]); 
     return (
         <header className="bg-indigo-300 p-0 py-5">
                 <div className="container flex justify-between items-center max-w-full">

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LogoutButton from "./LogoutButton";
 import { Link } from "react-router-dom";
 import { getCurrentUser, getEnrolledCourses, logout } from "../UserUtils"
 import {createClass, joinClass} from "../ClassUtils"
@@ -14,7 +13,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [userClasses, setUserClasses] = useState([]);
-  const [hasClassroom, setHasClassroom] = useState(false)
   const [user, setUser] = useState(null)
   const currentToken = localStorage.getItem("token")
 
@@ -46,9 +44,7 @@ const Dashboard = () => {
         if(userObject.data && userObject.data.user) {
           const currentUser = userObject.data.user
 
-          if(currentUser.classesAsTA.length > 0 || currentUser.classesAsInstructor.length > 0) {
-            setHasClassroom(true)
-          }
+        
 
           setUser(currentUser)
           // get user's classes
