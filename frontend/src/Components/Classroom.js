@@ -271,6 +271,7 @@ const Classroom = () => {
                     }}>
                         <option value="whiteboard">Whiteboard</option>
                         <option value="videocall">Video Call</option>
+                        <option value="chat">Text Chat</option>
                     </select>
                     <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
                         console.log("adding", newComponentName, "to user classroom")
@@ -286,10 +287,7 @@ const Classroom = () => {
                     }}> add</button>
                 </span>
                 : <></>}
-            </>
-                : <></>}
-                </div>
-                
+            </> : <></>}
                 {
                     elements.map((element) => {
                         console.log(element)
@@ -300,6 +298,8 @@ const Classroom = () => {
                                     <button onClick={handleDelete} id={element.name}> Remove </button>
                                     <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
                                     </div>
+                                    <Whiteboard width={element.width} height={element.height} />
+                                </div>
                                 </Draggable> : <Whiteboard width={element.width} height={element.height} />}
                             </div>
                         }
@@ -307,8 +307,8 @@ const Classroom = () => {
                             return <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
                                 {editMode && isOwner ? <Draggable grid={[20, 20]} handle={`#${element.name}handle`} onStop={handleDrag} key="chat">
                                     <div>
-                                        <button onClick={handleDelete} id={element.name}> x </button>
-                                        <div id={`${element.name}handle`} className="bg-gray-500 p-3">
+                                        <button onClick={handleDelete} id={element.name}> Remove </button>
+                                        <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3">
                                         </div>
                                         <ChatContainer />
                                     </div>
@@ -325,6 +325,8 @@ const Classroom = () => {
                                     <button onClick={handleDelete} id={element.name}> Remove </button>
                                     <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
                                     </div>
+                                    {render}
+                                </div>
                                 </Draggable> : render}
                             </div>
                         }
@@ -332,7 +334,6 @@ const Classroom = () => {
                 }
             </div>
 
-        </div>
     );
 }
 

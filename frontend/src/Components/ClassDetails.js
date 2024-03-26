@@ -4,7 +4,6 @@ import LogoutButton from "./LogoutButton"
 import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
 import Header from "./Header";
-import { Link } from 'react-router-dom';
 import ProfilePage from './ProfilePage';
 import SimpleModal from './SimpleModal';
 import ScheduleModal from './ScheduleModal';
@@ -144,15 +143,12 @@ const ClassDetails = () => {
                     } else {
                         setIsLoading(false);
                     }
-                } else {
-                    setIsLoading(false);
-                }
             }).catch(error => {
                 console.error("Error fetching class details: ", error);
                 setIsLoading(false);
             });
-        };
-
+        })
+    }
         fetchClassDetailsAndUsers();
     }, [classId, navigate, token]);
 
