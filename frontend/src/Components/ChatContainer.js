@@ -56,7 +56,7 @@ export default function ChatContainer() {
         
         }
         return () => socketio.disconnect()
-    }, [userId, name]);
+    }, [userId, name, currentToken, socketio]);
 
   
  
