@@ -877,4 +877,9 @@ io.on("connect", (socket) => {
         })
         console.log("connected sockets", printIDs(connections))
     })
+
+    socket.on("chat", chat => {
+        io.emit("chat", chat)
+    })
+    
 })

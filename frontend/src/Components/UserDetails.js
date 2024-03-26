@@ -184,33 +184,6 @@ const UserDetails = () => {
 
     return (
         <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen" style={{backgroundColor: backgroundColor}}>
-            {/* header */}
-            {/* <header className="bg-indigo-300 p-0 py-5">
-                <div className="container flex justify-between items-center max-w-full">
-                    <Link to="/home">
-                        <div className="flex items-center">
-                            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
-                        </div>
-                    </Link>
-                    <div>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/dashboard")}
-                        >
-                            Back to Dashboard
-                        </button>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/me")}
-                        >
-                            My Profile
-                        </button>
-
-                        <LogoutButton />
-                    </div>
-                </div>
-            </header> */}
             <Header user={user} />
 
 
@@ -371,17 +344,8 @@ const UserDetails = () => {
                             </div>
                         </div>
                     </div>
-
                     {/* )} */}
-
-
                 </div>
-
-
-
-
-
-
             </div>
         </div>
     );

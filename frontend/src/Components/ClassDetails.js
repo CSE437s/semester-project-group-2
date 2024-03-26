@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import LogoutButton from "./LogoutButton"
 import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
+import Header from "./Header";
+import { Link } from 'react-router-dom';
+import ProfilePage from './ProfilePage';
 import SimpleModal from './SimpleModal';
 import ScheduleModal from './ScheduleModal';
 import axios from 'axios';
@@ -63,7 +66,6 @@ const ClassDetails = () => {
             })
         }
         getCurrentUser().then(user => {
-            console.log('Fetched user:', user);
             if (user) {
                 setUser(user.data.user);
                 console.log('Set user:', user.data.user);
@@ -98,10 +100,20 @@ const ClassDetails = () => {
         const fetchClassDetailsAndUsers = () => {
             getClassByID(classId).then(classObject => {
                 if (classObject) {
-                    setClassDetails(classObject);
-
-                    if (classObject.students) {
-                        setStudents(classObject.students);
+                    setClassDetails(classObject)
+                }
+                if (classObject.students) {
+                    setStudents(classObject.students)
+                }
+                if (classObject.TAs) {
+                    setTeachingAssistants(classObject.TAs)
+                    // also get TA schedules
+                }
+                const instructorId = classObject.instructorId
+                findUser(instructorId).then(instructor => {
+                    if (instructor) {
+                        setInstructorId(instructorId)
+                        setInstructorName(instructor.firstName + " " + instructor.lastName)
                     }
 
                     if (classObject.TAs) {
@@ -211,7 +223,6 @@ const ClassDetails = () => {
             if (res === true) {
                 setStudents(prevStudents => prevStudents.filter(student => student._id !== studentId));
                 setTeachingAssistants(prevTAs => [...prevTAs, students.find(student => student._id === studentId)]);
-
                 alert("success")
                 window.location.reload()
             }
