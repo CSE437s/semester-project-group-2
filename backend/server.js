@@ -13,6 +13,7 @@ const JWTextract = require("passport-jwt").ExtractJwt
 const userModel = require("./database/models/userModel")
 const tokenModel = require("./database/models/tokenModel")
 const classModel = require("./database/models/classModel")
+const hoursModel = require("./database/models/hoursModel")
 const JWT = require("jsonwebtoken")
 const sendEmail = require("./sendEmail")
 const cors = require('cors')
@@ -26,7 +27,7 @@ var store = multer.diskStorage({
 
 const upload = multer({ store: store } )
 const DEBUGGING = process.env.DEBUGGING
-const url = DEBUGGING ? "http://localhost:3000" : "https://main--437ohproject.netlify.app" // where the request is coming from (frontend)
+const url = DEBUGGING ? process.env.DEBUGGING_FRONTEND_URL : process.env.FRONTEND_URL // where the request is coming from (frontend)
 app.use(cors({ credentials: true, origin: url}));
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
     res.header("Access-Control-Allow-Origin", url); 
@@ -433,53 +434,49 @@ app.post("/api/getClassById", (req, res) => {
 })
 
 app.post("/api/addHours", (req, res) => {
-    passport.authenticate("jwt", {session: false}, (error, user) => {
-        if(error) {
-            res.status(500).send({error: error})
-        }
-        else if(!user) {
-            res.status(401).send({error: "invalid auth"})
-        }
-        else {
-            userModel.findById(req.body.userId).then(user => {
-                var changed = false
-                if(user) {
-                    const hours = user.hours
-                    for(var i in hours) {
-                        const hoursObject = hours[i]
-                        if(hoursObject.classId === req.body.classId) {
-                            hours[i].hours.push({
-                                startTime: req.body.hours.startTime,
-                                endTime: req.body.hours.endTime,
-                                day: req.body.hours.day
-                            })
-                            changed = true
-                            // res.status(200).send({message: "successfully pushed new time"})
-                            // return
-                        }
-                    }
-                    if(changed === false) {
-                        hours.push({
-                            classId: req.body.classId,
-                            hours: [
-                                {
-                                    startTime: req.body.hours.startTime,
-                                    endTime: req.body.hours.endTime,
-                                    day: req.body.hours.day
-                                }
-                            ]
-                        })
-                    }
-                    user.updateOne({hours: hours}).then(something => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+      if (error) {
+        return res.status(500).send({ error: "Internal server error." });
+      }
+      if (!user) {
+        return res.status(401).send({ error: "Unauthorized access." });
+      }
+      const searchCriteria = {
+        userId: req.body.userId,
+        classId: req.body.classId
+      };
+  
+      const updateData = {
+        $set: { hours: req.body.hours }
+      };
 
-                        res.status(200).send({message: "created new class object"})
-                    })
-                }
-                // res.status(500).send({error: "not"})
-            })
-        }
-    })(req, res)
-})
+      hoursModel.findOneAndUpdate(searchCriteria, updateData, { new: true, upsert: true })
+        .then(updatedDocument => {
+          if(updatedDocument) {
+            res.status(200).send({ message: "Office hours updated successfully.", updatedDocument });
+          } else {
+            res.status(404).send({ message: "No matching document found to update." });
+          }
+        })
+        .catch(updateError => {
+          res.status(500).send({ error: updateError.message });
+        });
+    })(req, res);
+  });
+
+  app.get('/api/hours', (req, res) => {
+    const { userId, classId } = req.query;
+    hoursModel.findOne({ userId: userId, classId: classId })
+        .then(hoursData => {
+            if (!hoursData) {
+                return res.status(404).send({ message: 'Hours not found' });
+            }
+            res.json(hoursData);
+        })
+        .catch(error => {
+            res.status(500).send({ error: error.message });
+        });
+});
 
 app.post("/api/getHours",  (req, res) => {
     passport.authenticate("jwt", {session: false}, (error, user) => {

@@ -1,25 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate} from 'react-router-dom';
-//import LogoutButton from './LogoutButton';
 import { getCurrentUser, updateUserName, updateUserBio, updateUserBGColor } from "../UserUtils";
 import Header from "./Header";
 
-// const cleanFileName = (fileName) => {
-//     var newFileName = ""
-//     for (var i = 0; i < fileName.length; i++) {
-//         const char = fileName.charAt(i)
-//         if (char !== ' ' && char !== ' ' && char !== "(" && char !== ")") {
-//             newFileName += char
-//         }
-//     }
-//     return newFileName
-// }
-
 const UserDetails = () => {
-    // const DEBUGGING = false
-    // const base_url = "https://carefully-certain-swift.ngrok-free.app"
-    // const debugging_url = "http://localhost:3001"
-    // const api_url = DEBUGGING ? debugging_url : base_url
 
     const navigate = useNavigate();
     const [user, setUser] = useState();
@@ -157,7 +141,7 @@ const UserDetails = () => {
             updateUserName(user._id, firstName, lastName).then(res => {
                 console.log(res)
                 if (res === true) {
-                    alert("success")
+                    console.log("success")
                 }
             }).catch(e => console.log(e))
             navigate("/me");
@@ -172,7 +156,7 @@ const UserDetails = () => {
             updateUserBio(user._id, bio).then(res => {
                 console.log(res)
                 if (res === true) {
-                    alert("success")
+                    console.log("success")
                 }
             }).catch(e => console.log(e))
             navigate("/me");
@@ -188,7 +172,7 @@ const UserDetails = () => {
             updateUserBGColor(user._id, color).then(res => {
                 console.log(res)
                 if (res === true) {
-                    alert("success")
+                    console.log("success")
                 }
             }).catch(e => console.log(e))
             navigate("/me");
@@ -353,6 +337,10 @@ const UserDetails = () => {
                                     setBackgroundColor("grey");
                                     saveBackgroundColor("grey");
                                 }} role="menuitem">Grey</button>
+                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
+                                    setBackgroundColor("white");
+                                    saveBackgroundColor("white");
+                                }} role="menuitem">White</button>
                             </div>
                         </div>
                     </div>

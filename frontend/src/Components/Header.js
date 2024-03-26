@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import LogoutButton from "./LogoutButton";
 import { useNavigate, Link } from 'react-router-dom';
+import { getCurrentUser } from "../UserUtils";
 
 
 const Header = (props) => {
@@ -10,17 +11,30 @@ const Header = (props) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const { pathname } = window.location;
         // only run this if on dashboard-- was messing up the ability to use the header component on other pages TODO fix
-        if (pathname === '/dashboard') {
-            const user = props.user;
-            setId(user._id);
-            if (user.classesAsTA.length > 0 || user.classesAsInstructor.length > 0) {
-                setHasClassroom(true);
+        // if (pathname === '/dashboard') {
+            var user = props.user;
+            if(!user) {
+                const token = localStorage.getItem("token")
+                if(token) {
+                    getCurrentUser().then(u => {
+                        user = u.data.user
+                        console.log(user)
+                        setId(user._id)
+                    }).catch(e => console.log(e))
+                }
+                else {
+                    navigate("/login")
+                }
             }
-        }
-    }, [props.user]);
-
+            else {
+                setId(user._id);
+                if (user.classesAsTA.length > 0 || user.classesAsInstructor.length > 0) {
+                    setHasClassroom(true);
+                }
+            }
+        // }
+    }, [props.user, navigate]);
     return (
         <header className="bg-indigo-300 p-0 py-5 z-10">
 
@@ -87,31 +101,32 @@ const Header = (props) => {
                             >
                                 My Classroom
                             </button>
-                            : <></>
+                            : <>{hasClassroom}</>
                         }
 
                     </div>
-                    <button
-                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                        onClick={() => navigate("/dashboard")}
-                    >
-                        Back to Dashboard
-                    </button>
-
-
-                    <button
-                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                        onClick={() => navigate("/my-room")}
-                    >
-                        My Classroom
-                    </button>
-
-                    <button
-                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                        onClick={() => navigate("/me")}
-                    >
-                        My Profile
-                    </button>
+                    {
+                        window.location.href.indexOf("dashboard") < 0 ?
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/dashboard")}
+                        >
+                            Back to Dashboard
+                        </button>
+                        :
+                        <></>
+                    }
+                    {
+                        window.location.href.indexOf("me") < 0 ?
+                        <button
+                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                            onClick={() => navigate("/me")}
+                        >
+                            My Profile
+                        </button>
+                        :
+                        <></>
+                    }
 
                     <LogoutButton />
 
