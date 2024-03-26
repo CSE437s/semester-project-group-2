@@ -96,7 +96,7 @@ const ClassDetails = () => {
     };
 
     function getHoursByUserAndClass(userId, classId) {
-          return getUserHoursForClass(userId, classId)
+          return getUserHoursForClass(userId, classId).then(result => result)
           // .then(hours => {
           //   if(hours === null) {
           //     console.log("An error occured")
@@ -149,13 +149,13 @@ const ClassDetails = () => {
             if (classObject.TAs) {
               setTeachingAssistants(classObject.TAs);
               // Fetch TA schedules using TA IDs and class ID
-              const taSchedulesPromises = classObject.TAs.map((ta) =>
+              const taSchedules = classObject.TAs.map((ta) =>
                 getHoursByUserAndClass(ta._id, classObject._id)
               );
-
-              Promise.all(taSchedulesPromises)
-                .then((taSchedules) => {
+              // Promise.all(taSchedulesPromises)
+              //   .then((taSchedules) => {
                   setTASchedules(taSchedules);
+                  console.log("set ta schedules to ", setTASchedules)
                   // After setting TA schedules, fetch instructor details
                   if (classObject.instructorId) {
                     findUser(classObject.instructorId)
@@ -176,11 +176,11 @@ const ClassDetails = () => {
                         setIsLoading(false);
                       });
                   }
-                })
-                .catch((error) => {
-                  console.error("Error fetching TA schedules: ", error);
-                  setIsLoading(false);
-                });
+                // })
+                // .catch((error) => {
+                //   console.error("Error fetching TA schedules: ", error);
+                //   setIsLoading(false);
+                // });
             } else {
               setIsLoading(false);
             }
