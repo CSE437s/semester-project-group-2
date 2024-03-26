@@ -96,30 +96,32 @@ const ClassDetails = () => {
     };
 
     function getHoursByUserAndClass(userId, classId) {
-      const debugging = process.env.REACT_APP_DEBUGGING;
-      const url =
-        debugging === "true"
-          ? process.env.REACT_APP_DEBUGGING_FRONTEND_URL
-          : process.env.REACT_APP_FRONTEND_URL;
-      return axios
-        .get(url + "/api/hours", { params: { userId, classId } },
-        {
-            headers: {
-                "ngrok-skip-browser-warning": true
-            }
-        })
-        .then((response) => {
-          console.log(
-            `Hours data for user ${userId} and class ${classId}:`,
-            response.data.hours
-          );
-          return response.data.hours; // Assuming the response has the hours data
-        })
-        .catch((error) => {
-          console.error("Error fetching hours for user and class: ", error);
-          // Handle error appropriately
-          return null; // Indicate an error by returning null or an appropriate error value
-        });
+          return getUserHoursForClass(userId, classId)
+          // .then(hours => {
+          //   if(hours === null) {
+          //     console.log("An error occured")
+          //   }
+          //   return hours
+          // })
+      // return axios
+      //   .get(url + "/api/hours", { params: { userId, classId } },
+      //   {
+      //       headers: {
+      //           "ngrok-skip-browser-warning": true
+      //       }
+      //   })
+      //   .then((response) => {
+      //     console.log(
+      //       `Hours data for user ${userId} and class ${classId}:`,
+      //       response.data.hours
+      //     );
+      //     return response.data.hours; // Assuming the response has the hours data
+      //   })
+      //   .catch((error) => {
+      //     console.error("Error fetching hours for user and class: ", error);
+      //     // Handle error appropriately
+      //     return null; // Indicate an error by returning null or an appropriate error value
+      //   });
     }
     // eslint-disable-next-line
     const fetchClassDetailsAndUsers = () => {
