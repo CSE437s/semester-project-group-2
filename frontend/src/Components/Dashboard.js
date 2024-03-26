@@ -126,7 +126,7 @@ const Dashboard = () => {
 
   return (
     <div className="font-mono">
-      <Header user={user} />
+      <Header user={user} showSetOfficeHours={false} />
 
       <div className="font-mono container mx-auto mt-6 p-10 ">
 

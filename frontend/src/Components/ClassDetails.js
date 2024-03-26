@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
 import SimpleModal from './SimpleModal';
-
+import ScheduleModal from './ScheduleModal';
 
 const ClassDetails = () => {
     const { classId } = useParams();
@@ -18,7 +18,7 @@ const ClassDetails = () => {
     const [instructorName, setInstructorName] = useState("")
     const [instructorId, setInstructorId] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-
+    const [isTA, setIsTA] = useState(false);
     const token = localStorage.getItem("token")
     const [isInstructor, setIsInstructor] = useState(false);
     useEffect(() => {
@@ -28,6 +28,12 @@ const ClassDetails = () => {
 
     const toggleModal = () => setIsModalOpen(!isModalOpen);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+    const toggleScheduleModal = () => {
+        console.log('Toggling Schedule Modal');
+        setShowScheduleModal(!showScheduleModal);
+    };
 
     const filteredTeachingAssistants = teachingAssistants.filter(ta =>
         ta.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,10 +61,12 @@ const ClassDetails = () => {
             })
         }
         getCurrentUser().then(user => {
+            console.log('Fetched user:', user);
             if (user) {
-                setUser(user.data.user)
+                setUser(user.data.user);
+                console.log('Set user:', user.data.user);
             }
-        }).catch(e => console.log(e))
+        }).catch(e => console.log(e));
         //eslint-disable-next-line
         const fetchUsersDetails = async (userIds) => {
             const userDetails = await Promise.all(userIds.map(async (id) => {
@@ -72,6 +80,7 @@ const ClassDetails = () => {
             return userDetails.filter(Boolean)
         };
 
+
         // eslint-disable-next-line
         const fetchClassDetailsAndUsers = async () => {
             getClassByID(classId).then(classObject => {
@@ -84,6 +93,7 @@ const ClassDetails = () => {
                 if (classObject.TAs) {
                     setTeachingAssistants(classObject.TAs)
                     // also get TA schedules
+
                 }
                 const instructorId = classObject.instructorId
                 findUser(instructorId).then(instructor => {
@@ -97,6 +107,14 @@ const ClassDetails = () => {
         }
         fetchClassDetailsAndUsers();
     }, [classId, navigate, token]);
+
+    useEffect(() => {
+        if (user && classDetails) {
+            const isUserTA = classDetails.TAs.some(ta => ta._id === user._id);
+            setIsTA(isUserTA);
+            console.log("TAsate" + isUserTA);
+        }
+    }, [user, classDetails]);
 
     //eslint-disable-next-line
     const fetchTASchedules = async (taIds) => {
@@ -284,6 +302,7 @@ const ClassDetails = () => {
                         >
                             Back to Dashboard
                         </button>
+
                         {isInstructor === true ? (
                             <button
                                 className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
@@ -298,6 +317,18 @@ const ClassDetails = () => {
                             >
                                 View Classmates
                             </button>
+                        )}
+
+                        {isTA && (
+                            <button
+                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                                onClick={toggleScheduleModal}
+                            >
+                                Set Office Hours
+                            </button>
+                        )}
+                        {showScheduleModal && (
+                            <ScheduleModal onClose={toggleScheduleModal} />
                         )}
                         <button
                             className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
@@ -434,6 +465,7 @@ const ClassDetails = () => {
 
 
                         </div>
+
 
                     </>
                 )}
