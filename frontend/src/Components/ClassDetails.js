@@ -149,7 +149,7 @@ const ClassDetails = () => {
             if (classObject.TAs) {
               setTeachingAssistants(classObject.TAs);
               // Fetch TA schedules using TA IDs and class ID
-              const taSchedules = classObject.TAs.map((ta) =>
+              const taSchedulesPromises = classObject.TAs.map((ta) =>
                 getHoursByUserAndClass(ta._id, classObject._id)
               );
               Promise.all(taSchedulesPromises)
