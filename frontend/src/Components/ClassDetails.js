@@ -1,8 +1,8 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import LogoutButton from './LogoutButton';
+import { useParams, useNavigate} from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
+import Header from "./Header";
 
 
 const ClassDetails = () => {
@@ -223,7 +223,8 @@ const ClassDetails = () => {
 
     return (
         <div className="font-mono">
-            <header className="bg-indigo-300 p-0 py-5">
+            <Header user={user} />
+            {/* <header className="bg-indigo-300 p-0 py-5">
                 <div className="container flex justify-between items-center max-w-full">
                     <Link to="/home">
                         <div className="flex items-center">
@@ -248,7 +249,7 @@ const ClassDetails = () => {
                         <LogoutButton />
                     </div>
                 </div>
-            </header>
+            </header> */}
 
             <div className="container mx-auto px-4 py-8">
 

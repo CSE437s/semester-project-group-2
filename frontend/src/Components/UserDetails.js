@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from 'react-router-dom';
-import LogoutButton from './LogoutButton';
+import { useNavigate} from 'react-router-dom';
+//import LogoutButton from './LogoutButton';
 import { getCurrentUser, updateUserName, updateUserBio, updateUserBGColor } from "../UserUtils";
+import Header from "./Header";
 
 // const cleanFileName = (fileName) => {
 //     var newFileName = ""
@@ -200,7 +201,7 @@ const UserDetails = () => {
     return (
         <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen" style={{backgroundColor: backgroundColor}}>
             {/* header */}
-            <header className="bg-indigo-300 p-0 py-5">
+            {/* <header className="bg-indigo-300 p-0 py-5">
                 <div className="container flex justify-between items-center max-w-full">
                     <Link to="/home">
                         <div className="flex items-center">
@@ -225,7 +226,8 @@ const UserDetails = () => {
                         <LogoutButton />
                     </div>
                 </div>
-            </header>
+            </header> */}
+            <Header user={user} />
 
 
             <div id="userDetailsContainer" className="font-mono">
