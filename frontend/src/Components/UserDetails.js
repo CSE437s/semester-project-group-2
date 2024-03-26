@@ -68,10 +68,9 @@ const UserDetails = () => {
         try {
             await updateColor(color);
     
-            document.body.style.backgroundColor = color;
-    
             setDropdownOpen(false);
             setBackgroundColor(color);
+            document.getElementById('userDetailsContainer').style.backgroundColor = color;
             
         } catch (error) {
             console.error("Error saving background color:", error);
@@ -122,7 +121,9 @@ const UserDetails = () => {
                     setIsTA(user.isTA || false);
                     setBio(user.bio || '');
                     setBackgroundColor(user.bg_color || 'white');
-                    document.body.style.backgroundColor = user.bg_color || 'white';
+                   
+                    document.getElementById('userDetailsContainer').style.backgroundColor = user.bg_color || 'white';
+                   
                 }
             }).catch((error) => {
                 console.log(error);
@@ -182,7 +183,7 @@ const UserDetails = () => {
 
     const updateColor = async (color) => {
         try {
-
+            
             updateUserBGColor(user._id, color).then(res => {
                 console.log(res)
                 if (res === true) {
@@ -197,7 +198,7 @@ const UserDetails = () => {
     }
 
     return (
-        <div className="font-mono">
+        <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen" style={{backgroundColor: backgroundColor}}>
             {/* header */}
             <header className="bg-indigo-300 p-0 py-5">
                 <div className="container flex justify-between items-center max-w-full">
@@ -227,7 +228,7 @@ const UserDetails = () => {
             </header>
 
 
-            <div classsName="">
+            <div id="userDetailsContainer" className="font-mono">
                 {/* {user && user.photoURL ? <img src={user.photoURL.replace("backend/", api_url)} className="rounded-full mx-auto mb-4" alt="Profile" width="100px" /> : null} */}
 
                 <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
@@ -320,6 +321,7 @@ const UserDetails = () => {
                     </div>
                 </div>
                 {/* )} */}
+                
 
                 <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
                     <div className="flex items-center">
