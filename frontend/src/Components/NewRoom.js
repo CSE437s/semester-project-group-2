@@ -9,9 +9,7 @@ const NewRoom = (props) => {
     console.log(props)
     const navigate = useNavigate()
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
-    const base_url = "https://carefully-certain-swift.ngrok-free.app"
-    const debugging_url ="http://localhost:5050"
-    const api_url = DEBUGGING ? debugging_url : base_url
+    const api_url = DEBUGGING ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const token = localStorage.getItem("token")
     if(!token) {
         navigate("/login")

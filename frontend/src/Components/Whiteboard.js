@@ -8,9 +8,8 @@ const Whiteboard = (props) => {
     const canvasRef = useRef(null)
     const [context, setContext] = useState(null)
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;;
-    const base_url = "wss://carefully-certain-swift.ngrok-free.app";
-    const debugging_url = "http://localhost:5050";
-    const url = DEBUGGING ? debugging_url : base_url;
+    // const base_url = "wss://carefully-certain-swift.ngrok-free.app";
+    const url = DEBUGGING ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL;
     const socket = io(url, {
         autoConnect: false,
         extraHeaders: {

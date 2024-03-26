@@ -26,7 +26,7 @@ var store = multer.diskStorage({
 
 const upload = multer({ store: store } )
 const DEBUGGING = process.env.DEBUGGING
-const url = DEBUGGING ? "http://localhost:3000" : "https://main--437ohproject.netlify.app" // where the request is coming from (frontend)
+const url = DEBUGGING ? process.env.DEBUGGING_FRONTEND_URL : process.env.FRONTEND_URL // where the request is coming from (frontend)
 app.use(cors({ credentials: true, origin: url}));
 app.use(function(req, res, next) { // https://enable-cors.org/server_expressjs.html
     res.header("Access-Control-Allow-Origin", url); 

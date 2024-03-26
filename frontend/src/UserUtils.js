@@ -1,8 +1,7 @@
 import axios from "axios"
 
 const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING
-const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
-// const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://silly-ads-taste.loca.lt"
+const url = DEBUGGING_MODE ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
 
 /**
  * getUser helper function
