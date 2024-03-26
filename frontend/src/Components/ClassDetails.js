@@ -152,8 +152,8 @@ const ClassDetails = () => {
               const taSchedules = classObject.TAs.map((ta) =>
                 getHoursByUserAndClass(ta._id, classObject._id)
               );
-              // Promise.all(taSchedulesPromises)
-              //   .then((taSchedules) => {
+              Promise.all(taSchedulesPromises)
+                .then((taSchedules) => {
                   setTASchedules(taSchedules);
                   console.log("set ta schedules to ", taSchedules)
                   // After setting TA schedules, fetch instructor details
@@ -176,11 +176,11 @@ const ClassDetails = () => {
                         setIsLoading(false);
                       });
                   }
-                // })
-                // .catch((error) => {
-                //   console.error("Error fetching TA schedules: ", error);
-                //   setIsLoading(false);
-                // });
+                })
+                .catch((error) => {
+                  console.error("Error fetching TA schedules: ", error);
+                  setIsLoading(false);
+                });
             } else {
               setIsLoading(false);
             }
