@@ -155,7 +155,7 @@ const ClassDetails = () => {
               // Promise.all(taSchedulesPromises)
               //   .then((taSchedules) => {
                   setTASchedules(taSchedules);
-                  console.log("set ta schedules to ", setTASchedules)
+                  console.log("set ta schedules to ", taSchedules)
                   // After setting TA schedules, fetch instructor details
                   if (classObject.instructorId) {
                     findUser(classObject.instructorId)
