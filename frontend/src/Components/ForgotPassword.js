@@ -1,4 +1,5 @@
 import axios from "axios"
+import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
     const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING;
@@ -9,21 +10,43 @@ const ForgotPassword = () => {
         const userEmail = e.target.email.value
         axios.post(url + "/api/initiateReset", {
             email: userEmail
-        }, 
-        {
-            headers: {
-                "ngrok-skip-browser-warning": true
-            }
-        }).then((res) => {
-            // const resetLink = res.data.resetLink
-        }).catch(e => console.log(e))
+        },
+            {
+                headers: {
+                    "ngrok-skip-browser-warning": true
+                }
+            }).then((res) => {
+                // const resetLink = res.data.resetLink
+            }).catch(e => console.log(e))
     }
     return (<>
-    pls enter your password for the reset email link (todo make this not stupid)
-        <form onSubmit={initiateReset}>
-            <input className="shadow appearance-none border rounded w-full py-2 my-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="email" />
-            <input type="submit" value="submit" />
-        </form>
+
+        <div className="font-mono">
+            <header className="bg-indigo-300 p-0 py-5">
+                <div className="container flex justify-center items-center max-w-full">
+                    <Link to="/home">
+                        <div className="flex items-center">
+                            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2" />
+                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
+                        </div>
+                    </Link>
+                </div>
+            </header>
+        </div>
+
+        <div className="flex justify-center mt-6 p-10 pb-4 font-mono">
+            <div className="mb-4">
+                <form onSubmit={initiateReset} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                    Enter your email to reset your password
+                </label>
+                    <input placeholder="Email" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-6" type="text" name="email" />
+                    <input type="submit" value="Submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
+                </form>
+            </div>
+
+        </div>
+
     </>)
 }
 
