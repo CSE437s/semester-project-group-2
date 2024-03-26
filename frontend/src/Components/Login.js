@@ -32,7 +32,6 @@ const Login = () => {
         }
         const email = e.target.email.value;
         const pass = e.target.current_password.value;
-        console.log(process.env)
         getUser(email, pass).then(userResult => {
             if(userResult.error) {
                 console.log("something went wrong", userResult.error)
