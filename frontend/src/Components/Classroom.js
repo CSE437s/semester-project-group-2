@@ -242,7 +242,11 @@ const Classroom = () => {
     return (
         <div className="font-mono">
             <Header user={user} />
-            {isOwner ? <>
+            
+             <div className="container mx-auto py-8">
+                <div className = "bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-7 mb-4 bg-indigo-200">
+                <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
+                {isOwner ? <>
                 <button onClick={() => {
                     if (editMode === true) {
                         setClassroomComponents(elements).then(_ => {
@@ -291,9 +295,6 @@ const Classroom = () => {
                     : <></>}
             </>
                 : <></>}
-             <div className="container mx-auto py-8">
-                <div className = "bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-7 mb-4 bg-indigo-200">
-                <h1 className="text-2xl font-bold text-center mb-4">{isOwner ? "Your Classroom" : `${taName}'s Classroom!`}</h1>
                 </div>
                 
                 {
