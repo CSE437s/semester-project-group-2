@@ -1,9 +1,10 @@
 import axios from "axios"
-import { Link } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 
 const ForgotPassword = () => {
     const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING;
     const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
+    const navigate = useNavigate();
 
     const initiateReset = (e) => {
         e.preventDefault()
@@ -18,6 +19,8 @@ const ForgotPassword = () => {
             }).then((res) => {
                 // const resetLink = res.data.resetLink
             }).catch(e => console.log(e))
+            alert("Please check your email for a reset link");
+            navigate("/login")
     }
     return (<>
 
