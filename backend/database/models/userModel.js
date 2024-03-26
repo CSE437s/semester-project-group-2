@@ -59,6 +59,12 @@ const userSchema = new mongoose.Schema(
       required: false,
       unique: false,
       default: []
+    },
+    classroomComponents: {
+      type: Array,
+      required: false,
+      unique: false,
+      default: []
     }
   },
   { timestamps: true }

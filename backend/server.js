@@ -24,8 +24,6 @@ var store = multer.diskStorage({
     }
 });
 
-console.log(process.env)
-
 const upload = multer({ store: store } )
 const DEBUGGING = process.env.DEBUGGING
 const url = DEBUGGING ? "http://localhost:3000" : "https://main--437ohproject.netlify.app" // where the request is coming from (frontend)
@@ -591,6 +589,88 @@ app.post("/api/updateUserName", (req, res) => {
                 console.log(e)
                 res.status(500).send({error: e})
             })
+        }
+    })(req, res)
+})
+
+const contains = (array, element) => {
+    for(var i in array) {
+        if(array[i].name === element) {
+            return true
+        }
+    }
+    return false
+}
+
+app.post("/api/addClassroomComponent", (req, res) => {
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findById(user._id).then(user => {
+                var name = req.body.componentName
+                var i = 1
+                while(contains(user.classroomComponents, name)) {
+                    name = req.body.componentName + i
+                    i++
+                }
+                console.log(name)
+                user.classroomComponents.push({
+                    name: name,
+                    x: req.body.x,
+                    y: req.body.y,
+                    width: req.body.width,
+                    height: req.body.height
+                })
+                userModel.updateOne(user).then(r => {
+                    console.log("success")
+                    res.sendStatus(200)
+                }).catch(e => {
+                    console.log(e)
+                    res.status(500).send({error: e})
+                })
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({error: e})
+            })
+        }
+    })(req, res)
+})
+
+app.post("/api/getClassroomComponents", (req, res) => {
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findById(req.body.userId).then(TAuser => {       
+                res.status(200).send({components: TAuser.classroomComponents})
+            }).catch(e => res.status(500).send({error: e}))
+        }
+    })(req, res)
+})
+
+app.post("/api/setClassroomComponents", (req, res) => {
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error})
+        }
+        else if(!user) {
+            res.status(401).send({error: "invalid auth"})
+        }
+        else {
+            userModel.findByIdAndUpdate(user._id, {
+                classroomComponents: req.body.newComponents
+            }).then(r => {
+                res.status(200).send({message: "updated"})
+            }).catch(e => res.status(500).send({error: e}))
         }
     })(req, res)
 })
