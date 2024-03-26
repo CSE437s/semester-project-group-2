@@ -22,7 +22,12 @@ const currentToken = localStorage.getItem("token");
 
 export default function ChatContainer() {
     
-    let socketio = socketIOClient(url)
+    let socketio = socketIOClient(url,
+        {
+            extraHeaders: {
+                "ngrok-skip-browser-warning": true
+            }
+        })
     const [chats, setChats ] = useState([])
    
     const [name, setName] = useState("");
