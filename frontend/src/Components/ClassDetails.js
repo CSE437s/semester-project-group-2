@@ -102,7 +102,12 @@ const ClassDetails = () => {
           ? process.env.REACT_APP_DEBUGGING_FRONTEND_URL
           : process.env.REACT_APP_FRONTEND_URL;
       return axios
-        .get(url + "/api/hours", { params: { userId, classId } })
+        .get(url + "/api/hours", { params: { userId, classId } },
+        {
+            headers: {
+                "ngrok-skip-browser-warning": true
+            }
+        })
         .then((response) => {
           console.log(
             `Hours data for user ${userId} and class ${classId}:`,

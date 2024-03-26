@@ -22,21 +22,25 @@ const currentToken = localStorage.getItem("token");
 
 export default function ChatContainer() {
     
-    let socketio = socketIOClient(url,
-        {
-            extraHeaders: {
-                "ngrok-skip-browser-warning": true
-            }
-        })
+    let socketio = socketIOClient(url, {
+        autoConnect: false,
+        extraHeaders: {
+            "ngrok-skip-browser-warning": true
+        }
+    })
     const [chats, setChats ] = useState([])
    
     const [name, setName] = useState("");
     const [userId, setId] = useState();
 
     useEffect(() => {
+        socketio.on("connect", () => {
+            console.log("socket connected")
+        })
         socketio.on("chat", senderChats => {
             setChats(senderChats)
         })
+        socketio.connect()
     })
 
     useEffect(() => {
