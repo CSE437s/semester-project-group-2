@@ -178,6 +178,7 @@ export function getAllUserHours(userId) {
  */
 export function getUserHoursForClass(userId, classId) {
     return getAllUserHours(userId).then(hours => hours.filter((hour) => {
+        console.log(hour)
         return hour.classId === classId
     })).catch(e => null)
 }
