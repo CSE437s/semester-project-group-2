@@ -1,9 +1,8 @@
-
 import './App.css';
 import Login from "./Components/Login"
 import Signup from './Components/Signup';
 import PendingApproval from './Components/PendingApproval'; 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Correct import statement
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "./Components/Home"
 import Dashboard from './Components/Dashboard';
 import UserDetails from './Components/UserDetails';
@@ -14,6 +13,7 @@ import CreateClassForm from "./Components/CreateClassForm";
 import Whiteboard from './Components/Whiteboard';
 import ResetPassword from "./Components/ResetPassword";
 import ForgotPassword from "./Components/ForgotPassword";
+import ProfilePage from './Components/ProfilePage';
 
 
 
@@ -34,6 +34,7 @@ const App = () => {
         <Route path="/whiteboard" element={<Whiteboard height={500} width={500}/>} /> 
         <Route path="/passwordReset" element={<ResetPassword />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
+        <Route path="/users/:userId" element={<ProfilePage/>} />
 
       </Routes>
     </Router>

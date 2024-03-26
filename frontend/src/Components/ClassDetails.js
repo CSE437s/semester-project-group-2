@@ -1,9 +1,10 @@
-import { useParams, useNavigate} from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { changeRoleInClass, findUser, getCurrentUser, logout } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
 import Header from "./Header";
-
+import { Link } from 'react-router-dom';
+import ProfilePage from './ProfilePage';
 
 const ClassDetails = () => {
     const { classId } = useParams();
@@ -21,9 +22,9 @@ const ClassDetails = () => {
     const token = localStorage.getItem("token")
 
     useEffect(() => {
-        if(!token) {
+        if (!token) {
             logout().then(status => {
-                if(status === true) {
+                if (status === true) {
                     navigate("/login")
                 }
                 else {
@@ -35,7 +36,7 @@ const ClassDetails = () => {
             })
         }
         getCurrentUser().then(user => {
-            if(user) {
+            if (user) {
                 setUser(user.data.user)
             }
         }).catch(e => console.log(e))
@@ -43,8 +44,8 @@ const ClassDetails = () => {
         const fetchUsersDetails = async (userIds) => {
             const userDetails = await Promise.all(userIds.map(async (id) => {
                 findUser(id).then(user => {
-                    if(user) {
-                        return {id: user._id, ...user}
+                    if (user) {
+                        return { id: user._id, ...user }
                     }
                     return null
                 }).catch(e => console.log(e))
@@ -55,19 +56,19 @@ const ClassDetails = () => {
         // eslint-disable-next-line
         const fetchClassDetailsAndUsers = async () => {
             getClassByID(classId).then(classObject => {
-                if(classObject) {
+                if (classObject) {
                     setClassDetails(classObject)
                 }
-                if(classObject.students) {
+                if (classObject.students) {
                     setStudents(classObject.students)
                 }
-                if(classObject.TAs) {
+                if (classObject.TAs) {
                     setTeachingAssistants(classObject.TAs)
                     // also get TA schedules
                 }
                 const instructorId = classObject.instructorId
                 findUser(instructorId).then(instructor => {
-                    if(instructor) {
+                    if (instructor) {
                         setInstructorId(instructorId)
                         setInstructorName(instructor.firstName + " " + instructor.lastName)
                     }
@@ -113,7 +114,7 @@ const ClassDetails = () => {
         }
 
         changeRoleInClass(studentId, classId, "student", "TA").then(res => {
-            if(res === true) {
+            if (res === true) {
                 alert("success")
                 // window.location.reload()
             }
@@ -210,47 +211,20 @@ const ClassDetails = () => {
 
     if (isLoading) {
         return (
-          <div className="flex justify-center items-center h-screen">
-            <div className="flex justify-center items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
-              </svg>
+            <div className="flex justify-center items-center h-screen">
+                <div className="flex justify-center items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
+                    </svg>
+                </div>
             </div>
-          </div>
         );
-      }
+    }
 
     return (
         <div className="font-mono">
             <Header user={user} />
-            {/* <header className="bg-indigo-300 p-0 py-5">
-                <div className="container flex justify-between items-center max-w-full">
-                    <Link to="/home">
-                        <div className="flex items-center">
-                            <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OFFICE HOURS</h1>
-                        </div>
-                    </Link>
-                    <div>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/dashboard")}
-                        >
-                            Back to Dashboard
-                        </button>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                            onClick={() => navigate("/me")}
-                        >
-                            My Profile
-                        </button>
-
-                        <LogoutButton />
-                    </div>
-                </div>
-            </header> */}
-
             <div className="container mx-auto px-4 py-8">
 
                 {classDetails && (
@@ -274,11 +248,16 @@ const ClassDetails = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                                     {teachingAssistants.map((ta) => {
                                         // console.log(ta)
-                                        if(ta) {
+                                        if (ta) {
                                             const taSchedule = taSchedules.find(schedule => schedule.taId === ta._id);
                                             const isOHNow = taSchedule && isCurrentlyOH(taSchedule.ohTimes, currentTime);
                                             return (
                                                 <div key={ta._id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
+                    
+                                                    <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
+                                                        {ta.firstName} {ta.lastName}
+                                                    </Link>
+                                                    
                                                     <h3 className="text-xl font-bold mb-4">{ta.firstName} {ta.lastName}</h3>
                                                     {taSchedule && (
                                                         <div className="text-center mb-4">
@@ -303,7 +282,7 @@ const ClassDetails = () => {
                                         }
                                         else {
                                             return (<>
-                                            error
+                                                error
                                             </>)
                                         }
                                     })}
