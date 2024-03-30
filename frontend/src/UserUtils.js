@@ -283,7 +283,7 @@ export function updateUserName(userId, firstName, lastName) {
  * @param y 
  * @param width 
  * @param height 
- * @returns true if successful, false otherwise
+ * @returns new component if successful, false otherwise
  */
 export function addClassroomComponent(type, x, y, width, height) {
     const token = localStorage.getItem("token")
@@ -303,10 +303,10 @@ export function addClassroomComponent(type, x, y, width, height) {
         }
     }).then(result => {
         if(result.status === 200) {
-            return true
+            return result.data.newComponent
         }
-        return false
-    }).catch(e => false)
+        return null
+    }).catch(e => null)
 }
 
 /**

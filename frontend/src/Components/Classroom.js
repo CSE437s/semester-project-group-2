@@ -61,7 +61,7 @@ const Classroom = () => {
                 console.log("TA was unable to be found")
             }
         }).catch(e => console.log(e))
-    }, [TAid]); // Dependency: TAid
+    }, [TAid, elements]); // Dependency: TAid
 
     useEffect(() => {
         getAllUserHours(TAid).then(hours => {
@@ -101,16 +101,6 @@ const Classroom = () => {
             console.log(e);
         });
     };
-    // var dates = [];
-    // const removeElement = (element) => {
-    //     const newDates = [];
-    //     for (var day in dates) {
-    //         if (dates[day] !== element) {
-    //             newDates.push(dates[day]);
-    //         }
-    //     }
-    //     dates = newDates;
-    // };
 
     const findElement = (elementName) => {
         for (var i in elements) {
@@ -120,42 +110,6 @@ const Classroom = () => {
         }
     }
 
-    // const handleDayPicker = (e) => {
-    //     e.preventDefault();
-    //     const day = e.target.value;
-    //     const color = e.target.style.backgroundColor;
-    //     if (color !== '' && color !== "") { // deselecting
-    //         e.target.style.backgroundColor = "";
-    //         removeElement(day);
-    //     }
-    //     else { //  selecting
-    //         e.target.style.backgroundColor = "#818cf8";
-    //         dates.push(day);
-    //     }
-    //     console.log(dates);
-    // };
-
-    // const sendTimeInformation =  async (e) => {
-    //     // e.preventDefault();
-    //     // const start_time = e.target.start_time.value;
-    //     // const end_time = e.target.end_time.value;
-    //     //  for(var i in dates) {
-    //     //     const date = dates[i]
-    //     //     // figure out how to get class id if classroom is just for TA 
-    //     //     // const status = await addUserHours(user._id, "", classId, {
-    //     //     //     day: date,
-    //     //     //     startTime: start_time,
-    //     //     //     endTime: end_time
-    //     //     // })
-    //     //     // if(status === true) {
-    //     //     //     alert("success")
-    //     //     // }z
-    //     //     // else {
-    //     //     //     alert("Something went wrong please try again")
-    //     //     // }
-    //     // }
-    //     // dates = [];
-    // };
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -197,14 +151,16 @@ const Classroom = () => {
         )
 
     }
-
+// FIXME after 2nd whiteboard added, first becomes undraggable?
     const handleDrag = (e) => {
+        console.log(elements)
         const element = e.target
         const rectangle = element.getBoundingClientRect()
         const x = rectangle.x
         const y = rectangle.y
         console.log(x, y)
         const widgetName = element.id.substring(0, element.id.indexOf("handle"))
+        console.log(widgetName, elements)
         const targetElement = findElement(widgetName)
         if (targetElement) {
             console.log("MOVED: x:", targetElement.x - x, "y:", targetElement.y - y)
@@ -212,6 +168,12 @@ const Classroom = () => {
             targetElement.y = y
             console.log(elements)
         }
+    }
+
+    const saveElements = () => {
+        setClassroomComponents(elements).then(_ => {
+            // window.location.reload()
+        }).catch(e => console.log(e))
     }
 
     const removeFromArray = (elementToRemove) => {
@@ -224,19 +186,36 @@ const Classroom = () => {
         setElements(newArray)
     }
 
+    const handleAdd = () => {
+        addClassroomComponent(newComponentName, 200, 200, 500, 500).then(result => {
+            console.log(result)
+            if(result !== null) {
+                // window.location.reload()
+                console.log(elements)
+                const oldElements = [...elements]
+                oldElements.push(result)
+                setElements(oldElements)
+                console.log(elements, oldElements)
+                return true
+            }
+            else {
+                console.log("An error occured")
+                return false
+            }
+        }).catch(e => console.log(e))
+    }
+
     const handleDelete = (e) => {
-        console.log("you clicked delete on", e.target.id)
         removeFromArray(e.target.id)
+        saveElements()
     }
     return (
         <div className="font-mono">
             <Header user={user} />
             {isOwner? <>
-            <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5" onClick={() => {
+            <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
                 if(editMode === true) {
-                    setClassroomComponents(elements).then(_ => {
-                        // window.location.reload()
-                    }).catch(e => console.log(e))
+                    saveElements()
                 }
                 setEditMode(!editMode)
             }}> { editMode === true ? "save changes" : "edit classroom" }</button>
@@ -267,20 +246,14 @@ const Classroom = () => {
                     </select>
                     <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
                         console.log("adding", newComponentName, "to user classroom")
-                        addClassroomComponent(newComponentName, 100, 100, 500, 500).then(result => {
-                            console.log(result)
-                            if(result === true) {
-                                window.location.reload()
-                            }
-                            else {
-                                console.log("An error occured")
-                            }
-                        }).catch(e => console.log(e))
+                        handleAdd()
+                        // if(result === true) this.forceUpdate()
                     }}> add</button>
                 </span>
                 : <></>}
             </> : <></>}
                 {
+                    // console.log(elements)
                     elements.map((element) => {
                         console.log(element)
                         if(element.name.indexOf("whiteboard") >= 0) {
