@@ -187,6 +187,8 @@ const Classroom = () => {
     }
 
     const handleAdd = () => {
+        // const x = Math.floor(Math.random() * 100)
+        // const y = Math.floor(Math.random() * 100)
         addClassroomComponent(newComponentName, 200, 200, 500, 500).then(result => {
             console.log(result)
             if(result !== null) {
@@ -216,6 +218,7 @@ const Classroom = () => {
             <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
                 if(editMode === true) {
                     saveElements()
+                    setShowDropdown(false)
                 }
                 setEditMode(!editMode)
             }}> { editMode === true ? "save changes" : "edit classroom" }</button>
@@ -257,16 +260,20 @@ const Classroom = () => {
                     elements.map((element) => {
                         console.log(element)
                         if(element.name.indexOf("whiteboard") >= 0) {
-                            return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                                {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
-                                <div>
+                            return <>
+                                {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key={element.name}>
+                                <div id={element.name} style={{position: "absolute", top: element.y + "px", left: element.x + "px"}}>
                                     <button onClick={handleDelete} id={element.name}> Remove </button>
                                     <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
                                     </div>
                                     <Whiteboard width={element.width} height={element.height} />
                                 </div>
-                                </Draggable> : <Whiteboard width={element.width} height={element.height} />}
-                            </div>
+                                </Draggable> : 
+                                <div style={{position: "absolute", top: element.y + "px", left: element.x + "px"}}>
+                                    <Whiteboard width={element.width} height={element.height} />
+                                </div>
+                        }
+                            </>
                         }
                         else if(element.name.indexOf("chat") >= 0) {
                             return <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>

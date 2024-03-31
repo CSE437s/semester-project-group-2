@@ -746,6 +746,7 @@ app.post("/api/sendVideoURL", (req, res) => {
             const callCreatedBy = req.body.creator
             const url = req.body.url
             URLs.set(callCreatedBy, url)
+            console.log(URLs)
             res.sendStatus(201)
         }
     })(req, res)
@@ -762,6 +763,7 @@ app.post("/api/getVideoURL", (req, res) => {
         else {
             const user = req.body.creator
             if(URLs.has(user) == true) {
+                
                 res.json({"url": URLs.get(user)})
             }
             else {

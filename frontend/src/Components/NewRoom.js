@@ -1,6 +1,6 @@
 import { JitsiMeeting } from '@jitsi/react-sdk';
 import {useNavigate} from "react-router-dom"
-import axios from "axios";
+import { sendNewVideoURL } from '../UserUtils';
 // import Draggable, {DraggableCore} from "react-draggable";
 
 
@@ -29,18 +29,14 @@ const NewRoom = (props) => {
             }
             else {
                 console.log("creating a new room")
-                const data = {
-                    "creator": localStorage.getItem("userID"),
-                    "url": iframeRef.childNodes[0].getAttribute("src")
-                }
-                console.log(data)
-                axios.post(api_url + "/api/sendVideoURL", data, {
-                    headers: {
-                        "content-type": "application/json",
-                        Authorization: "Bearer " + token,
-                        "ngrok-skip-browser-warning": true
-                    },
-                });
+                sendNewVideoURL(iframeRef.children[0].getAttribute("src")).then(result => {
+                    if(result === true) {
+                        console.log('successfully added room URL')
+                    }
+                    if(result.error) {
+                        console.log(result.error)
+                    }
+                }).catch(e => console.log(e))
             }
             console.log(iframeRef); 
             iframeRef.style.height = '500px'; 
