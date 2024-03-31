@@ -79,7 +79,7 @@ const Classroom = () => {
 
     const handleSubmit = (e) => {
         const newRoomName = Math.random() * 10 + "." + Date.now();
-        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />);
+        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} height="700px" width="500px"/>);
     };
 
     const getNewUrl = (roomOwner) => {
@@ -151,7 +151,6 @@ const Classroom = () => {
         )
 
     }
-// FIXME after 2nd whiteboard added, first becomes undraggable?
     const handleDrag = (e) => {
         console.log(elements)
         const element = e.target
@@ -168,6 +167,7 @@ const Classroom = () => {
             targetElement.y = y
             console.log(elements)
         }
+        saveElements()
     }
 
     const saveElements = () => {
@@ -263,8 +263,8 @@ const Classroom = () => {
                             return <>
                                 {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key={element.name}>
                                 <div id={element.name} style={{position: "absolute", top: element.y + "px", left: element.x + "px"}}>
-                                    <button onClick={handleDelete} id={element.name}> Remove </button>
-                                    <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
+                                    <div id={`${element.name}handle`} className="h-fit cursor-move bg-gray-500 p-1 px-3"> 
+                                        <button className="text-sm" onClick={handleDelete} id={element.name}> Remove </button>
                                     </div>
                                     <Whiteboard width={element.width} height={element.height} />
                                 </div>
@@ -276,31 +276,37 @@ const Classroom = () => {
                             </>
                         }
                         else if(element.name.indexOf("chat") >= 0) {
-                            return <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
+                            return <>
                                 {editMode && isOwner ? <Draggable grid={[20, 20]} handle={`#${element.name}handle`} onStop={handleDrag} key="chat">
-                                    <div>
-                                        <button onClick={handleDelete} id={element.name}> Remove </button>
-                                        <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3">
+                                    <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
+                                        <div id={`${element.name}handle`} className="h-fit cursor-move bg-gray-500 p-1 px-3">
+                                            <button className="text-sm" onClick={handleDelete} id={element.name}> Remove </button>
                                         </div>
                                         <ChatContainer />
                                     </div>
                                 </Draggable> 
                                 : 
-                                <ChatContainer />
+                                <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
+                                    <ChatContainer />
+                                </div>
                                 }
-                            </div>
+                            </>
                         }
                         else {
-                            return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
+                            return <>
                              {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="handle">
-                                <div>
-                                    <button onClick={handleDelete} id={element.name}> Remove </button>
-                                    <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
+                                <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
+                                    <div id={`${element.name}handle`} className="h-fit cursor-move bg-gray-500 p-1 px-3"> 
+                                        <button className="text-sm" onClick={handleDelete} id={element.name}> Remove </button>
                                     </div>
                                     {render}
                                 </div>
-                                </Draggable> : render}
-                            </div>
+                                </Draggable> : 
+                                <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
+                                    {render}
+                                </div>
+                        }
+                            </>
                         }
                     })
                 }

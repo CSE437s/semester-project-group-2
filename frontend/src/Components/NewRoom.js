@@ -1,15 +1,13 @@
 import { JitsiMeeting } from '@jitsi/react-sdk';
 import {useNavigate} from "react-router-dom"
 import { sendNewVideoURL } from '../UserUtils';
-// import Draggable, {DraggableCore} from "react-draggable";
+
 
 
 const NewRoom = (props) => {
     // const api = useRef();
     console.log(props)
     const navigate = useNavigate()
-    const DEBUGGING = process.env.REACT_APP_DEBUGGING;
-    const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const token = localStorage.getItem("token")
     if(!token) {
         navigate("/login")
@@ -39,8 +37,8 @@ const NewRoom = (props) => {
                 }).catch(e => console.log(e))
             }
             console.log(iframeRef); 
-            iframeRef.style.height = '500px'; 
-            iframeRef.style.width = '100%'; 
+            iframeRef.style.height = props.height; 
+            iframeRef.style.width = props.width; 
         } }
         />
     </>)
