@@ -94,7 +94,7 @@ const ClassDetails = () => {
     function getHoursByUserAndClass(userId, classId) {
       console.log(process.env)
       const url = process.env.REACT_APP_DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
-      return axios.get(url + "/api/hours", { params: { userId, classId } }, {
+      return axios.get(url + "/api/hours", { params: { userId, classId },
         headers: {
           "ngrok-skip-browser-warning": true
       }
@@ -168,31 +168,6 @@ const ClassDetails = () => {
       console.log("TAsate" + isUserTA);
     }
   }, [user, classDetails]);
-
-  //eslint-disable-next-line
-  const fetchTASchedules = async (taIds) => {
-    // try {
-    //     const schedules = await Promise.all(taIds.map(async (TAid) => {
-    //         const taRef = doc(db, "classes", classId, "TAs", TAid);
-    //         const taDoc = await getDoc(taRef);
-    //         if (taDoc.exists()) {
-    //             const taData = taDoc.data();
-    //             if (taData.OHtimes) {
-    //                 return { taId: TAid, ohTimes: taData.OHtimes };
-    //             } else {
-    //                 console.log(`TA with ID ${TAid} has no office hours data.`);
-    //                 return null;
-    //             }
-    //         } else {
-    //             console.log(`TA document with ID ${TAid} does not exist.`);
-    //             return null;
-    //         }
-    //     }));
-    //     setTASchedules(schedules.filter(Boolean));
-    // } catch (error) {
-    //     console.error("Error fetching TA schedules:", error);
-    // }
-  };
 
   const demoteToStudent = async (taId) => {
     if (instructorId && user._id !== instructorId) {
@@ -346,21 +321,6 @@ const ClassDetails = () => {
 
     return `${hour}:${minute} ${ampm}`;
   }
-
-  // // Example usage
-  // const taSchedule = [
-  //   [
-  //     0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  //     0, 0, 0,
-  //   ],
-  //   [
-  //     0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  //     0, 0, 0,
-  //   ],
-  //   // ... and so on for each day
-  // ];
-
-  // console.log(formatSchedule(taSchedule));
 
   useEffect(() => {
     if (classDetails) {
