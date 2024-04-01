@@ -96,13 +96,13 @@ const ClassDetails = () => {
     };
 
     function getHoursByUserAndClass(userId, classId) {
-          return getUserHoursForClass(userId, classId).then(result => result)
-          // .then(hours => {
-          //   if(hours === null) {
-          //     console.log("An error occured")
-          //   }
-          //   return hours
-          // })
+      return getUserHoursForClass(userId, classId).then(result => result)
+      // .then(hours => {
+      //   if(hours === null) {
+      //     console.log("An error occured")
+      //   }
+      //   return hours
+      // })
       // return axios
       //   .get(url + "/api/hours", { params: { userId, classId } },
       //   {
@@ -486,29 +486,7 @@ const ClassDetails = () => {
                     </li>
                   )}
 
-                  {isInstructor ? (
-                    <li className="border-b border-gray-400 my-8 uppercase">
-                      <button
-                        onClick={() => {
-                          toggleModal();
-                          setIsNavOpen(false);
-                        }}
-                      >
-                        Manage Students
-                      </button>
-                    </li>
-                  ) : (
-                    <li className="border-b border-gray-400 my-8 uppercase">
-                      <button
-                        onClick={() => {
-                          toggleModal();
-                          setIsNavOpen(false);
-                        }}
-                      >
-                        View Classmates
-                      </button>
-                    </li>
-                  )}
+
                   <li className="border-b border-gray-400 my-8 uppercase">
                     <LogoutButton />
                   </li>
@@ -527,30 +505,14 @@ const ClassDetails = () => {
               Back to Dashboard
             </button>
 
-            {isInstructor === true ? (
+            {isTA === true || isInstructor === true ?
               <button
                 className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                onClick={toggleModal}
+                onClick={() => navigate("/classrooms/" + user._id)}
               >
-                Manage Students
+                My Classroom
               </button>
-            ) : (
-              <button
-                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                onClick={toggleModal}
-              >
-                View Classmates
-              </button>
-            )}
-
-            {isTA === true || isInstructor === true ? 
-                            <button
-                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                                onClick={()=>navigate("/classrooms/" + user._id)}
-                            >
-                                My Classroom
-                            </button>
-            : <></>}
+              : <></>}
 
             <button
               className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
@@ -578,10 +540,28 @@ const ClassDetails = () => {
           <>
             <div className="font-mono home-container">
               {/* class name and prof */}
+              {/* class name and prof */}
               <div className="container mx-auto mt-6 bg-indigo-200 p-10 mb-6 rounded-lg shadow-lg">
-                <h1 className="text-3xl font-bold mb-4">
-                  {classDetails.className}
-                </h1>
+                <div className="flex justify-between items-center">
+                  <h1 className="text-3xl font-bold mb-4">
+                    {classDetails.className}
+                  </h1>
+                  {isInstructor === true ? (
+                    <button
+                      className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                      onClick={toggleModal}
+                    >
+                      Manage Students
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                      onClick={toggleModal}
+                    >
+                      View Classmates
+                    </button>
+                  )}
+                </div>
                 <p className="text-lg mb-4 text-gray-700">
                   {classDetails.classDescription}
                 </p>
@@ -624,11 +604,11 @@ const ClassDetails = () => {
                         <h3 className="text-xl font-bold mb-4">
                           {" "}
                           <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
-                              
-                          {user._id === ta._id
-                            ? "You!"
-                            : ta.firstName + " " + ta.lastName}
-                            </Link>
+
+                            {user._id === ta._id
+                              ? "You!"
+                              : ta.firstName + " " + ta.lastName}
+                          </Link>
                         </h3>
                         {taSchedule && taSchedule.hours ? (
                           <div className="text-center mb-4">
@@ -675,11 +655,10 @@ const ClassDetails = () => {
                           </button>
                         ) : (
                           <button
-                            className={`mt-auto ${
-                              isOHNow
+                            className={`mt-auto ${isOHNow
                                 ? "bg-green-500 hover:bg-green-700"
                                 : "bg-indigo-500 hover:bg-indigo-700"
-                            } text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
+                              } text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
                             value={ta._id}
                             onClick={rerouteToClassroom}
                           >
