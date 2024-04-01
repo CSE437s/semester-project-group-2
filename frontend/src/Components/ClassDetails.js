@@ -549,9 +549,11 @@ const ClassDetails = () => {
                           return schedule?.userId === ta._id
                         }
                       );
+                      console.log(taSchedule)
+                    const hours = process.env.REACT_APP_DEBUGGING === "true" ? taSchedule?.hours?.hours : taSchedule ? taSchedule.hours : undefined
                     const isOHNow =
                         taSchedule &&
-                        isCurrentlyOH(taSchedule.hours?.hours, currentTime);
+                        isCurrentlyOH(hours, currentTime);
                     console.log(isOHNow)
                     // return <></>
                     return (
