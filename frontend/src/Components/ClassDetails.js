@@ -10,7 +10,7 @@ import {
 import { getClassByID } from "../ClassUtils";
 import SimpleModal from "./SimpleModal";
 import ScheduleModal from "./ScheduleModal";
-import { getUserHoursForClass } from "../UserUtils";
+import axios from "axios"
 
 const ClassDetails = () => {
   const { classId } = useParams();
@@ -80,119 +80,86 @@ const ClassDetails = () => {
       .catch((e) => console.log(e));
     //eslint-disable-next-line
     const fetchUsersDetails = async (userIds) => {
-      const userDetails = await Promise.all(
-        userIds.map(async (id) => {
-          findUser(id)
-            .then((user) => {
+      const userDetails = await Promise.all(userIds.map(async (id) => {
+          findUser(id).then(user => {
               if (user) {
-                return { id: user._id, ...user };
+                  return { id: user._id, ...user }
               }
-              return null;
-            })
-            .catch((e) => console.log(e));
-        })
-      );
-      return userDetails.filter(Boolean);
-    };
+              return null
+          }).catch(e => console.log(e))
+      }))
+      return userDetails.filter(Boolean)
+  };
 
     function getHoursByUserAndClass(userId, classId) {
-          return getUserHoursForClass(userId, classId).then(result => result)
-          // .then(hours => {
-          //   if(hours === null) {
-          //     console.log("An error occured")
-          //   }
-          //   return hours
-          // })
-      // return axios
-      //   .get(url + "/api/hours", { params: { userId, classId } },
-      //   {
-      //       headers: {
-      //           "ngrok-skip-browser-warning": true
-      //       }
-      //   })
-      //   .then((response) => {
-      //     console.log(
-      //       `Hours data for user ${userId} and class ${classId}:`,
-      //       response.data.hours
-      //     );
-      //     return response.data.hours; // Assuming the response has the hours data
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error fetching hours for user and class: ", error);
-      //     // Handle error appropriately
-      //     return null; // Indicate an error by returning null or an appropriate error value
-      //   });
-    }
+      console.log(process.env)
+      const url = process.env.REACT_APP_DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
+      return axios.get(url + "/api/hours", { params: { userId, classId } }, {
+        headers: {
+          "ngrok-skip-browser-warning": true
+      }
+      })
+          .then(response => {
+              console.log(`Hours data for user ${userId} and class ${classId}:`, response.data);
+              return response.data; // Assuming the response has the hours data
+          })
+          .catch(error => {
+              console.error("Error fetching hours for user and class: ", error);
+              // Handle error appropriately
+              return null; // Indicate an error by returning null or an appropriate error value
+          });
+  }
+
     // eslint-disable-next-line
     const fetchClassDetailsAndUsers = () => {
-      getClassByID(classId).then((classObject) => {
-        if (classObject) {
-          setClassDetails(classObject);
-        }
-        if (classObject.students) {
-          setStudents(classObject.students);
-        }
-        if (classObject.TAs) {
-          setTeachingAssistants(classObject.TAs);
-          // also get TA schedules
-        }
-        const instructorId = classObject.instructorId;
-        findUser(instructorId)
-          .then((instructor) => {
-            if (instructor) {
-              setInstructorId(instructorId);
-              setInstructorName(
-                instructor.firstName + " " + instructor.lastName
-              );
-            }
+      getClassByID(classId).then(classObject => {
+          if (classObject) {
+              setClassDetails(classObject);
 
-            if (classObject.TAs) {
-              setTeachingAssistants(classObject.TAs);
-              // Fetch TA schedules using TA IDs and class ID
-              const taSchedulesPromises = classObject.TAs.map((ta) =>
-                getHoursByUserAndClass(ta._id, classObject._id)
-              );
-              Promise.all(taSchedulesPromises)
-                .then((taSchedules) => {
-                  setTASchedules(taSchedules);
-                  console.log("set ta schedules to ", taSchedules)
-                  // After setting TA schedules, fetch instructor details
-                  if (classObject.instructorId) {
-                    findUser(classObject.instructorId)
-                      .then((instructor) => {
-                        if (instructor) {
-                          setInstructorId(instructor._id);
-                          setInstructorName(
-                            instructor.firstName + " " + instructor.lastName
-                          );
-                          setIsLoading(false); // Set loading to false after all async operations are complete
-                        }
-                      })
-                      .catch((error) => {
-                        console.error(
-                          "Error fetching instructor details: ",
-                          error
-                        );
-                        setIsLoading(false);
-                      });
-                  }
-                })
-                .catch((error) => {
-                  console.error("Error fetching TA schedules: ", error);
+              if (classObject.students) {
+                  setStudents(classObject.students);
+              }
+
+              if (classObject.TAs) {
+                  setTeachingAssistants(classObject.TAs);
+                  // Fetch TA schedules using TA IDs and class ID
+                  const taSchedulesPromises = classObject.TAs.map(ta =>
+                      getHoursByUserAndClass(ta._id, classObject._id));
+
+                  Promise.all(taSchedulesPromises).then(taSchedules => {
+                      setTASchedules(taSchedules);
+                      // After setting TA schedules, fetch instructor details
+                      if (classObject.instructorId) {
+                          findUser(classObject.instructorId).then(instructor => {
+                              if (instructor) {
+                                  setInstructorId(instructor._id);
+                                  setInstructorName(instructor.firstName + " " + instructor.lastName);
+                                  setIsLoading(false); // Set loading to false after all async operations are complete
+                              }
+                          }).catch(error => {
+                              console.error("Error fetching instructor details: ", error);
+                              setIsLoading(false);
+                          });
+                      }
+                  }).catch(error => {
+                      console.error("Error fetching TA schedules: ", error);
+                      setIsLoading(false);
+                  });
+              } else {
                   setIsLoading(false);
-                });
-            } else {
+              }
+          } else {
               setIsLoading(false);
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching class details: ", error);
-            setIsLoading(false);
-          });
+          }
+      }).catch(error => {
+          console.error("Error fetching class details: ", error);
+          setIsLoading(false);
       });
-    };
-    fetchClassDetailsAndUsers();
-  }, [classId, navigate, token]);
+  };
+
+  fetchClassDetailsAndUsers();
+}, [classId, navigate, token]);
+
 
   useEffect(() => {
     if (user && classDetails) {
@@ -290,6 +257,7 @@ const ClassDetails = () => {
 
   function isCurrentlyOH(hoursArray, currentTime) {
     const currentDayIndex = currentTime.getDay() - 1;
+    console.log(hoursArray)
     const currentHour = currentTime.getHours();
     const currentMinute = currentTime.getMinutes();
     const currentTimeSlotIndex =
@@ -379,20 +347,20 @@ const ClassDetails = () => {
     return `${hour}:${minute} ${ampm}`;
   }
 
-  // Example usage
-  const taSchedule = [
-    [
-      0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0,
-    ],
-    [
-      0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0,
-    ],
-    // ... and so on for each day
-  ];
+  // // Example usage
+  // const taSchedule = [
+  //   [
+  //     0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  //     0, 0, 0,
+  //   ],
+  //   [
+  //     0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  //     0, 0, 0,
+  //   ],
+  //   // ... and so on for each day
+  // ];
 
-  console.log(formatSchedule(taSchedule));
+  // console.log(formatSchedule(taSchedule));
 
   useEffect(() => {
     if (classDetails) {
@@ -608,14 +576,19 @@ const ClassDetails = () => {
                         </div>
                       );
                     }
-
+                    // console.log(taSchedules)
+                    // taSchedules?.forEach((schedule) => {
+                    //   console.log("!", schedule?.hours?.userId, ta._id)
+                    // })
+                    // return <></>
                     const taSchedule = taSchedules?.find(
-                      (schedule) => schedule?.userId === ta._id
-                    );
+                        (schedule) => schedule?.hours?.userId === ta._id
+                      );
                     const isOHNow =
-                      taSchedule &&
-                      isCurrentlyOH(taSchedule.hours, currentTime);
-
+                        taSchedule &&
+                        isCurrentlyOH(taSchedule.hours?.hours, currentTime);
+                    console.log(isOHNow)
+                    // return <></>
                     return (
                       <div
                         key={ta._id}
@@ -634,7 +607,7 @@ const ClassDetails = () => {
                           <div className="text-center mb-4">
                             <p className="font-semibold">Office Hours:</p>
                             <div className="space-y-1">
-                              {formatSchedule(taSchedule.hours).map(
+                              {formatSchedule(taSchedule.hours.hours).map(
                                 (scheduleEntry, index) => (
                                   <div
                                     key={index}
