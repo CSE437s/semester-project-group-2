@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
-// import LogoutButton from './LogoutButton';
 import NewRoom from "./NewRoom";
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from "axios";
-// import OHschedule from "./OHSchedule";
 import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent } from "../UserUtils";
-// import { getClassByCode, getClassByID } from "../ClassUtils";
 import Whiteboard from "./Whiteboard";
 import Header from "./Header";
 import Draggable from "react-draggable";
 import ChatContainer from "./ChatContainer";
+import  { Resizable } from 'react-resizable';
+import '../resizable.css';
 
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
@@ -75,7 +74,7 @@ const Classroom = () => {
         }).catch((error) => {
             console.log("Error getting TA document:", error);
         });
-    }, [TAid]); // Dependencies: classId and TAid
+    }, [TAid]); // Dependency: TAid
 
     const handleSubmit = (e) => {
         const newRoomName = Math.random() * 10 + "." + Date.now();
@@ -198,6 +197,13 @@ const Classroom = () => {
 
     }
 
+    const handleResize = (element, newSize) => {
+        const elementToChange = findElement(element.name)
+        console.log(newSize)
+        elementToChange.width = newSize.width
+        elementToChange.height = newSize.height
+    }
+
     const handleDrag = (e) => {
         const element = e.target
         const rectangle = element.getBoundingClientRect()
@@ -223,7 +229,7 @@ const Classroom = () => {
         }
         setElements(newArray)
     }
-
+    
     const handleDelete = (e) => {
         console.log("you clicked delete on", e.target.id)
         removeFromArray(e.target.id)
@@ -285,14 +291,24 @@ const Classroom = () => {
                         console.log(element)
                         if(element.name.indexOf("whiteboard") >= 0) {
                             return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                                {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
-                                <div>
-                                    <button onClick={handleDelete} id={element.name}> Remove </button>
-                                    <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
-                                    </div>
-                                    <Whiteboard width={element.width} height={element.height} />
-                                </div>
-                                </Draggable> : <Whiteboard width={element.width} height={element.height} />}
+                                {editMode && isOwner ? <Resizable width={element.width} height={element.height}  onResize={(event, {elem, size, handle}) => {
+                                        element.height = size.height
+                                        element.width = size.width
+                                        setElements(elements)
+                                        console.log(size)
+                                        }}>
+                                        <div>
+                                            <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
+                                                <div>
+                                                    <button onClick={handleDelete} id={element.name}> Remove </button>
+                                                    <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
+                                                    </div>
+                                                    <Whiteboard width={element.width} height={element.height} />
+                                                </div>
+                                            </Draggable>
+                                        </div>
+                                        </Resizable>
+                                : <Whiteboard width={element.width} height={element.height} />}
                             </div>
                         }
                         else if(element.name.indexOf("chat") >= 0) {

@@ -1,7 +1,6 @@
 import { JitsiMeeting } from '@jitsi/react-sdk';
 import {useNavigate} from "react-router-dom"
 import axios from "axios";
-// import Draggable, {DraggableCore} from "react-draggable";
 
 
 const NewRoom = (props) => {
