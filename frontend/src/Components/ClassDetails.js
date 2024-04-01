@@ -6,6 +6,7 @@ import {
   findUser,
   getCurrentUser,
   logout,
+  DropStudentFromClass,
 } from "../UserUtils";
 import { getClassByID } from "../ClassUtils";
 import SimpleModal from "./SimpleModal";
@@ -225,6 +226,18 @@ const ClassDetails = () => {
     // } catch (error) {
     //     console.error("Error fetching TA schedules:", error);
     // }
+  };
+
+  const dropClass = async () => {
+    const userId = user.id;
+    DropStudentFromClass(userId, classId)
+      .then((res) => {
+        if (res === true) {
+          alert("Successfuly dropped class!");
+        } else {
+          alert("There was an error dropping the class");
+        }
+      })
   };
 
   const demoteToStudent = async (taId) => {
@@ -554,12 +567,23 @@ const ClassDetails = () => {
                       Manage Students
                     </button>
                   ) : (
-                    <button
-                      className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                      onClick={toggleModal}
-                    >
-                      View Classmates
-                    </button>
+                    <div>
+                      <button
+                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                        onClick={toggleModal}
+                      >
+                        View Classmates
+                      </button>
+                      <button
+                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                        onClick={() => {
+                          dropClass()
+                        }}
+                      >
+                        Drop Class
+                      </button>
+                    </div>
+
                   )}
                 </div>
                 <p className="text-lg mb-4 text-gray-700">
@@ -656,8 +680,8 @@ const ClassDetails = () => {
                         ) : (
                           <button
                             className={`mt-auto ${isOHNow
-                                ? "bg-green-500 hover:bg-green-700"
-                                : "bg-indigo-500 hover:bg-indigo-700"
+                              ? "bg-green-500 hover:bg-green-700"
+                              : "bg-indigo-500 hover:bg-indigo-700"
                               } text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out`}
                             value={ta._id}
                             onClick={rerouteToClassroom}

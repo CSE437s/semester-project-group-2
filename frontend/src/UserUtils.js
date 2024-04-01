@@ -276,6 +276,27 @@ export function updateUserName(userId, firstName, lastName) {
     }).catch(e => e)
 }
 
+export function DropStudentFromClass(userId, classId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/dropStudentFromClass", {
+        userId: userId,
+        classId: classId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(res => {
+        if(res.data.message === "updated successfully") {
+            return true
+        }
+        return false
+    }).catch(e => e)
+}
+
 /**
  *  adds a classroom to users account
  * @param type 

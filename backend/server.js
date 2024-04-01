@@ -591,6 +591,47 @@ app.post("/api/updateUserName", (req, res) => {
     })(req, res)
 })
 
+app.post("/api/dropStudentFromClass", (req, res) => {
+    userId = req.body.userId;
+    classId = req.body.classId;
+    passport.authenticate("jwt", {session: false}, (error, user) => {
+        if(error) {
+            res.status(500).send({error: error});
+        } else if(!user) {
+            res.status(401).send({error: "invalid auth"});
+        } else {
+            userModel.findByIdAndUpdate(
+                user._id, 
+                { $pull: { classesAsStudent: { _id: req.body.id } } }, 
+                { new: true }   
+            ).then(updatedUser => {
+                if(updatedUser) {
+                    classModel.findByIdAndUpdate(
+                        req.body.classId,
+                        { $pull: { students: { _id: user._id } } },
+                        { new: true }
+                    ).then(updatedClass => {
+                        if(updatedClass) {
+                            res.status(201).send({message: "updated successfully"});
+                        } else {
+                            res.status(500).send({error: "unable to update class"});
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                        res.status(500).send({error: "unable to update class: " + e.message});
+                    });
+                }
+                else {
+                    res.status(500).send({error: "unable to update user"});
+                }
+            }).catch(e => {
+                console.log(e);
+                res.status(500).send({error: "unable to update user: " + e.message});
+            });
+        }
+    })(req, res);
+});
+
 const contains = (array, element) => {
     for(var i in array) {
         if(array[i].name === element) {
