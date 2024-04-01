@@ -56,7 +56,7 @@ const TAHoursModal = ({ hoursData, tas, onClose }) => {
         <td key={day} className="p-2 border-b border-gray-200 text-center">
           <div className="inline-flex w-full h-4">
             {(() => {
-              const selectedTAs = hoursData.filter(hoursObj => hoursObj && hoursObj.hours[dayIndex][timeSlotIndex] === 1);
+              const selectedTAs = hoursData.filter(hoursObj => hoursObj &&   tas.some(ta => ta._id === hoursObj.userId) &&hoursObj.hours[dayIndex][timeSlotIndex] === 1);
               if (selectedTAs.length === 1) {
                 const ta = selectedTAs[0];
                 const colorClass = colorMapping[ta.userId];
