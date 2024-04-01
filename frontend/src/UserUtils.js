@@ -276,14 +276,15 @@ export function updateUserName(userId, firstName, lastName) {
     }).catch(e => e)
 }
 
-export function DropStudentFromClass(userId, classId) {
+export function DropStudentFromClass(userId, classId, isTA) {
     const token = localStorage.getItem("token")
     if(!token) {
         return null
     }
     return axios.post(url + "/api/dropStudentFromClass", {
         userId: userId,
-        classId: classId
+        classId: classId,
+        isTA : isTA
     }, {
         headers: {
             Authorization: "Bearer " + token,

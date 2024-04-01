@@ -230,7 +230,7 @@ const ClassDetails = () => {
 
   const dropClass = async () => {
     const userId = user.id;
-    DropStudentFromClass(userId, classId)
+    DropStudentFromClass(userId, classId, isTA)
       .then((res) => {
         if (res === true) {
           alert("Successfuly dropped class!");
