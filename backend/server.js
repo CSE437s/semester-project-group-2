@@ -488,14 +488,15 @@ app.post("/api/getHours",  (req, res) => {
             res.status(401).send({error: "invalid auth"})
         }
         else {
-            userModel.findById(req.body.userId).then(async user => {
-                if(user) {
-                res.status(200).send({hours: user.hours})
-                }
-                else {
-                    res.status(404).send({message: "could not locate user"})
-                }
-            }).catch(e => res.status(500).send({error: e}))
+            hoursModel.findOne({ userId: req.body.userId})
+                .then(hoursData => {
+                    if (hoursData) {
+                        res.status(200).send({ hours: hoursData });
+                    } else {
+                        res.status(404).send({ message: "Hours not found" });
+                    }
+                })
+                .catch(e => res.status(500).send({ error: e }));
         }
     })(req, res)
 })

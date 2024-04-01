@@ -1,7 +1,9 @@
 import axios from "axios"
 
 const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING
-const url = DEBUGGING_MODE === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
+console.log(process.env)
+const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
+// const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://silly-ads-taste.loca.lt"
 
 /**
  * getUser helper function
@@ -177,10 +179,22 @@ export function getAllUserHours(userId) {
  * @returns hours for that class, undefined if they don't exist or null if something goes wrong
  */
 export function getUserHoursForClass(userId, classId) {
-    return getAllUserHours(userId).then(hours => hours.filter((hour) => {
-        console.log(hour)
-        return hour.classId === classId
-    })).catch(e => null)
+    console.log(`Getting hours for user: ${userId} and class: ${classId}`);
+
+    return getAllUserHours(userId).then(hoursData => {
+        console.log(`Received hours data:`, hoursData);
+
+        if (hoursData && hoursData.classId === classId) {
+            console.log(`Hours for class ${classId}:`, hoursData.hours);
+            return hoursData;
+        } else {
+            console.log(`No hours found for class ${classId} or mismatch in class IDs`);
+            return [];
+        }
+    }).catch(e => {
+        console.error(`Error fetching hours for user ${userId} and class ${classId}:`, e);
+        return null;
+    });
 }
 
 /**
@@ -275,136 +289,3 @@ export function updateUserName(userId, firstName, lastName) {
         return false
     }).catch(e => e)
 }
-
-/**
- *  adds a classroom to users account
- * @param type 
- * @param x 
- * @param y 
- * @param width 
- * @param height 
- * @returns true if successful, false otherwise
- */
-export function addClassroomComponent(type, x, y, width, height) {
-    const token = localStorage.getItem("token")
-    if(!token) {
-        return null
-    }
-    return axios.post(url + "/api/addClassroomComponent", {
-        componentName: type,
-        x: x, 
-        y: y,
-        width: width,
-        height: height
-    }, {
-        headers: {
-            Authorization: "Bearer " + token,
-            "ngrok-skip-browser-warning": true
-        }
-    }).then(result => {
-        if(result.status === 200) {
-            return true
-        }
-        return false
-    }).catch(e => false)
-}
-
-/**
- * gets all components in a users classrooms
- * @returns components if successful, error object otherwise
- */
-export function getClassroomComponents(userId) {
-    const token = localStorage.getItem("token")
-    if(!token) {
-        return {error: "no auth token available"}
-    }
-    return axios.post(url + "/api/getClassroomComponents", {
-        userId: userId
-    }, {
-        headers: {
-            Authorization: "Bearer " + token,
-            "ngrok-skip-browser-warning": true
-        }
-    }).then(result => {
-        return result.data.components
-    }).catch(e => e)
-}
-
-/**
- * reset user components to new array
- * @param  newComponents 
- * @returns true if successful, false otherwise
- */
-export function setClassroomComponents(newComponents) {
-    const token = localStorage.getItem("token")
-    if(!token) {
-        return null
-    }
-    return axios.post(url + "/api/setClassroomComponents", {
-        newComponents: newComponents
-    }, {
-        headers: {
-            Authorization: "Bearer " + token,
-            "ngrok-skip-browser-warning": true
-        }
-    }).then(result => {
-        console.log(result)
-        if(result.status === 200) {
-            return true
-        }
-        return false
-    }).catch(e => false)
-}
-
-// helper to change a user's bio
-// @param userId
-// @param bio
-
-export function updateUserBio(userId, bio) {
-    console.log("we get to UserUtils.js");
-    const token = localStorage.getItem("token")
-    if(!token) {
-        return null
-    }
-    return axios.post(url + "/api/updateUserBio", {
-        id: userId,
-        bio: bio
-    }, {
-        headers: {
-            Authorization: "Bearer " + token,
-            "ngrok-skip-browser-warning": true
-        }
-    }).then(res => {
-        if(res.data.message === "updated successfully") {
-            return true
-        }
-        return false
-    }).catch(e => e)
-}
-
-// helper to change a user's bg color
-// @param userId
-// @param color
-
-export function updateUserBGColor(userId, color) {
-    //console.log("we get to UserUtils.js");
-    const token = localStorage.getItem("token")
-    if(!token) {
-        return null
-    }
-    return axios.post(url + "/api/updateUserBGColor", {
-        id: userId,
-        color: color
-    }, {
-        headers: {
-            Authorization: "Bearer " + token,
-            "ngrok-skip-browser-warning": true
-        }
-    }).then(res => {
-        if(res.data.message === "updated successfully") {
-            return true
-        }
-        return false
-    }).catch(e => e)
-}
-
