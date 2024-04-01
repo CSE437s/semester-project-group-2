@@ -542,7 +542,12 @@ const ClassDetails = () => {
                     // })
                     // return <></>
                     const taSchedule = taSchedules?.find(
-                        (schedule) => schedule?.hours?.userId === ta._id
+                        (schedule) => {
+                          if(process.env.REACT_APP_DEBUGGING === "true") {
+                            return schedule?.hours?.userId === ta._id
+                          }
+                          return schedule?.userId === ta._id
+                        }
                       );
                     const isOHNow =
                         taSchedule &&

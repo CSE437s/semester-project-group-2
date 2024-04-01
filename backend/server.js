@@ -455,6 +455,7 @@ app.post("/api/addHours", (req, res) => {
           if(updatedDocument) {
             res.status(200).send({ message: "Office hours updated successfully.", updatedDocument });
           } else {
+            
             res.status(404).send({ message: "No matching document found to update." });
           }
         })
