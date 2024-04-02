@@ -158,8 +158,8 @@ const Classroom = () => {
             }</>
             : <></>
             }
-            {console.log(elements)}
             {
+                elements && 
                 elements.map((element) => {
                     if(element.name.indexOf("whiteboard") >= 0) {
                         return <>
