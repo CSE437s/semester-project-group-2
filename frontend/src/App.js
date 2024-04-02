@@ -14,6 +14,7 @@ import Whiteboard from './Components/Whiteboard';
 import ResetPassword from "./Components/ResetPassword";
 import ForgotPassword from "./Components/ForgotPassword";
 import ProfilePage from './Components/ProfilePage';
+import Moveable from './Components/Moveable';
 
 
 
@@ -35,6 +36,7 @@ const App = () => {
         <Route path="/passwordReset" element={<ResetPassword />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/users/:userId" element={<ProfilePage/>} />
+        <Route path="/resize" element={<Moveable/>} />
 
       </Routes>
     </Router>

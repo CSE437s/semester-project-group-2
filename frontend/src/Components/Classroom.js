@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
-// import LogoutButton from './LogoutButton';
 import NewRoom from "./NewRoom";
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from "axios";
-// import OHschedule from "./OHSchedule";
 import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent } from "../UserUtils";
-// import { getClassByCode, getClassByID } from "../ClassUtils";
 import Whiteboard from "./Whiteboard";
 import Header from "./Header";
 import Draggable from "react-draggable";
 import ChatContainer from "./ChatContainer";
+// import  { Resizable } from 'react-resizable';
+import '../resizable.css';
+import Moveable from "./Moveable";
+import VideoCall from "./VideoCall";
 
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
 const Classroom = () => {
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
     const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
-    const [room, createRoom] = useState(undefined);
     // eslint-disable-next-line
     const [name, setName] = useState("");
     const [editMode, setEditMode] = useState(false)
@@ -123,49 +123,27 @@ const Classroom = () => {
         );
     }
 
-
-    let render;
-    if (isOwner === false) {
-        if (roomURL) {
-            render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />;
-        }
-        else {
-            getNewUrl(TAid);
-            if (!roomURL) {
-                render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
-            }
-        }
+    const handleResize = (element, newSize) => {
+        const elementToChange = findElement(element.name)
+        console.log(newSize)
+        elementToChange.width = newSize.width
+        elementToChange.height = newSize.height
+        setClassroomComponents(elements).then(_ => {
+            // window.location.reload()
+        }).catch(e => console.log(e))
     }
-    else {
-        render = room ? room : (
-            <div className="flex justify-center space-x-4">
-                {/* Classroom Name Form Card */}
-                <div className="flex-1 rounded-lg shadow-md p-8 bg-indigo-200">
-                    <form onSubmit={handleSubmit} className="text-center">
-                        <label htmlFor="roomtype" className="block mb-4 font-bold">What would you like to name your room?</label>
-                        <input id="roomtype" type="text" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-                        <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
-                    </form>
-                </div>
-            </div>
-        )
 
-    }
-    const handleDrag = (e) => {
-        console.log(elements)
-        const element = e.target
-        const rectangle = element.getBoundingClientRect()
-        const x = rectangle.x
-        const y = rectangle.y
-        console.log(x, y)
-        const widgetName = element.id.substring(0, element.id.indexOf("handle"))
-        console.log(widgetName, elements)
+    const handleDrag = (x, y, elementName) => {
+        const widgetName = elementName
         const targetElement = findElement(widgetName)
         if (targetElement) {
             console.log("MOVED: x:", targetElement.x - x, "y:", targetElement.y - y)
             targetElement.x = x
             targetElement.y = y
             console.log(elements)
+            setClassroomComponents(elements).then(_ => {
+                // window.location.reload()
+            }).catch(e => console.log(e))
         }
         saveElements()
     }
@@ -184,27 +162,6 @@ const Classroom = () => {
             }
         }
         setElements(newArray)
-    }
-
-    const handleAdd = () => {
-        // const x = Math.floor(Math.random() * 100)
-        // const y = Math.floor(Math.random() * 100)
-        addClassroomComponent(newComponentName, 200, 200, 500, 500).then(result => {
-            console.log(result)
-            if(result !== null) {
-                // window.location.reload()
-                console.log(elements)
-                const oldElements = [...elements]
-                oldElements.push(result)
-                setElements(oldElements)
-                console.log(elements, oldElements)
-                return true
-            }
-            else {
-                console.log("An error occured")
-                return false
-            }
-        }).catch(e => console.log(e))
     }
 
     const handleDelete = (e) => {
@@ -260,53 +217,59 @@ const Classroom = () => {
                     elements.map((element) => {
                         console.log(element)
                         if(element.name.indexOf("whiteboard") >= 0) {
-                            return <>
-                                {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key={element.name}>
-                                <div id={element.name} style={{position: "absolute", top: element.y + "px", left: element.x + "px"}}>
-                                    <div id={`${element.name}handle`} className="h-fit cursor-move bg-gray-500 p-1 px-3"> 
-                                        <button className="text-sm" onClick={handleDelete} id={element.name}> Remove </button>
-                                    </div>
-                                    <Whiteboard width={element.width} height={element.height} />
-                                </div>
-                                </Draggable> : 
-                                <div style={{position: "absolute", top: element.y + "px", left: element.x + "px"}}>
-                                    <Whiteboard width={element.width} height={element.height} />
-                                </div>
-                        }
-                            </>
+                            return <Moveable
+                                width={element.width}
+                                height={element.height}
+                                initialX={element.x}
+                                initialY={element.y}
+                                component="whiteboard"
+                                movingStop={(newX, newY) => {
+                                    console.log("dragging stopped at", newX, newY)
+                                    handleDrag(newX, newY, element.name)
+                                }}
+                                resizingStop={(size)=>{
+                                    handleResize(element, size)
+                                }}
+                                isOwner={isOwner}
+                                >
+                            </Moveable>
                         }
                         else if(element.name.indexOf("chat") >= 0) {
-                            return <>
-                                {editMode && isOwner ? <Draggable grid={[20, 20]} handle={`#${element.name}handle`} onStop={handleDrag} key="chat">
-                                    <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
-                                        <div id={`${element.name}handle`} className="h-fit cursor-move bg-gray-500 p-1 px-3">
-                                            <button className="text-sm" onClick={handleDelete} id={element.name}> Remove </button>
-                                        </div>
-                                        <ChatContainer />
-                                    </div>
-                                </Draggable> 
-                                : 
-                                <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
-                                    <ChatContainer />
-                                </div>
-                                }
-                            </>
+                            return <Moveable
+                            width={element.width}
+                            height={element.height}
+                            initialX={element.x}
+                            initialY={element.y}
+                            component="chat"
+                            movingStop={(newX, newY) => {
+                                console.log("dragging stopped at", newX, newY)
+                                handleDrag(newX, newY, element.name)
+                            }}
+                            resizingStop={(size)=>{
+                                handleResize(element, size)
+                            }}
+                            isOwner={isOwner}
+                            >
+                        </Moveable>
                         }
                         else {
-                            return <>
-                             {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="handle">
-                                <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
-                                    <div id={`${element.name}handle`} className="h-fit cursor-move bg-gray-500 p-1 px-3"> 
-                                        <button className="text-sm" onClick={handleDelete} id={element.name}> Remove </button>
-                                    </div>
-                                    {render}
-                                </div>
-                                </Draggable> : 
-                                <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
-                                    {render}
-                                </div>
-                        }
-                            </>
+                            return <Moveable
+                            width={element.width}
+                            height={element.height}
+                            initialX={element.x}
+                            initialY={element.y}
+                            component={<VideoCall />}
+                            movingStop={(newX, newY) => {
+                                console.log("dragging stopped at", newX, newY)
+                                handleDrag(newX, newY, element.name)
+                            }}
+                            resizingStop={(size)=>{
+                                handleResize(element, size)
+                            }}
+                            isOwner={isOwner}
+                            >
+                        </Moveable>
+
                         }
                     })
                 }

@@ -7,7 +7,8 @@ module.exports = {
     extend: {
       backgroundImage: {
         "eraser": "url('../public/eraser.svg')",
-        "clear": "url('../public/clear.svg')"
+        "clear": "url('../public/clear.svg')",
+        "resize": "url('../public/resize.svg')"
       }
     },
   },
