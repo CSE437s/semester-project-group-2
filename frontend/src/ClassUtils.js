@@ -31,13 +31,14 @@ export function createClass(className, classDescription, classCode, creator, ins
     })
     .then((res) => {
         console.log("created course successfully")
-        return joinClass(classCode, instructorId, "instructor").then(value => {
-            if(value === true) {
-                return true
-            }
-        }).catch(e => {
-            return {error: e}
-        })
+        return res
+        // return joinClass(classCode, instructorId, "instructor").then(value => {
+        //     if(value === true) {
+        //         return true
+        //     }
+        // }).catch(e => {
+        //     return {error: e}
+        // })
     }).catch((error) => {
         return {"error": error}
     })

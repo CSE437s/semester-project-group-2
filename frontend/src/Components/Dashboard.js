@@ -62,7 +62,7 @@ const Dashboard = () => {
   }, [navigate, currentToken, user])
 
 
-  const handleCreateClassSubmit = async (e) => {
+  const handleCreateClassSubmit = (e) => {
     e.preventDefault();
 
     // Check if the user has the 'instructor' role before proceeding
@@ -70,24 +70,30 @@ const Dashboard = () => {
       alert("Only instructors can create classes.");
       return;
     }
+    console.log(user)
 
-    try {
       createClass(className, classDescription, classCode, user.email, user._id).then((result) => {
         console.log(result)
-      })
+        joinClass(classCode, user._id, "instructor").then(value => {
+          console.log(value)
+          if(value === true) {
+              console.log("success")
+              window.location.reload()
+          }
+          }).catch(e => {
+              return {error: e}
+          })
+      }).catch(e => console.log(e))
 
       // Reset input fields after successful submission
       setClassName("");
       setClassDescription("");
       setClassCode("");
-      window.location.reload(); // force automatic reload
-    } catch (error) {
-      console.error("Error creating class:", error);
-      alert("Failed to create class. Please try again.");
-    }
+      // window.location.reload(); // force automatic reload
+  
   };
 
-  const handleJoinClassSubmit = async (e) => {
+  const handleJoinClassSubmit = (e) => {
     e.preventDefault();
 
     joinClass(joinClassCode, user._id, "student").then((result) => {// all users are added to a course as a student at first

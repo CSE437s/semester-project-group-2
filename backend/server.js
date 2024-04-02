@@ -86,9 +86,9 @@ passport.use("jwt", new JWTstrategy({
 passport.use("login", new Strategy({
     usernameField: "email",
     passwordField: "password",
-    passReqToCallback: false
+    passReqToCallback: true
 },
-    (email, password, next) => { // create a strategy for authentication, setup what we will do during auth 
+    (req, email, password, next) => { // create a strategy for authentication, setup what we will do during auth 
         userModel.findOne({ email: email }).then((user) => {
             if (!user) {
                 return next(null, null, { message: "this email does not have as associated account" })
@@ -120,7 +120,7 @@ passport.use("signup", new Strategy({
         const last = body.lastName
         const role = body.role
         const status = body.status
-        userModel.create({ "email": email, "password": password, "firstName": first, "lastName": last, "role": role, "status": status }).then((user) => {
+        userModel.create({ "username": email, "email": email, "password": password, "firstName": first, "lastName": last, "role": role, "status": status }).then((user) => {
             return callback(null, {
                 "message": "success",
                 "user": user

@@ -6,6 +6,12 @@ require("dotenv").config()
 
 const userSchema = new mongoose.Schema(
   {
+    username: {
+      type: String,
+      required: false,
+      unique: false,
+      default: "HUH"
+    },
     firstName: {
       type: String,
       required: true,
