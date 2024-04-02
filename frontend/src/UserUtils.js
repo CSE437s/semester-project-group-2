@@ -353,7 +353,7 @@ export function DeleteClass(classId) {
  * @param y 
  * @param width 
  * @param height 
- * @returns true if successful, false otherwise
+ * @returns new component if successful, false otherwise
  */
 export function addClassroomComponent(type, x, y, width, height) {
     const token = localStorage.getItem("token")
@@ -373,10 +373,10 @@ export function addClassroomComponent(type, x, y, width, height) {
         }
     }).then(result => {
         if(result.status === 200) {
-            return true
+            return result.data.newComponent
         }
-        return false
-    }).catch(e => false)
+        return null
+    }).catch(e => null)
 }
 
 /**
@@ -476,4 +476,30 @@ export function updateUserBGColor(userId, color) {
         }
         return false
     }).catch(e => e)
+  
+export function sendNewVideoURL(videoURL) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "redirect to login"}
+    }
+    return getCurrentUser().then(u => {
+        const user = u.data.user
+        const data = {
+            "creator": user._id,
+            "url": videoURL
+        }
+        console.log(data)
+        return axios.post(url + "/api/sendVideoURL", data, {
+            headers: {
+                "content-type": "application/json",
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            },
+        }).then(result => {
+            if(result.status === 201) {
+                return true
+            }
+            return false
+        });
+    })
 }

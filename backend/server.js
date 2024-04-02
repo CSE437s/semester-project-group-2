@@ -747,16 +747,16 @@ app.post("/api/addClassroomComponent", (req, res) => {
                     i++
                 }
                 console.log(name)
-                user.classroomComponents.push({
+                const tempComponent = {
                     name: name,
                     x: req.body.x,
                     y: req.body.y,
                     width: req.body.width,
                     height: req.body.height
-                })
+                }
+                user.classroomComponents.push(tempComponent)
                 userModel.updateOne(user).then(r => {
-                    console.log("success")
-                    res.sendStatus(200)
+                    res.status(200).send({newComponent: tempComponent})
                 }).catch(e => {
                     console.log(e)
                     res.status(500).send({ error: e })
@@ -876,6 +876,7 @@ app.post("/api/sendVideoURL", (req, res) => {
             const callCreatedBy = req.body.creator
             const url = req.body.url
             URLs.set(callCreatedBy, url)
+            console.log(URLs)
             res.sendStatus(201)
         }
     })(req, res)
