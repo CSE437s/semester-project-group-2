@@ -247,7 +247,7 @@ const ClassDetails = () => {
   const deleteClass = async () => {
     const confirmDrop = window.confirm("Are you sure you want to delete this class?");
     if (confirmDrop) {
-      const userId = user.id;
+      //const userId = user.id;
       DeleteClass(classId)
         .then((res) => {
             alert("Successfully deleted class!");
