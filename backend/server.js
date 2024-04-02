@@ -722,6 +722,9 @@ app.post("/api/dropStudentFromClass", (req, res) => {
 });
 
 const contains = (array, element) => {
+    if(!array) {
+        return false
+    }
     for (var i in array) {
         if (array[i].name === element) {
             return true
@@ -742,6 +745,7 @@ app.post("/api/addClassroomComponent", (req, res) => {
             userModel.findById(user._id).then(user => {
                 var name = req.body.componentName
                 var i = 1
+                console.log(user)
                 while (contains(user.classroomComponents, name)) {
                     name = req.body.componentName + i
                     i++
@@ -755,7 +759,9 @@ app.post("/api/addClassroomComponent", (req, res) => {
                     height: req.body.height
                 }
                 user.classroomComponents.push(tempComponent)
-                userModel.updateOne(user).then(r => {
+                userModel.findByIdAndUpdate(user._id, {
+                    $push: { classroomComponents: tempComponent }
+                }, { new: true }).then(r => {
                     res.status(200).send({newComponent: tempComponent})
                 }).catch(e => {
                     console.log(e)
