@@ -637,7 +637,7 @@ const ClassDetails = () => {
 
                     return (
                       <div key={ta._id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
-                        <h3 className="text-xl font-bold mb-4">{isOwner === true ? "You!" : ta.firstName + " " + ta.lastName}</h3>
+                        <h3 className="text-xl font-bold mb-4">{user?._id === ta._id ? "You!" : ta.firstName + " " + ta.lastName}</h3>
                         {taSchedule && taSchedule.hours ? (
                           <div className="text-center mb-4">
                             <p className="font-semibold">Office Hours:</p>
@@ -661,7 +661,7 @@ const ClassDetails = () => {
                           value={ta._id}
                           onClick={rerouteToClassroom}
                         >
-                          {isOwner === true ? "Your Classroom" : isOHNow === true ? 'Join Office Hours Now' : 'View Virtual Classroom'}
+                          {user?._id === ta._id ? "Your Classroom" : isOHNow === true ? 'Join Office Hours Now' : 'View Virtual Classroom'}
                         </button>
                       </div>
 
