@@ -1,61 +1,52 @@
 import { useState, useEffect } from "react";
-import NewRoom from "./NewRoom";
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from "axios";
+import { useParams } from 'react-router-dom';
 import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent } from "../UserUtils";
-import Whiteboard from "./Whiteboard";
 import Header from "./Header";
-import Draggable from "react-draggable";
-import ChatContainer from "./ChatContainer";
-// import  { Resizable } from 'react-resizable';
-import '../resizable.css';
 import Moveable from "./Moveable";
-import VideoCall from "./VideoCall";
 
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
 const Classroom = () => {
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
     const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
-    // eslint-disable-next-line
-    const [name, setName] = useState("");
     const [editMode, setEditMode] = useState(false)
-    const [roomURL, setRoomURL] = useState("")
     const [user, setCurrentUser] = useState(null);
-    // eslint-disable-next-line
     const [isOwner, setIsOwner] = useState(false);
-    const [elements, setElements] = useState([])
-    const [showDropdown, setShowDropdown] = useState(false)
+    const [elements, setElements] = useState()
     const [newComponentName, setNewComponentName] = useState("whiteboard")
     const { TAid } = useParams();
     const currentToken = localStorage.getItem("token");
-    // const isOwner = currentUser._id === TAid; // Determine if current user is the owner of the classroom
     const [isLoading, setIsLoading] = useState(true);
-    // const [roomOnline, setOnline] = useState(false)
-
-    const navigate = useNavigate();
+    //eslint-disable-next-line
+    const saveElements = () => {
+        setClassroomComponents(elements).then(_ => {
+            // window.location.reload()
+        }).catch(e => console.log(e))
+    }
 
     useEffect(() => {
         if (currentToken && !user) {
             getCurrentUser().then(user => {
                 const u = user.data.user
                 setCurrentUser(u)
-                setName(u.firstName + " " + u.lastName)
                 if (u._id === TAid) {
                     setIsOwner(true)
                 }
             })
-            if (elements.length === 0) {
+            if (!elements) {
                 getClassroomComponents(TAid).then(components => {
-                    console.log(components)
                     setElements(components)
                 })
             }
         }
-    }, [currentToken, api_url, TAid, user, elements.length]);
+    }, [currentToken, api_url, TAid, user, elements]);
 
     useEffect(() => {
-        console.log("Fetching TA's name...");
+        if(elements) {
+            saveElements()
+        }
+    }, [elements, saveElements])
+    useEffect(() => {
         findUser(TAid).then(TA => {
             if (TA === null) {
                 console.log("TA was unable to be found")
@@ -100,7 +91,6 @@ const Classroom = () => {
 
     const handleResize = (element, newSize) => {
         const elementToChange = findElement(element.name)
-        console.log(newSize)
         elementToChange.width = newSize.width
         elementToChange.height = newSize.height
         setClassroomComponents(elements).then(_ => {
@@ -112,10 +102,9 @@ const Classroom = () => {
         const widgetName = elementName
         const targetElement = findElement(widgetName)
         if (targetElement) {
-            console.log("MOVED: x:", targetElement.x - x, "y:", targetElement.y - y)
+
             targetElement.x = x
             targetElement.y = y
-            console.log(elements)
             setClassroomComponents(elements).then(_ => {
                 // window.location.reload()
             }).catch(e => console.log(e))
@@ -123,31 +112,25 @@ const Classroom = () => {
         saveElements()
     }
 
-    const saveElements = () => {
-        setClassroomComponents(elements).then(_ => {
-            // window.location.reload()
+    
+
+    const handleAdd = (elementName) => {
+        addClassroomComponent(elementName, 100, 100, 300, 300).then(newComponent => {
+            if(newComponent) {
+                console.log(newComponent)
+                const newarray = [...elements]
+                newarray.push(newComponent)
+                setElements(newarray)
+            }
+            
         }).catch(e => console.log(e))
     }
 
-    const removeFromArray = (elementToRemove) => {
-        const newArray = []
-        for (var i in elements) {
-            if (elements[i].name !== elementToRemove) {
-                newArray.push(elements[i])
-            }
-        }
-        setElements(newArray)
-    }
-
-    const handleAdd = (element) => {
-        const newarray = [...elements, element]
-        setElements(newarray)
-        saveElements()
-    }
-
-    const handleDelete = (e) => {
-        removeFromArray(e.target.id)
-        saveElements()
+    const handleDelete = (elementName) => {
+        console.log('removing', elementName)
+        const newElements = elements.filter((element) => element.name !== elementName)
+        console.log(newElements)
+        setElements([...newElements])
     }
     return (
         <div className="font-mono">
@@ -156,7 +139,6 @@ const Classroom = () => {
             <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
                 if(editMode === true) {
                     saveElements()
-                    setShowDropdown(false)
                 }
                 setEditMode(!editMode)
             }}> { editMode === true ? "save changes" : "add widgets" }</button>
@@ -170,35 +152,36 @@ const Classroom = () => {
                         <option value="chat">Text Chat</option>
                     </select>
                     <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
-                        console.log("adding", newComponentName, "to user classroom")
-                        handleAdd()
-                        // if(result === true) this.forceUpdate()
+                        handleAdd(newComponentName)
                     }}> add</button>
                 </span> : <></> 
             }</>
             : <></>
             }
+            {console.log(elements)}
             {
-                // console.log(elements)
                 elements.map((element) => {
-                    console.log(element)
                     if(element.name.indexOf("whiteboard") >= 0) {
-                        return <Moveable
+                        return <>
+                        <Moveable
                             width={element.width}
                             height={element.height}
                             initialX={element.x}
                             initialY={element.y}
                             component="whiteboard"
                             movingStop={(newX, newY) => {
-                                console.log("dragging stopped at", newX, newY)
                                 handleDrag(newX, newY, element.name)
                             }}
                             resizingStop={(size)=>{
                                 handleResize(element, size)
                             }}
                             isOwner={isOwner}
+                            deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                                handleDelete(element.name)
+                            }}>Remove</buttton>}
                             >
                         </Moveable>
+                        </>
                     }
                     else if(element.name.indexOf("chat") >= 0) {
                         return <Moveable
@@ -208,13 +191,15 @@ const Classroom = () => {
                         initialY={element.y}
                         component="chat"
                         movingStop={(newX, newY) => {
-                            console.log("dragging stopped at", newX, newY)
                             handleDrag(newX, newY, element.name)
                         }}
                         resizingStop={(size)=>{
                             handleResize(element, size)
                         }}
                         isOwner={isOwner}
+                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                            handleDelete(element.name)
+                        }}>Remove</buttton>}
                         >
                     </Moveable>
                     }
@@ -226,13 +211,15 @@ const Classroom = () => {
                         initialY={element.y}
                         component="video"
                         movingStop={(newX, newY) => {
-                            console.log("dragging stopped at", newX, newY)
                             handleDrag(newX, newY, element.name)
                         }}
                         resizingStop={(size)=>{
                             handleResize(element, size)
                         }}
                         isOwner={isOwner}
+                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                            handleDelete(element.name)
+                        }}>Remove</buttton>}
                         >
                     </Moveable>
 

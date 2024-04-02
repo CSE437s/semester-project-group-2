@@ -84,19 +84,18 @@ const Moveable = (props) => {
  
     return (<div id="container" className="w-screen h-screen">
         <div id="MoveableComponent" style={{
-            // width: specs.width,
-            // height: specs.height,
             position: "absolute",
             top: specs.y,
             left: specs.x
         }}>
             {props.isOwner === true &&
-                <div id="handle" className="bg-gray-500 py-2 hover:cursor-move" onMouseDown={startWatchingMove}  style={{
+                <div id="handle" className="bg-gray-500 py-1 hover:cursor-move" onMouseDown={startWatchingMove}  style={{
                     position: "absolute",
                     zIndex: 1,
                     width: "100%",
+                    height: "fit-content"
                 }}>
-
+                    {props.deleteButton}
                 </div>
             }
             <div id="inner-container" style={{
