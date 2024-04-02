@@ -65,6 +65,7 @@ const Classroom = () => {
             }
         }).catch((error) => {
             console.log("Error getting TA document:", error);
+            setIsLoading(false)
         });
     }, [TAid]); // Dependencies: classId and TAid
 
