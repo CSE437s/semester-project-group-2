@@ -632,6 +632,7 @@ const ClassDetails = () => {
                       );
                     }
 
+                    console.log(taSchedules)
                     const taSchedule = taSchedules?.find(schedule => schedule?.userId === ta._id);
                     const isOHNow = taSchedule && isCurrentlyOH(taSchedule.hours, currentTime);
 

@@ -116,12 +116,13 @@ const Classroom = () => {
 
     const handleAdd = (elementName) => {
         addClassroomComponent(elementName, 100, 100, 300, 300).then(newComponent => {
-            if(newComponent) {
+            console.log(newComponent)
+            // if(newComponent) {
                 console.log(newComponent)
                 const newarray = [...elements]
                 newarray.push(newComponent)
                 setElements(newarray)
-            }
+            // }
             
         }).catch(e => console.log(e))
     }
