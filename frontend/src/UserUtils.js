@@ -1,7 +1,9 @@
 import axios from "axios"
 
 const DEBUGGING_MODE = process.env.REACT_APP_DEBUGGING
-const url = DEBUGGING_MODE === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
+console.log(process.env)
+const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://carefully-certain-swift.ngrok-free.app"
+// const url = DEBUGGING_MODE ? "http://localhost:5050" : "https://silly-ads-taste.loca.lt"
 
 /**
  * getUser helper function
@@ -177,10 +179,22 @@ export function getAllUserHours(userId) {
  * @returns hours for that class, undefined if they don't exist or null if something goes wrong
  */
 export function getUserHoursForClass(userId, classId) {
-    return getAllUserHours(userId).then(hours => hours.filter((hour) => {
-        console.log(hour)
-        return hour.classId === classId
-    })).catch(e => null)
+    console.log(`Getting hours for user: ${userId} and class: ${classId}`);
+
+    return getAllUserHours(userId).then(hoursData => {
+        console.log(`Received hours data:`, hoursData);
+
+        if (hoursData && hoursData.classId === classId) {
+            console.log(`Hours for class ${classId}:`, hoursData.hours);
+            return hoursData;
+        } else {
+            console.log(`No hours found for class ${classId} or mismatch in class IDs`);
+            return [];
+        }
+    }).catch(e => {
+        console.error(`Error fetching hours for user ${userId} and class ${classId}:`, e);
+        return null;
+    });
 }
 
 /**
@@ -276,6 +290,62 @@ export function updateUserName(userId, firstName, lastName) {
     }).catch(e => e)
 }
 
+
+/**
+ * drops a student from a class
+ * @param userId
+ * @param classId
+ * @param isTA
+ * @returns true if successful, false otherwise
+ */
+export function DropStudentFromClass(userId, classId, isTA) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/dropStudentFromClass", {
+        userId: userId,
+        classId: classId,
+        isTA : isTA
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(res => {
+        if(res.data.message === "updated successfully") {
+            return true
+        }
+        return false
+    }).catch(e => e)
+}
+
+/**
+ * deletes a class
+ * @param classId
+ * @returns true if successful, false otherwise
+ */
+export function DeleteClass(classId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/deleteClass", {
+        classId: classId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(res => {
+        if(res.data.message === "deleted successfully") {
+            return true
+        }
+        return false
+    }).catch(e => e)
+}
+
+
 /**
  *  adds a classroom to users account
  * @param type 
@@ -283,7 +353,7 @@ export function updateUserName(userId, firstName, lastName) {
  * @param y 
  * @param width 
  * @param height 
- * @returns true if successful, false otherwise
+ * @returns new component if successful, false otherwise
  */
 export function addClassroomComponent(type, x, y, width, height) {
     const token = localStorage.getItem("token")
@@ -303,10 +373,10 @@ export function addClassroomComponent(type, x, y, width, height) {
         }
     }).then(result => {
         if(result.status === 200) {
-            return true
+            return result.data.newComponent
         }
-        return false
-    }).catch(e => false)
+        return null
+    }).catch(e => null)
 }
 
 /**
@@ -406,5 +476,30 @@ export function updateUserBGColor(userId, color) {
         }
         return false
     }).catch(e => e)
+  
+export function sendNewVideoURL(videoURL) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "redirect to login"}
+    }
+    return getCurrentUser().then(u => {
+        const user = u.data.user
+        const data = {
+            "creator": user._id,
+            "url": videoURL
+        }
+        console.log(data)
+        return axios.post(url + "/api/sendVideoURL", data, {
+            headers: {
+                "content-type": "application/json",
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            },
+        }).then(result => {
+            if(result.status === 201) {
+                return true
+            }
+            return false
+        });
+    })
 }
-

@@ -61,7 +61,7 @@ const Classroom = () => {
                 console.log("TA was unable to be found")
             }
         }).catch(e => console.log(e))
-    }, [TAid]); // Dependency: TAid
+    }, [TAid, elements]); // Dependency: TAid
 
     useEffect(() => {
         getAllUserHours(TAid).then(hours => {
@@ -75,20 +75,32 @@ const Classroom = () => {
         }).catch((error) => {
             console.log("Error getting TA document:", error);
         });
-    }, [TAid]); // Dependency: TAid
+    }, [TAid]); // Dependencies: classId and TAid
 
-    
-    
-    // var dates = [];
-    // const removeElement = (element) => {
-    //     const newDates = [];
-    //     for (var day in dates) {
-    //         if (dates[day] !== element) {
-    //             newDates.push(dates[day]);
-    //         }
-    //     }
-    //     dates = newDates;
-    // };
+    const handleSubmit = (e) => {
+        const newRoomName = Math.random() * 10 + "." + Date.now();
+        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} height="700px" width="500px"/>);
+    };
+
+    const getNewUrl = (roomOwner) => {
+        const token = localStorage.getItem("token")
+        if (!token) {
+            navigate("/login")
+        }
+        axios.post(api_url + "/api/getVideoURL", { "creator": roomOwner }, {
+            headers: {
+                "Authorization": "Bearer " + token,
+                "content-type": "application/json",
+                "ngrok-skip-browser-warning": true
+            },
+        }).then((res) => {
+            if (res.data.url !== "") {
+                setRoomURL(res.data.url);
+            }
+        }).catch(e => {
+            console.log(e);
+        });
+    };
 
     const findElement = (elementName) => {
         for (var i in elements) {
@@ -98,42 +110,6 @@ const Classroom = () => {
         }
     }
 
-    // const handleDayPicker = (e) => {
-    //     e.preventDefault();
-    //     const day = e.target.value;
-    //     const color = e.target.style.backgroundColor;
-    //     if (color !== '' && color !== "") { // deselecting
-    //         e.target.style.backgroundColor = "";
-    //         removeElement(day);
-    //     }
-    //     else { //  selecting
-    //         e.target.style.backgroundColor = "#818cf8";
-    //         dates.push(day);
-    //     }
-    //     console.log(dates);
-    // };
-
-    // const sendTimeInformation =  async (e) => {
-    //     // e.preventDefault();
-    //     // const start_time = e.target.start_time.value;
-    //     // const end_time = e.target.end_time.value;
-    //     //  for(var i in dates) {
-    //     //     const date = dates[i]
-    //     //     // figure out how to get class id if classroom is just for TA 
-    //     //     // const status = await addUserHours(user._id, "", classId, {
-    //     //     //     day: date,
-    //     //     //     startTime: start_time,
-    //     //     //     endTime: end_time
-    //     //     // })
-    //     //     // if(status === true) {
-    //     //     //     alert("success")
-    //     //     // }z
-    //     //     // else {
-    //     //     //     alert("Something went wrong please try again")
-    //     //     // }
-    //     // }
-    //     // dates = [];
-    // };
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -169,6 +145,13 @@ const Classroom = () => {
                 // window.location.reload()
             }).catch(e => console.log(e))
         }
+        saveElements()
+    }
+
+    const saveElements = () => {
+        setClassroomComponents(elements).then(_ => {
+            // window.location.reload()
+        }).catch(e => console.log(e))
     }
 
     const removeFromArray = (elementToRemove) => {
@@ -180,20 +163,19 @@ const Classroom = () => {
         }
         setElements(newArray)
     }
-    
+
     const handleDelete = (e) => {
-        console.log("you clicked delete on", e.target.id)
         removeFromArray(e.target.id)
+        saveElements()
     }
     return (
         <div className="font-mono">
             <Header user={user} />
             {isOwner? <>
-            <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5" onClick={() => {
+            <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
                 if(editMode === true) {
-                    setClassroomComponents(elements).then(_ => {
-                        // window.location.reload()
-                    }).catch(e => console.log(e))
+                    saveElements()
+                    setShowDropdown(false)
                 }
                 setEditMode(!editMode)
             }}> { editMode === true ? "save changes" : "edit classroom" }</button>
@@ -224,20 +206,14 @@ const Classroom = () => {
                     </select>
                     <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
                         console.log("adding", newComponentName, "to user classroom")
-                        addClassroomComponent(newComponentName, 100, 100, 500, 500).then(result => {
-                            console.log(result)
-                            if(result === true) {
-                                window.location.reload()
-                            }
-                            else {
-                                console.log("An error occured")
-                            }
-                        }).catch(e => console.log(e))
+                        handleAdd()
+                        // if(result === true) this.forceUpdate()
                     }}> add</button>
                 </span>
                 : <></>}
             </> : <></>}
                 {
+                    // console.log(elements)
                     elements.map((element) => {
                         console.log(element)
                         if(element.name.indexOf("whiteboard") >= 0) {
@@ -293,7 +269,6 @@ const Classroom = () => {
                             isOwner={isOwner}
                             >
                         </Moveable>
-                            
 
                         }
                     })
