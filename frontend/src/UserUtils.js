@@ -276,6 +276,13 @@ export function updateUserName(userId, firstName, lastName) {
     }).catch(e => e)
 }
 
+/**
+ * drops a student from a class
+ * @param userId
+ * @param classId
+ * @param isTA
+ * @returns true if successful, false otherwise
+ */
 export function DropStudentFromClass(userId, classId, isTA) {
     const token = localStorage.getItem("token")
     if(!token) {
@@ -297,6 +304,32 @@ export function DropStudentFromClass(userId, classId, isTA) {
         return false
     }).catch(e => e)
 }
+
+/**
+ * deletes a class
+ * @param classId
+ * @returns true if successful, false otherwise
+ */
+export function DeleteClass(classId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/deleteClass", {
+        classId: classId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(res => {
+        if(res.data.message === "deleted successfully") {
+            return true
+        }
+        return false
+    }).catch(e => e)
+}
+
 
 /**
  *  adds a classroom to users account

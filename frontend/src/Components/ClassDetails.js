@@ -7,6 +7,7 @@ import {
   getCurrentUser,
   logout,
   DropStudentFromClass,
+  DeleteClass,
 } from "../UserUtils";
 import { getClassByID } from "../ClassUtils";
 import SimpleModal from "./SimpleModal";
@@ -229,15 +230,31 @@ const ClassDetails = () => {
   };
 
   const dropClass = async () => {
-    const userId = user.id;
-    DropStudentFromClass(userId, classId, isTA)
-      .then((res) => {
-        if (res === true) {
-          alert("Successfuly dropped class!");
-        } else {
-          alert("There was an error dropping the class");
-        }
-      })
+    const confirmDrop = window.confirm("Are you sure you want to drop this class?");
+    if (confirmDrop) {
+      const userId = user.id;
+      DropStudentFromClass(userId, classId, isTA)
+        .then((res) => {
+          if (res === true) {
+            alert("Successfully dropped class!");
+          } else {
+            alert("There was an error dropping the class");
+          }
+        });
+    }
+  };
+
+  const deleteClass = async () => {
+    const confirmDrop = window.confirm("Are you sure you want to delete this class?");
+    if (confirmDrop) {
+      const userId = user.id;
+      DeleteClass(classId)
+        .then((res) => {
+            alert("Successfully deleted class!");
+            navigate("/dashboard");
+   
+        });
+    }
   };
 
   const demoteToStudent = async (taId) => {
@@ -552,7 +569,7 @@ const ClassDetails = () => {
         {classDetails && (
           <>
             <div className="font-mono home-container">
-              {/* class name and prof */}
+              
               {/* class name and prof */}
               <div className="container mx-auto mt-6 bg-indigo-200 p-10 mb-6 rounded-lg shadow-lg">
                 <div className="flex justify-between items-center">
@@ -560,12 +577,22 @@ const ClassDetails = () => {
                     {classDetails.className}
                   </h1>
                   {isInstructor === true ? (
-                    <button
-                      className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                      onClick={toggleModal}
-                    >
-                      Manage Students
-                    </button>
+                    <div>
+                      <button
+                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                        onClick={toggleModal}
+                      >
+                        Manage Students
+                      </button>
+                      <button
+                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                        onClick={() => {
+                          deleteClass()
+                        }}
+                      >
+                        Delete Class
+                      </button>
+                    </div>
                   ) : (
                     <div>
                       <button

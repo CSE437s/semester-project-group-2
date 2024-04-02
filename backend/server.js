@@ -591,6 +591,58 @@ app.post("/api/updateUserName", (req, res) => {
     })(req, res)
 })
 
+app.post("/api/deleteClass", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error });
+        } else if (!user) {
+            res.status(401).send({ error: "invalid auth" });
+        } else {
+            const classId = req.body.classId;
+            // delete class first
+            classModel.findByIdAndDelete(classId)
+                .then(async deletedClass => {
+                    if (deletedClass) {
+                        // update each student, TA, and instructor who is in class
+                        const usersToUpdate = await userModel.find({
+                            $or: [
+                                { classesAsStudent: { $elemMatch: { _id: classId } } },
+                                { classesAsTA: { $elemMatch: { _id: classId } } },
+                                { classesAsInstructor: { $elemMatch: { _id: classId } } }
+                                
+                            ]
+                        });
+
+                        const updatePromises = usersToUpdate.map(async user => {
+                            // remove class from classesAsStudent, classesAsTA, and classesAsInstructor
+                            user.classesAsStudent = user.classesAsStudent.filter(c => c._id.toString() !== classId);
+                            user.classesAsTA = user.classesAsTA.filter(c => c._id.toString() !== classId);
+                            user.classesAsInstructor = user.classesAsInstructor.filter(c => c._id.toString() !== classId);
+                        
+                            // inform Mongoose that the nested fields have been modified?? idk why this is necessary but it is
+                            user.markModified('classesAsStudent');
+                            user.markModified('classesAsTA');
+                            user.markModified('classesAsInstructor');
+                        
+                            // save updated doc
+                            await user.save();
+                        });                        
+
+                        await Promise.all(updatePromises);
+
+                        res.status(200).send({ message: "class deleted successfully" });
+                    } else {
+                        res.status(404).send({ error: "class not found" });
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    res.status(500).send({ error: "internal server error" });
+                });
+        }
+    })(req, res);
+});
+
 //im sorry i know this is horrendous
 app.post("/api/dropStudentFromClass", (req, res) => {
     userId = req.body.userId;
