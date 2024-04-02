@@ -16,7 +16,7 @@ import { getCurrentUser} from "../UserUtils";
 // import InputText from "./InputText";
 
 
-export default function ChatContainer() {
+export default function ChatContainer(props) {
     const currentToken = localStorage.getItem("token");
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;;
     const url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
@@ -84,7 +84,7 @@ export default function ChatContainer() {
     
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-8 mb-4 bg-indigo-200">
+    <div className="container mx-auto px-4 py-8 bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-8 mb-4 bg-indigo-200" style={{width: props.width, height: props.height}}>
        <ChatsList />
        <InputText addMessage={addMessage} />
        

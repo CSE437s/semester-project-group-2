@@ -7,15 +7,16 @@ import Whiteboard from "./Whiteboard";
 import Header from "./Header";
 import Draggable from "react-draggable";
 import ChatContainer from "./ChatContainer";
-import  { Resizable } from 'react-resizable';
+// import  { Resizable } from 'react-resizable';
 import '../resizable.css';
+import Moveable from "./Moveable";
+import VideoCall from "./VideoCall";
 
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
 const Classroom = () => {
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
     const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
-    const [room, createRoom] = useState(undefined);
     // eslint-disable-next-line
     const [name, setName] = useState("");
     const [editMode, setEditMode] = useState(false)
@@ -76,30 +77,8 @@ const Classroom = () => {
         });
     }, [TAid]); // Dependency: TAid
 
-    const handleSubmit = (e) => {
-        const newRoomName = Math.random() * 10 + "." + Date.now();
-        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />);
-    };
-
-    const getNewUrl = (roomOwner) => {
-        const token = localStorage.getItem("token")
-        if (!token) {
-            navigate("/login")
-        }
-        axios.post(api_url + "/api/getVideoURL", { "creator": roomOwner }, {
-            headers: {
-                "Authorization": "Bearer " + token,
-                "content-type": "application/json",
-                "ngrok-skip-browser-warning": true
-            },
-        }).then((res) => {
-            if (res.data.url !== "") {
-                setRoomURL(res.data.url);
-            }
-        }).catch(e => {
-            console.log(e);
-        });
-    };
+    
+    
     // var dates = [];
     // const removeElement = (element) => {
     //     const newDates = [];
@@ -168,55 +147,27 @@ const Classroom = () => {
         );
     }
 
-
-    let render;
-    if (isOwner === false) {
-        if (roomURL) {
-            render = <NewRoom roomName="asdf" type="asdf" URL={roomURL} />;
-        }
-        else {
-            getNewUrl(TAid);
-            if (!roomURL) {
-                render = <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
-            }
-        }
-    }
-    else {
-        render = room ? room : (
-            <div className="flex justify-center space-x-4">
-                {/* Classroom Name Form Card */}
-                <div className="flex-1 rounded-lg shadow-md p-8 bg-indigo-200">
-                    <form onSubmit={handleSubmit} className="text-center">
-                        <label htmlFor="roomtype" className="block mb-4 font-bold">What would you like to name your room?</label>
-                        <input id="roomtype" type="text" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-                        <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-4">Submit</button>
-                    </form>
-                </div>
-            </div>
-        )
-
-    }
-
     const handleResize = (element, newSize) => {
         const elementToChange = findElement(element.name)
         console.log(newSize)
         elementToChange.width = newSize.width
         elementToChange.height = newSize.height
+        setClassroomComponents(elements).then(_ => {
+            // window.location.reload()
+        }).catch(e => console.log(e))
     }
 
-    const handleDrag = (e) => {
-        const element = e.target
-        const rectangle = element.getBoundingClientRect()
-        const x = rectangle.x
-        const y = rectangle.y
-        console.log(x, y)
-        const widgetName = element.id.substring(0, element.id.indexOf("handle"))
+    const handleDrag = (x, y, elementName) => {
+        const widgetName = elementName
         const targetElement = findElement(widgetName)
         if (targetElement) {
             console.log("MOVED: x:", targetElement.x - x, "y:", targetElement.y - y)
             targetElement.x = x
             targetElement.y = y
             console.log(elements)
+            setClassroomComponents(elements).then(_ => {
+                // window.location.reload()
+            }).catch(e => console.log(e))
         }
     }
 
@@ -290,53 +241,60 @@ const Classroom = () => {
                     elements.map((element) => {
                         console.log(element)
                         if(element.name.indexOf("whiteboard") >= 0) {
-                            return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                                {editMode && isOwner ? <Resizable width={element.width} height={element.height}  onResize={(event, {elem, size, handle}) => {
-                                        element.height = size.height
-                                        element.width = size.width
-                                        setElements(elements)
-                                        console.log(size)
-                                        }}>
-                                        <div>
-                                            <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="whiteboard">
-                                                <div>
-                                                    <button onClick={handleDelete} id={element.name}> Remove </button>
-                                                    <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
-                                                    </div>
-                                                    <Whiteboard width={element.width} height={element.height} />
-                                                </div>
-                                            </Draggable>
-                                        </div>
-                                        </Resizable>
-                                : <Whiteboard width={element.width} height={element.height} />}
-                            </div>
+                            return <Moveable
+                                width={element.width}
+                                height={element.height}
+                                initialX={element.x}
+                                initialY={element.y}
+                                component="whiteboard"
+                                movingStop={(newX, newY) => {
+                                    console.log("dragging stopped at", newX, newY)
+                                    handleDrag(newX, newY, element.name)
+                                }}
+                                resizingStop={(size)=>{
+                                    handleResize(element, size)
+                                }}
+                                isOwner={isOwner}
+                                >
+                            </Moveable>
                         }
                         else if(element.name.indexOf("chat") >= 0) {
-                            return <div style={{ position: "absolute", "top": element.y + "px", "left": element.x + "px" }}>
-                                {editMode && isOwner ? <Draggable grid={[20, 20]} handle={`#${element.name}handle`} onStop={handleDrag} key="chat">
-                                    <div>
-                                        <button onClick={handleDelete} id={element.name}> Remove </button>
-                                        <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3">
-                                        </div>
-                                        <ChatContainer />
-                                    </div>
-                                </Draggable> 
-                                : 
-                                <ChatContainer />
-                                }
-                            </div>
+                            return <Moveable
+                            width={element.width}
+                            height={element.height}
+                            initialX={element.x}
+                            initialY={element.y}
+                            component="chat"
+                            movingStop={(newX, newY) => {
+                                console.log("dragging stopped at", newX, newY)
+                                handleDrag(newX, newY, element.name)
+                            }}
+                            resizingStop={(size)=>{
+                                handleResize(element, size)
+                            }}
+                            isOwner={isOwner}
+                            >
+                        </Moveable>
                         }
                         else {
-                            return <div style={{position: "absolute", "top": element.y + "px", "left": element.x + "px"}}>
-                             {editMode && isOwner ? <Draggable grid={[20,20]} handle={`#${element.name}handle`} onStop={handleDrag} key="handle">
-                                <div>
-                                    <button onClick={handleDelete} id={element.name}> Remove </button>
-                                    <div id={`${element.name}handle`} className="cursor-move bg-gray-500 p-3"> 
-                                    </div>
-                                    {render}
-                                </div>
-                                </Draggable> : render}
-                            </div>
+                            return <Moveable
+                            width={element.width}
+                            height={element.height}
+                            initialX={element.x}
+                            initialY={element.y}
+                            component={<VideoCall />}
+                            movingStop={(newX, newY) => {
+                                console.log("dragging stopped at", newX, newY)
+                                handleDrag(newX, newY, element.name)
+                            }}
+                            resizingStop={(size)=>{
+                                handleResize(element, size)
+                            }}
+                            isOwner={isOwner}
+                            >
+                        </Moveable>
+                            
+
                         }
                     })
                 }
