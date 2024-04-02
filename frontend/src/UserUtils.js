@@ -474,6 +474,7 @@ export function updateUserBGColor(userId, color) {
         }
         return false
     }).catch(e => e)
+}
   
 export function sendNewVideoURL(videoURL) {
     const token = localStorage.getItem("token")

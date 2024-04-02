@@ -77,31 +77,6 @@ const Classroom = () => {
         });
     }, [TAid]); // Dependencies: classId and TAid
 
-    const handleSubmit = (e) => {
-        const newRoomName = Math.random() * 10 + "." + Date.now();
-        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} height="700px" width="500px"/>);
-    };
-
-    const getNewUrl = (roomOwner) => {
-        const token = localStorage.getItem("token")
-        if (!token) {
-            navigate("/login")
-        }
-        axios.post(api_url + "/api/getVideoURL", { "creator": roomOwner }, {
-            headers: {
-                "Authorization": "Bearer " + token,
-                "content-type": "application/json",
-                "ngrok-skip-browser-warning": true
-            },
-        }).then((res) => {
-            if (res.data.url !== "") {
-                setRoomURL(res.data.url);
-            }
-        }).catch(e => {
-            console.log(e);
-        });
-    };
-
     const findElement = (elementName) => {
         for (var i in elements) {
             if (elements[i].name === elementName) {
@@ -164,6 +139,12 @@ const Classroom = () => {
         setElements(newArray)
     }
 
+    const handleAdd = (element) => {
+        const newarray = [...elements, element]
+        setElements(newarray)
+        saveElements()
+    }
+
     const handleDelete = (e) => {
         removeFromArray(e.target.id)
         saveElements()
@@ -178,25 +159,9 @@ const Classroom = () => {
                     setShowDropdown(false)
                 }
                 setEditMode(!editMode)
-            }}> { editMode === true ? "save changes" : "edit classroom" }</button>
+            }}> { editMode === true ? "save changes" : "add widgets" }</button>
             <br></br>
-            {editMode === true ? <button onClick={() => {
-                setShowDropdown(!showDropdown)
-            }}> 
-                 {showDropdown ? 
-                    <div className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5">
-                    x   
-                    {/* <label for="dropdown">  Select a new element:  </label> */}
-                    </div>
-                    :
-                    <div className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5">
-                        + add widget
-                    </div >
-
-                 }
-            </button> : <></> }
-            {showDropdown ? 
-                <span className="">
+            {editMode === true ? <span className="">
                     <select className="mx-3" name="components" id="select-components" onChange={(e)=>{
                             setNewComponentName(e.target.value)
                     }}>
@@ -209,38 +174,21 @@ const Classroom = () => {
                         handleAdd()
                         // if(result === true) this.forceUpdate()
                     }}> add</button>
-                </span>
-                : <></>}
-            </> : <></>}
-                {
-                    // console.log(elements)
-                    elements.map((element) => {
-                        console.log(element)
-                        if(element.name.indexOf("whiteboard") >= 0) {
-                            return <Moveable
-                                width={element.width}
-                                height={element.height}
-                                initialX={element.x}
-                                initialY={element.y}
-                                component="whiteboard"
-                                movingStop={(newX, newY) => {
-                                    console.log("dragging stopped at", newX, newY)
-                                    handleDrag(newX, newY, element.name)
-                                }}
-                                resizingStop={(size)=>{
-                                    handleResize(element, size)
-                                }}
-                                isOwner={isOwner}
-                                >
-                            </Moveable>
-                        }
-                        else if(element.name.indexOf("chat") >= 0) {
-                            return <Moveable
+                </span> : <></> 
+            }</>
+            : <></>
+            }
+            {
+                // console.log(elements)
+                elements.map((element) => {
+                    console.log(element)
+                    if(element.name.indexOf("whiteboard") >= 0) {
+                        return <Moveable
                             width={element.width}
                             height={element.height}
                             initialX={element.x}
                             initialY={element.y}
-                            component="chat"
+                            component="whiteboard"
                             movingStop={(newX, newY) => {
                                 console.log("dragging stopped at", newX, newY)
                                 handleDrag(newX, newY, element.name)
@@ -251,29 +199,47 @@ const Classroom = () => {
                             isOwner={isOwner}
                             >
                         </Moveable>
-                        }
-                        else {
-                            return <Moveable
-                            width={element.width}
-                            height={element.height}
-                            initialX={element.x}
-                            initialY={element.y}
-                            component={<VideoCall />}
-                            movingStop={(newX, newY) => {
-                                console.log("dragging stopped at", newX, newY)
-                                handleDrag(newX, newY, element.name)
-                            }}
-                            resizingStop={(size)=>{
-                                handleResize(element, size)
-                            }}
-                            isOwner={isOwner}
-                            >
-                        </Moveable>
+                    }
+                    else if(element.name.indexOf("chat") >= 0) {
+                        return <Moveable
+                        width={element.width}
+                        height={element.height}
+                        initialX={element.x}
+                        initialY={element.y}
+                        component="chat"
+                        movingStop={(newX, newY) => {
+                            console.log("dragging stopped at", newX, newY)
+                            handleDrag(newX, newY, element.name)
+                        }}
+                        resizingStop={(size)=>{
+                            handleResize(element, size)
+                        }}
+                        isOwner={isOwner}
+                        >
+                    </Moveable>
+                    }
+                    else {
+                        return <Moveable
+                        width={element.width}
+                        height={element.height}
+                        initialX={element.x}
+                        initialY={element.y}
+                        component="video"
+                        movingStop={(newX, newY) => {
+                            console.log("dragging stopped at", newX, newY)
+                            handleDrag(newX, newY, element.name)
+                        }}
+                        resizingStop={(size)=>{
+                            handleResize(element, size)
+                        }}
+                        isOwner={isOwner}
+                        >
+                    </Moveable>
 
-                        }
-                    })
-                }
-            </div>
+                    }
+                })
+            }
+        </div>
 
     );
 }

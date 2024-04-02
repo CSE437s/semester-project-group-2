@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import Whiteboard from "./Whiteboard"
 import ChatContainer from "./ChatContainer"
+import VideoCall from "./VideoCall"
 const Moveable = (props) => {
     // help starting: https://stackoverflow.com/questions/60792300/how-to-create-a-resizable-component-in-react
     // then i did moveable myself B) 
@@ -110,7 +111,7 @@ const Moveable = (props) => {
                         <Whiteboard width={specs.width} height={specs.height}/> : 
                         (props.component === "chat" ? 
                             <ChatContainer width={specs.width} height={specs.height} /> :
-                            props.component)
+                            <VideoCall width={specs.width} height={specs.height} />)
                 }
                 {props.isOwner === true && 
                 <button id="handle" style={{
