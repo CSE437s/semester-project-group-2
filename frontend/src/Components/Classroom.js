@@ -162,7 +162,11 @@ const Classroom = () => {
             {
                 elements && 
                 elements.map((element) => {
-                    if(element.name.indexOf("whiteboard") >= 0) {
+                    if(!element || element === null || !element.name) {
+                        console.log("no such element")
+                        return <></>
+                    }
+                    else if(element.name.indexOf("whiteboard") >= 0) {
                         return <>
                         <Moveable
                             width={element.width}
