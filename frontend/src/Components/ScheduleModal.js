@@ -35,7 +35,6 @@ const ScheduleModal = ({ onClose, userId, className, classId, onScheduleSubmit }
       addUserHours(userId, className, classId, selectedHoursArray)
         .then((response) => {
           if (response) {
-            alert('Office hours updated successfully.');
             onScheduleSubmit(classId, userId, selectedHoursArray);
             onClose();
           } else {

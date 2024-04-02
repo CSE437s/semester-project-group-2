@@ -80,7 +80,6 @@ const Dashboard = () => {
       setClassName("");
       setClassDescription("");
       setClassCode("");
-      alert("Class created successfully! Refreshing...");
       window.location.reload(); // force automatic reload
     } catch (error) {
       console.error("Error creating class:", error);
@@ -93,7 +92,6 @@ const Dashboard = () => {
 
     joinClass(joinClassCode, user._id, "student").then((result) => {// all users are added to a course as a student at first
       if (result === true) {
-        alert("You have successfully joined the class! Refreshing...");
         window.location.reload();// force automatic reload to see the joined class
       }
       else {
