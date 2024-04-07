@@ -939,6 +939,8 @@ const io = require("socket.io")(server, {
 
 //WHITEBOARD SOCKETS
 // thank you to this random guy who helped me use sockets for this purpose: https://www.youtube.com/watch?v=Br4uaXHrODg
+
+const classroomQueues = new Map()
 var connections = []
 const printIDs = (connections) => {
     var ids = ""
@@ -1019,4 +1021,100 @@ io.on("connect", (socket) => {
         io.emit("chat", chat)
     })
 
+    socket.on("join-queue", (data) => {
+        const targetClassroom = data.taId
+        const user = data.user
+        if(classroomQueues.has(targetClassroom)) {
+            const queue = classroomQueues.get(targetClassroom)
+            console.log(queue, queue.includes(socket.id))
+            if(queue.includes({user: user, socket: socket.id}) === true) {
+                console.log("socket is already in the queue.")
+            }
+            else {
+                queue.push({user: user, socket: socket.id})
+                console.log("socket added. updated queue:", queue)
+                io.emit("queue-change") // alert the TA that the queue has changed
+            }
+        }
+        else { // if the queu doesn't exist, make one and put the student in it
+            classroomQueues.set(targetClassroom, [{user: user, socket: socket.id}])
+            console.log("added to queue. new queues:", classroomQueues)
+            io.emit("queue-change")
+        }
+    })
+
+    socket.on("quit-queue", (data) => {
+        const targetClassroom = data.taId
+        if(classroomQueues.has(targetClassroom)){
+            const queue = classroomQueues.get(targetClassroom)
+            const newQueue = queue.filter((s) => s.socket !== socket.id)
+            classroomQueues.set(targetClassroom, newQueue)
+            io.emit("queue-change")
+        }
+        else {
+            console.log("trying to leave a queue that does not exist")
+        }
+    })
+
+    socket.on("move-student", (data) => {
+        const targetSocket = data.socketToMove
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id === targetSocket) {
+                listeningSocket.emit("move-me")
+            }
+        })
+    })
+
+})
+
+app.get("/api/pullOffQueue", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = user._id.toString()
+            if(classroomQueues.has(id) === false) {
+                res.status(404).send({error: "queue doesn't exist"})
+            }
+            else {
+                const queue = classroomQueues.get(id)
+                const nextInLine = queue.pop()
+                console.log("pulling", nextInLine, "off the q")
+                res.status(200).send({nextStudent: nextInLine.user, socket: nextInLine.socket})
+                // userModel.findById(nextInLine.user.toString()).then(user => {
+                //     if(user) {
+                //         res.status(200).send({nextStudent: user, socket: nextInLine.socket})
+                //     }
+                //     else {
+                //         res.status(404).send({error: "student in queue not found"})
+                //     }
+                // }).catch(e => res.status(500).send({error: e}))
+            }
+        }
+    })(req, res)
+})
+
+app.get("/api/getQueue", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = user._id.toString()
+            console.log("searching for queue for user", user._id.toString(), "in queues", classroomQueues)
+            if (classroomQueues.has(id) === true) {
+                res.status(200).send({ queue: classroomQueues.get(id) })
+            }
+            else {
+                res.status(404).send({error: "there is no existing queue for the user"})
+            }
+        }
+    })(req, res)
 })

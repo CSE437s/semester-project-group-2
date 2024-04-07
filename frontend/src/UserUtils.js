@@ -502,3 +502,61 @@ export function sendNewVideoURL(videoURL) {
         });
     })
 }
+
+
+/**
+ * get the queue for a user's classroom 
+ * @returns queue if successful, null otherwise
+ */
+export function getQueue() {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.get(url + "/api/getQueue", {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        console.log(result)
+        if(result.status === 200) {
+            return result.data.queue
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            return []
+        }
+        return null
+    })
+}
+
+
+/**
+ * get the next student ID from the queue
+ * @returns student ID if successful, null otherwise
+ */
+export function getNextStudentInLine() {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.get(url + "/api/pullOffQueue", {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        console.log(result)
+        if(result.status === 200) {
+            return result.data 
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            console.log("no such student")
+        }
+        return null
+    })
+}

@@ -15,6 +15,7 @@ import ResetPassword from "./Components/ResetPassword";
 import ForgotPassword from "./Components/ForgotPassword";
 import ProfilePage from './Components/ProfilePage';
 import Moveable from './Components/Moveable';
+import Queue from './Components/Queue';
 
 
 
@@ -37,6 +38,7 @@ const App = () => {
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/users/:userId" element={<ProfilePage/>} />
         <Route path="/resize" element={<Moveable/>} />
+        <Route path="/queue/:TAid" element={<Queue />} />
 
       </Routes>
     </Router>
