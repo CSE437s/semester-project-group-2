@@ -949,6 +949,14 @@ const printIDs = (connections) => {
     }
     return ids
 }
+const containsUser = (userIdToFind, list) => {
+    list.forEach(item => {
+        if(item?.user?._id === userIdToFind) {
+            return true
+        }
+    })
+    return false
+}
 io.on("connect", (socket) => {
     connections.push(socket) // keep track of all connected sockets
     console.log("Socket:", socket.id, "has connected")
@@ -1027,7 +1035,7 @@ io.on("connect", (socket) => {
         if(classroomQueues.has(targetClassroom)) {
             const queue = classroomQueues.get(targetClassroom)
             console.log(queue, queue.includes(socket.id))
-            if(queue.includes({user: user, socket: socket.id}) === true) {
+            if(containsUser(user._id, queue) === true) {
                 console.log("socket is already in the queue.")
             }
             else {
@@ -1061,6 +1069,7 @@ io.on("connect", (socket) => {
         connections.forEach(listeningSocket => {
             if(listeningSocket.id === targetSocket) {
                 listeningSocket.emit("move-me")
+                io.emit("queue-change")
             }
         })
     })

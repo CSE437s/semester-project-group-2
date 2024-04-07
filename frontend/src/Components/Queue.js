@@ -7,7 +7,6 @@ import { io } from "socket.io-client"
 const Queue = () => {
     const [isStudent, setIsStudent] = useState(null)
     const [queue, setQueue] = useState()
-    const [id, setId] = useState("")
     const [user, setUser] = useState()
     const [joined, setJoined] = useState(false)
     const { TAid } = useParams()
@@ -35,7 +34,7 @@ const Queue = () => {
         if(!token) {
             navigate("/login")
         }
-        if(id === "") {
+        if(isStudent === null) {
             getCurrentUser().then(u => {
                 const retrievedUser = u.data.user
                 if(retrievedUser) {
@@ -63,8 +62,6 @@ const Queue = () => {
     const getNewQueue = () => {
         if(isStudent === false) { 
             getQueue().then(q => {
-                console.log(q)
-                console.log("!")
 
                 setQueue(q)
             })
@@ -73,9 +70,7 @@ const Queue = () => {
 
     const nextStudent = () => {
         getNextStudentInLine().then(studentObject => {
-            const nextStudent = studentObject.nextStudent
             const studentSocket = studentObject.socket
-            console.log("pulled", nextStudent, studentSocket)
             socket.emit("move-student",  {
                 socketToMove: studentSocket,
                 TAid: TAid
@@ -101,12 +96,13 @@ const Queue = () => {
     </>
     :
     <>
-        Students Waiting: {queue ? queue.length : 0}
-        {queue && queue.map((item) => {
-            console.log(item)
-            return <div key={item.user?._id}>{item.user.firstName + " " + item.user.lastName}</div>
-        })}
-        <button onClick={nextStudent}>next student</button>
+        <div>
+            Students Waiting: {queue ? queue.length : 0}
+            {queue && queue.map((item) => {
+                return <div key={item.user?._id}>{item.user.firstName + " " + item.user.lastName}</div>
+            })}
+        </div>
+        <button onClick={nextStudent}>help next student</button>
     </>
     
     
