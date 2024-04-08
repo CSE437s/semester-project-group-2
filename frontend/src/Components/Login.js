@@ -55,7 +55,7 @@ const Login = () => {
                     <Link to="/home">
                         <div className="flex items-center">
                             <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OH</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OH</h1>
                         </div>
                     </Link>
                 </div>
@@ -63,11 +63,11 @@ const Login = () => {
             <div className="flex justify-center mt-6 p-10 pb-4">
                 <form onSubmit={performLogin} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                        <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="email">
                             Email
                         </label>
                         <input
-                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             id="email"
                             type="text"
                             name="email"
@@ -75,11 +75,11 @@ const Login = () => {
                         />
                     </div>
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                        <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="password">
                             Password
                         </label>
                         <input
-                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             id="current_password"
                             type="password"
                             name="current_password"
@@ -101,7 +101,7 @@ const Login = () => {
                     </div>
                 </form>
             </div>
-            <div className="flex sm:flex-row flex-col justify-center text-center">
+            <div className="text-gray-800 flex sm:flex-row flex-col justify-center text-center">
             Don't have an account? <Link to="/signup" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2">Sign up</Link>
             </div>
            

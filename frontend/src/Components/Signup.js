@@ -58,13 +58,13 @@ const Signup = () => {
 
 
     return (
-        <div className="font-mono bg-gray-50 h-dvh">
+        <div className="font-mono bg-gray-50 h-dvh text-gray-800">
             <header className="bg-indigo-300 p-0 py-5">
                 <div className="container flex justify-center items-center max-w-full">
                     <Link to="/home">
                         <div className="flex items-center">
                             <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OH</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OH</h1>
                         </div>
                     </Link>
                 </div>
@@ -72,11 +72,11 @@ const Signup = () => {
             <div className="flex justify-center mt-6 p-10 pb-4 ">
                 <form onSubmit={handleSignup} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
+                        <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="firstName">
                             First Name
                         </label>
                         <input
-                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             type="text"
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
@@ -84,11 +84,11 @@ const Signup = () => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastName">
+                        <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="lastName">
                             Last Name
                         </label>
                         <input
-                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             type="text"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
@@ -96,11 +96,11 @@ const Signup = () => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                        <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="email">
                             Email
                         </label>
                         <input
-                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -108,11 +108,11 @@ const Signup = () => {
                         />
                     </div>
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                        <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="password">
                             Password
                         </label>
                         <input
-                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -120,7 +120,7 @@ const Signup = () => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Role</label>
+                        <label className="block text-gray-800 text-sm font-bold mb-2">Role</label>
                         <div className="flex items-center">
                             <input
                                 className="mr-2 leading-tight"

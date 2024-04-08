@@ -125,7 +125,7 @@ const Dashboard = () => {
 
 
   return (
-    <div className="font-mono">
+    <div className="font-mono bg-gray-50 h-dvh text-gray-800">
       <Header user={user} showSetOfficeHours={false} />
 
       <div className="font-mono container mx-auto mt-6 p-10 ">
@@ -178,7 +178,7 @@ const Dashboard = () => {
               />
               <input
                 id="classCode"
-                className="border border-gray-300 p-2 rounded block mb-2 mr-2"
+                className="bg-gray-50 border border-gray-300 p-2 rounded block mb-2 mr-2"
                 type="text"
                 placeholder="Class Code"
                 value={classCode}
@@ -197,15 +197,15 @@ const Dashboard = () => {
 
 
         {!isLoading && user.role === "student" ? (
-          <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200 ">
-            <label htmlFor="joinClassCode" className="mr-2 font-bold ">
+          <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
+            <label htmlFor="joinClassCode" className="mr-2 font-bold flex-wrap shrink">
               Join a Class:
             </label>
             <input
               id="joinClassCode"
-              className="border border-gray-300 p-2 rounded block mr-2"
+              className="grow bg-gray-50 border border-gray-300 p-2 rounded block mr-2 max-w-48 w-1/2"
               type="text"
-              placeholder="Class Code"
+              placeholder="Code"
               value={joinClassCode}
               onChange={(e) => setJoinClassCode(e.target.value)}
             />
@@ -213,7 +213,7 @@ const Dashboard = () => {
               className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
               type="submit"
             >
-              Join Class
+              Join
             </button>
           </form>
         ) : null}
