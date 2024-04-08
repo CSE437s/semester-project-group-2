@@ -29,6 +29,7 @@ const Queue = () => {
         }
     }
 
+    
     useEffect(() => {
         const token = localStorage.getItem("token")
         if(!token) {
@@ -36,7 +37,7 @@ const Queue = () => {
         }
         if(isStudent === null) {
             getCurrentUser().then(u => {
-                const retrievedUser = u.data.user
+                const retrievedUser = u.data?.user
                 if(retrievedUser) {
                     if(isStudent === null && !user) {
                         setIsStudent(TAid !== retrievedUser._id)
@@ -47,13 +48,20 @@ const Queue = () => {
         }
         socket.on("queue-change", getNewQueue)
         socket.on("move-me", move)
+        socket.ondisconnect(() => {
+            socket.emit("quit-queue", {
+                taId: TAid
+            })
+        })
         socket.connect()
-        // return () => {
-        //     socket.emit("quit-queue", {
-        //         taId: TAid
-        //     })
-        //     // socket.disconnect()
-        // }
+        return () => {
+            if(socket.readyState === 1) {
+                socket.emit("quit-queue", {
+                    taId: TAid
+                })
+                // socket.disconnect()
+            }
+        }
     })
 
     const move = () => {
@@ -62,8 +70,9 @@ const Queue = () => {
     const getNewQueue = () => {
         if(isStudent === false) { 
             getQueue().then(q => {
-
-                setQueue(q)
+                if(q.length !== queue?.length) {
+                    setQueue(q)
+                }
             })
         }
     }

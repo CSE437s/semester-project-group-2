@@ -949,18 +949,9 @@ const printIDs = (connections) => {
     }
     return ids
 }
-const containsUser = (userIdToFind, list) => {
-    list.forEach(item => {
-        if(item?.user?._id === userIdToFind) {
-            return true
-        }
-    })
-    return false
-}
+
 io.on("connect", (socket) => {
     connections.push(socket) // keep track of all connected sockets
-    console.log("Socket:", socket.id, "has connected")
-    console.log("connected sockets:", printIDs(connections))
     socket.on("begin-draw", (data) => {
         connections.forEach((listeningSocket) => {
             if (listeningSocket.id !== socket.id) { // only draw the new points on the canvas' that DONT belong to original socket
@@ -1017,12 +1008,13 @@ io.on("connect", (socket) => {
 
     socket.on("disconnect", (e) => {
         console.log("Socket", socket.id, "disconnected because", e)
+        io.emit("queue-change")
         connections = connections.filter((item) => {
             if (item.id !== socket.id) {
                 return item;
             }
         })
-        console.log("connected sockets", printIDs(connections))
+        
     })
 
     socket.on("chat", chat => {
@@ -1035,24 +1027,24 @@ io.on("connect", (socket) => {
         if(classroomQueues.has(targetClassroom)) {
             const queue = classroomQueues.get(targetClassroom)
             console.log(queue, queue.includes(socket.id))
-            if(containsUser(user._id, queue) === true) {
+            const idsInQueue = queue.flatMap(item => item.user._id)
+            if(idsInQueue.includes(user._id) === true) {
                 console.log("socket is already in the queue.")
             }
             else {
                 queue.push({user: user, socket: socket.id})
-                console.log("socket added. updated queue:", queue)
                 io.emit("queue-change") // alert the TA that the queue has changed
             }
         }
-        else { // if the queu doesn't exist, make one and put the student in it
+        else { // if the queue doesn't exist, make one and put the student in it
             classroomQueues.set(targetClassroom, [{user: user, socket: socket.id}])
-            console.log("added to queue. new queues:", classroomQueues)
             io.emit("queue-change")
         }
     })
 
     socket.on("quit-queue", (data) => {
         const targetClassroom = data.taId
+        console.log("LEAVING QUEUE")
         if(classroomQueues.has(targetClassroom)){
             const queue = classroomQueues.get(targetClassroom)
             const newQueue = queue.filter((s) => s.socket !== socket.id)
@@ -1092,20 +1084,16 @@ app.get("/api/pullOffQueue", (req, res) => {
             else {
                 const queue = classroomQueues.get(id)
                 const nextInLine = queue.pop()
-                console.log("pulling", nextInLine, "off the q")
                 res.status(200).send({nextStudent: nextInLine.user, socket: nextInLine.socket})
-                // userModel.findById(nextInLine.user.toString()).then(user => {
-                //     if(user) {
-                //         res.status(200).send({nextStudent: user, socket: nextInLine.socket})
-                //     }
-                //     else {
-                //         res.status(404).send({error: "student in queue not found"})
-                //     }
-                // }).catch(e => res.status(500).send({error: e}))
             }
         }
     })(req, res)
 })
+
+const searchConnectionsForId = (id) => {
+    const ids = connections.flatMap(s => s.id)
+    return ids.includes(id)
+}
 
 app.get("/api/getQueue", (req, res) => {
     passport.authenticate("jwt", { session: false }, (error, user) => {
@@ -1117,8 +1105,11 @@ app.get("/api/getQueue", (req, res) => {
         }
         else {
             const id = user._id.toString()
-            console.log("searching for queue for user", user._id.toString(), "in queues", classroomQueues)
             if (classroomQueues.has(id) === true) {
+                // only send sockets that are connected, then update the classroom queue to show this
+                const queue = classroomQueues.get(id)
+                const connectedSockets = queue.filter((sock) => searchConnectionsForId(sock.socket) === true)
+                classroomQueues.set(id, connectedSockets)
                 res.status(200).send({ queue: classroomQueues.get(id) })
             }
             else {
