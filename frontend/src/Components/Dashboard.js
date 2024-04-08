@@ -125,10 +125,10 @@ const Dashboard = () => {
 
 
   return (
-    <div className="font-mono bg-gray-50 h-dvh text-gray-800">
+    <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
       <Header user={user} showSetOfficeHours={false} />
 
-      <div className="font-mono container mx-auto mt-6 p-10 ">
+      <div className="font-mono container mx-auto p-10 ">
 
         {/* Display user's classes */}
         
@@ -140,7 +140,7 @@ const Dashboard = () => {
                 const coursesAsRole = userClasses[role];
                 return coursesAsRole.map((course) => (
                   <Link key={course._id} to={`/class/${course._id}`} className="">
-                    <div className="p-4 bg-indigo-200 mb-6 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48 hover:bg-indigo-300">
+                    <div className="p-4 bg-indigo-300 mb-6 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48 hover:bg-indigo-400">
                       <div>
                         <h3 className="font-bold text-lg mb-2">{course.className}</h3>
                         <p className="text-gray-700 flex-grow">{course.classDescription}</p>
@@ -157,20 +157,20 @@ const Dashboard = () => {
         </div>
 
         {!isLoading && user.role === "instructor" ? (
-          <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-200 rounded-lg shadow-md">
+          <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-400 rounded-lg shadow-md">
             <label htmlFor="classCode" className="mr-2 font-bold">
               Create A Class:
             </label>
             <div className="flex flex-wrap">
               <input
-                className="border border-gray-300 p-2 rounded block mb-2 mr-2"
+                className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mb-2 mr-2"
                 type="text"
                 placeholder="Class Name"
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
               />
               <input
-                className="border border-gray-300 p-2 rounded block mb-2 mr-2"
+                className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mb-2 mr-2"
                 type="text"
                 placeholder="Class Description"
                 value={classDescription}
@@ -178,7 +178,7 @@ const Dashboard = () => {
               />
               <input
                 id="classCode"
-                className="bg-gray-50 border border-gray-300 p-2 rounded block mb-2 mr-2"
+                className="hover:bg-gray-100 bg-gray-50 border border-gray-300 p-2 rounded block mb-2 mr-2"
                 type="text"
                 placeholder="Class Code"
                 value={classCode}
@@ -197,13 +197,13 @@ const Dashboard = () => {
 
 
         {!isLoading && user.role === "student" ? (
-          <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-200 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
+          <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-300 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
             <label htmlFor="joinClassCode" className="mr-2 font-bold flex-wrap shrink">
               Join a Class:
             </label>
             <input
               id="joinClassCode"
-              className="grow bg-gray-50 border border-gray-300 p-2 rounded block mr-2 max-w-48 w-1/2"
+              className="hover:bg-gray-100 grow bg-gray-50 border border-gray-300 p-2 rounded block mr-2 max-w-48 w-1/2"
               type="text"
               placeholder="Code"
               value={joinClassCode}

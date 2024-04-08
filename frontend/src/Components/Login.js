@@ -49,8 +49,8 @@ const Login = () => {
     }
 
     return (
-        <div className="font-mono bg-gray-50 h-dvh">
-            <header className="bg-indigo-300 p-0 py-5">
+        <div className="font-mono bg-indigo-50 h-dvh">
+            <header className="bg-indigo-50 p-0 py-5">
                 <div className="container flex justify-center items-center max-w-full">
                     <Link to="/home">
                         <div className="flex items-center">
@@ -60,8 +60,12 @@ const Login = () => {
                     </Link>
                 </div>
             </header>
+            <div className="border-0.5 border-gray-800 border-solid relative" >
+               
+
+               </div>
             <div className="flex justify-center mt-6 p-10 pb-4">
-                <form onSubmit={performLogin} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
+                <form onSubmit={performLogin} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-300">
                     <div className="mb-4">
                         <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="email">
                             Email
@@ -88,12 +92,12 @@ const Login = () => {
                     </div>
                     <div className="flex items-center justify-between">
                         <input
-                            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            className="bg-indigo-500 hover:bg-indigo-700 text-gray-50 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             type="submit"
                             value="Login"
                         />
                         <input
-                            className="inline-block align-baseline font-bold text-sm text-indigo-500 hover:text-indigo-800"
+                            className="inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800"
                             type="button"
                             value="Forgot Password?"
                             onClick={handleForgotPassword}
@@ -102,7 +106,7 @@ const Login = () => {
                 </form>
             </div>
             <div className="text-gray-800 flex sm:flex-row flex-col justify-center text-center">
-            Don't have an account? <Link to="/signup" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2">Sign up</Link>
+            Don't have an account? <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-800 ml-2 mr-2">Sign up</Link>
             </div>
            
         </div>

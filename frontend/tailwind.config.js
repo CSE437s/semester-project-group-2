@@ -9,6 +9,9 @@ module.exports = {
         "eraser": "url('../public/eraser.svg')",
         "clear": "url('../public/clear.svg')",
         "resize": "url('../public/resize.svg')"
+      },
+      borderWidth: {
+        '0.5': '0.5px',
       }
     },
   },

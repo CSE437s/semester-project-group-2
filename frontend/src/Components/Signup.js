@@ -58,8 +58,8 @@ const Signup = () => {
 
 
     return (
-        <div className="font-mono bg-gray-50 h-dvh text-gray-800">
-            <header className="bg-indigo-300 p-0 py-5">
+        <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
+            <header className="bg-indigo-50 p-0 py-5">
                 <div className="container flex justify-center items-center max-w-full">
                     <Link to="/home">
                         <div className="flex items-center">
@@ -69,8 +69,11 @@ const Signup = () => {
                     </Link>
                 </div>
             </header>
-            <div className="flex justify-center mt-6 p-10 pb-4 ">
-                <form onSubmit={handleSignup} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
+            <div className="border-0.5 border-gray-800 border-solid relative" >
+            
+               </div>
+            <div className="flex justify-center mt-6 p-10 pb-4 bg-indigo-50 ">
+                <form onSubmit={handleSignup} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-300">
                     <div className="mb-4">
                         <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="firstName">
                             First Name
@@ -145,7 +148,7 @@ const Signup = () => {
                         </div>
                     </div>
                     <button
-                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className="bg-indigo-500 hover:bg-indigo-700 text-gray-50 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="submit"
                     >
                         Sign Up
@@ -153,7 +156,7 @@ const Signup = () => {
                 </form>
             </div>
             <div className="flex justify-center sm:flex-row flex-col text-center">
-                Already have an account? <Link to="/login" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2  md:text-base">Log in</Link>
+                Already have an account? <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-800 ml-2 mr-2  md:text-base">Log in</Link>
             </div>
 
         </div>
