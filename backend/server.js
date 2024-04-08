@@ -1008,7 +1008,6 @@ io.on("connect", (socket) => {
 
     socket.on("disconnect", (e) => {
         console.log("Socket", socket.id, "disconnected because", e)
-        io.emit("queue-change")
         connections = connections.filter((item) => {
             if (item.id !== socket.id) {
                 return item;
@@ -1049,7 +1048,6 @@ io.on("connect", (socket) => {
             const queue = classroomQueues.get(targetClassroom)
             const newQueue = queue.filter((s) => s.socket !== socket.id)
             classroomQueues.set(targetClassroom, newQueue)
-            io.emit("queue-change")
         }
         else {
             console.log("trying to leave a queue that does not exist")
@@ -1061,7 +1059,6 @@ io.on("connect", (socket) => {
         connections.forEach(listeningSocket => {
             if(listeningSocket.id === targetSocket) {
                 listeningSocket.emit("move-me")
-                io.emit("queue-change")
             }
         })
     })
@@ -1083,7 +1080,7 @@ app.get("/api/pullOffQueue", (req, res) => {
             }
             else {
                 const queue = classroomQueues.get(id)
-                const nextInLine = queue.pop()
+                const nextInLine = queue.shift()
                 res.status(200).send({nextStudent: nextInLine.user, socket: nextInLine.socket})
             }
         }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { getCurrentUser, getNextStudentInLine, getQueue } from "../UserUtils"
 import { io } from "socket.io-client"
@@ -28,14 +28,33 @@ const Queue = () => {
             setJoined(true)
         }
     }
+    const move = () => {
+        navigate(`/classrooms/${TAid}`)
+    }
 
+    socket.on("queue-change", ()=> {
+        if(isStudent === false) {
+            getQueue().then(q => {
+                setQueue(q)
+            })
+        }
+    })
+
+    socket.on("move-me", move)
     
+    socket.connect()
+
+    useEffect(() => {
+        
+        //eslint-disable-next-line
+    }, [socket])
+
     useEffect(() => {
         const token = localStorage.getItem("token")
         if(!token) {
             navigate("/login")
         }
-        if(isStudent === null) {
+        if(isStudent === null && !user) {
             getCurrentUser().then(u => {
                 const retrievedUser = u.data?.user
                 if(retrievedUser) {
@@ -46,45 +65,31 @@ const Queue = () => {
                 }
             })
         }
-        socket.on("queue-change", getNewQueue)
-        socket.on("move-me", move)
-        socket.ondisconnect(() => {
-            socket.emit("quit-queue", {
-                taId: TAid
-            })
-        })
-        socket.connect()
+       
         return () => {
             if(socket.readyState === 1) {
-                socket.emit("quit-queue", {
-                    taId: TAid
-                })
-                // socket.disconnect()
+                socket.disconnect()
             }
         }
-    })
+        //eslint-disable-next-line
+    },  [TAid, navigate, socket])
 
-    const move = () => {
-        navigate(`/classrooms/${TAid}`)
-    }
-    const getNewQueue = () => {
-        if(isStudent === false) { 
-            getQueue().then(q => {
-                if(q.length !== queue?.length) {
-                    setQueue(q)
-                }
-            })
-        }
-    }
 
     const nextStudent = () => {
-        getNextStudentInLine().then(studentObject => {
-            const studentSocket = studentObject.socket
-            socket.emit("move-student",  {
-                socketToMove: studentSocket,
-                TAid: TAid
-            })
-        }).catch(e => console.log(e))
+        if(queue && queue.length > 0) {
+            getNextStudentInLine().then(studentObject => {
+                const studentSocket = studentObject.socket
+                socket.emit("move-student",  {
+                    socketToMove: studentSocket,
+                    TAid: TAid
+                })
+                getQueue().then(q => {
+                    if(q.length !== queue?.length) {
+                        setQueue(q)
+                    }
+                })
+            }).catch(e => console.log(e))
+        }
     }
 
     const getSuffix = (number) => {
