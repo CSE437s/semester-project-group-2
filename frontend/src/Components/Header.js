@@ -111,10 +111,10 @@ const Header = (props) => {
                         {
                             window.location.href.indexOf("dashboard") < 0 ?
                                 <button
-                                    className="text-gray-800 font-bold px-4 mr-2 rounded hover:text-gray-600"
+                                    className="text-gray-800 font-bold mr-10 rounded hover:text-gray-600"
                                     onClick={() => navigate("/dashboard")}
                                 >
-                                    Back to Dashboard
+                                    Back to Classes
                                 </button>
                                 :
                                 <></>

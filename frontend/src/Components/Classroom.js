@@ -135,7 +135,7 @@ const Classroom = () => {
         setElements([...newElements])
     }
     return (
-        <div className="font-mono">
+        <div className="font-mono bg-indigo-50 h-dvh ">
             <Header user={user} />
             {isOwner? <>
             <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {

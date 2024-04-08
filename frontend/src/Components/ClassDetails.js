@@ -9,6 +9,7 @@ import { getClassByID } from '../ClassUtils';
 import SimpleModal from './SimpleModal';
 import ScheduleModal from './ScheduleModal';
 import TAHoursModal from './TAHoursModal';
+import Header from './Header';
 
 const ClassDetails = () => {
   const { classId } = useParams();
@@ -407,111 +408,17 @@ const ClassDetails = () => {
   }
 
   return (
-    <div className="font-mono">
-      <header className="bg-indigo-300 p-0 py-5 z-10">
-        <div className="container flex justify-between items-center max-w-full">
-          <Link to="/home">
-            <div className="flex items-center">
-              <img
-                src="/logo.png"
-                alt="Logo"
-                className="h-12 w-auto mr-2 pl-10"
-              />
-              <h1 className="text-3xl font-bold text-black font-mono">
-                ONLINE OH
-              </h1>
-            </div>
-          </Link>
+    <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
+      <Header />
 
-          {/* hamburgie menu */}
-          <div className="lg:hidden font-mono">
-            <div
-              className="HAMBURGER-ICON space-y-2 mr-10"
-              onClick={() => setIsNavOpen((prev) => !prev)}
-            >
-              <span className="block h-0.5 w-8 animate-pulse bg-black"></span>
-              <span className="block h-0.5 w-8 animate-pulse bg-black"></span>
-              <span className="block h-0.5 w-8 animate-pulse bg-black"></span>
-            </div>
-
-            {isNavOpen && (
-              <div className="MOBILE-MENU absolute top-0 right-0 px-8 py-8 bg-white font-mono">
-                <div className="CROSS-ICON" onClick={() => setIsNavOpen(false)}>
-                  <svg
-                    className="h-8 w-8 text-gray-600"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </div>
-                <ul className="flex flex-col items-center justify-between min-h-[250px]">
-                  <li className="border-b border-gray-400 my-8 uppercase">
-                    <a href="/dashboard">Dashboard</a>
-                  </li>
-                  <li className="border-b border-gray-400 my-8 uppercase">
-                    <a href="/me">My Profile</a>
-                  </li>
-                  {isTA && (
-                    <li className="border-b border-gray-400 my-8 uppercase">
-                      <a href={`/classrooms/${user._id}`}>My Classroom</a>
-                    </li>
-                  )}
-
-
-                  <li className="border-b border-gray-400 my-8 uppercase">
-                    <LogoutButton />
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-
-          {/* normal menu */}
-
-          <nav className="hidden lg:flex mr-10">
-            <button
-              className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-              onClick={() => navigate("/dashboard")}
-            >
-              Back to Dashboard
-            </button>
-
-            {isTA === true || isInstructor === true ?
-              <button
-                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-                onClick={() => navigate("/classrooms/" + user._id)}
-              >
-                My Classroom
-              </button>
-              : <></>}
-
-            <button
-              className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
-              onClick={() => navigate("/me")}
-            >
-              My Profile
-            </button>
-
-            <LogoutButton />
-          </nav>
-        </div>
-
-      </header >
-
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 ">
 
         {classDetails && (
           <>
             <div className="font-mono home-container">
 
               {/* class name and prof */}
-              <div className="container mx-auto mt-6 bg-indigo-200 p-10 mb-6 rounded-lg shadow-lg">
+              <div className="container mx-auto mt-6 bg-indigo-300 p-10 mb-6 rounded-lg shadow-lg">
                 <div className="flex justify-between items-center">
                   <h1 className="text-3xl font-bold mb-4">{classDetails.className}</h1>
                   {isInstructor ? (
@@ -561,42 +468,21 @@ const ClassDetails = () => {
 
 
                 <p className="text-lg mb-4 text-gray-700">{classDetails.classDescription}</p>
-                <div className="border-t border-gray-300 pt-4 mb-6">
+                <div className="">
                   <p className="text-black font-semibold">Professor:</p>
                   <p className="text-gray-700 mb-6">{instructorName}</p>
+
                 </div>
 
 
 
-                {isTA && (
-                  <button
-                    className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center"
-                    onClick={toggleScheduleModal}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M6 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2h-1v1a1 1 0 11-2 0v-1H7v1a1 1 0 11-2 0v-1H4a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zM4 6v11h12V6H4z" clipRule="evenodd" />
-                      <path d="M8 11a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                    </svg>
-                    Set Office Hours
-                  </button>
-                )}{showScheduleModal && (
-                  <ScheduleModal
-                    onClose={toggleScheduleModal}
-                    userId={user._id}
-                    className={classDetails.className}
-                    classId={classId}
-                    onScheduleSubmit={handleScheduleSubmit}
-                  />
-                )}
 
               </div>
 
 
-
-
               {/* TAs */}
               <div className="mb-8">
-                <div className="flex items-center mb-6">
+                <div className="flex flex-row text-center items-center mb-6">
                   <h2 className="text-3xl font-bold mr-4">Teaching Assistants</h2>
                   <button
                     className="bg-indigo-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -604,6 +490,27 @@ const ClassDetails = () => {
                   >
                     View TA Schedules
                   </button>
+
+                  {isTA && (
+                    <button
+                      className="ml-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center"
+                      onClick={toggleScheduleModal}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M6 2a1 1 0 011 1v1h6V3a1 1 0 112 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2h-1v1a1 1 0 11-2 0v-1H7v1a1 1 0 11-2 0v-1H4a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zM4 6v11h12V6H4z" clipRule="evenodd" />
+                        <path d="M8 11a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                      </svg>
+                      Set My Schedule
+                    </button>
+                  )}{showScheduleModal && (
+                    <ScheduleModal
+                      onClose={toggleScheduleModal}
+                      userId={user._id}
+                      className={classDetails.className}
+                      classId={classId}
+                      onScheduleSubmit={handleScheduleSubmit}
+                    />
+                  )}
                 </div>
 
                 {isTAHoursModalOpen && (
@@ -637,12 +544,12 @@ const ClassDetails = () => {
                     const isOHNow = taSchedule && isCurrentlyOH(taSchedule.hours, currentTime);
 
                     return (
-                      <div key={ta._id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
-                        
+                      <div key={ta._id} className="p-6 bg-indigo-300 rounded-lg shadow-xl flex flex-col justify-center items-center">
+
                         <h3 className="text-xl font-bold mb-4">{user?._id === ta._id ? <Link to={`/me`} className="text-xl font-bold mb-4">
-                                                        {"You!"} </Link> : <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
-                                                        {ta.firstName} {ta.lastName}
-                          </Link>}</h3>
+                          {"You!"} </Link> : <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
+                          {ta.firstName} {ta.lastName}
+                        </Link>}</h3>
                         {taSchedule && taSchedule.hours ? (
                           <div className="text-center mb-4">
                             <p className="font-semibold">Office Hours:</p>
@@ -700,8 +607,8 @@ const ClassDetails = () => {
                                                         {ta.firstName} {ta.lastName}
                           </Link> */}
                           <h3 className="text-xl font-bold mb-1">{user?._id === ta._id ? <Link to={`/me`} className="text-xl font-bold mb-4">
-                          {ta.firstName} {ta.lastName} </Link> : <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
-                                                        {ta.firstName} {ta.lastName}
+                            {ta.firstName} {ta.lastName} </Link> : <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
+                            {ta.firstName} {ta.lastName}
                           </Link>}</h3>
                           <div className="text-gray-500">{ta.email}</div>
                         </div>
@@ -727,10 +634,10 @@ const ClassDetails = () => {
                                                         {student.firstName} {student.lastName}
                           </Link> */}
                           <h3 className="text-xl font-bold mb-1">{user?._id === student._id ? <Link to={`/me`} className="text-xl font-bold mb-4">
-                          {student.firstName} {student.lastName} </Link> : <Link to={`/users/${student._id}`} className="text-xl font-bold mb-4">
-                                                        {student.firstName} {student.lastName}
+                            {student.firstName} {student.lastName} </Link> : <Link to={`/users/${student._id}`} className="text-xl font-bold mb-4">
+                            {student.firstName} {student.lastName}
                           </Link>}</h3>
-                          
+
                           <div className="text-gray-500">{student.email}</div>
                         </div>
                         {isInstructor && (
