@@ -229,6 +229,34 @@ export function addUserHours(userId, className, classId, hours) {
 }
 
 /**
+ * Delete hours from database and remove ID from user's list of IDs
+ * @param userId
+ * @param classId
+ * @returns true if successful, false otherwise
+ */
+export function deleteUserHours(userId, classId) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        return null;
+    }
+    return axios.post(url + "/api/deleteHours", {
+        classId: classId,
+        userId: userId
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(res => {
+        return res.status === 200;
+    }).catch(e => {
+        console.error(e);
+        return false;
+    });
+}
+
+
+/**
  * change a user's role in a specified class
  * @param userId 
  * @param classId 
