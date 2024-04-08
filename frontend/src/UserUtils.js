@@ -519,7 +519,7 @@ export function getQueue() {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        // console.log(result)
+        console.log("getQueue called")
         if(result.status === 200) {
             return result.data.queue
         }

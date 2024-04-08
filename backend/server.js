@@ -952,6 +952,7 @@ const printIDs = (connections) => {
 
 io.on("connect", (socket) => {
     connections.push(socket) // keep track of all connected sockets
+    console.log("sockets connected:", connections.length)
     socket.on("begin-draw", (data) => {
         connections.forEach((listeningSocket) => {
             if (listeningSocket.id !== socket.id) { // only draw the new points on the canvas' that DONT belong to original socket
@@ -1032,11 +1033,13 @@ io.on("connect", (socket) => {
             }
             else {
                 queue.push({user: user, socket: socket.id})
+                console.log("new queues:", classroomQueues.get(targetClassroom))
                 io.emit("queue-change") // alert the TA that the queue has changed
             }
         }
         else { // if the queue doesn't exist, make one and put the student in it
             classroomQueues.set(targetClassroom, [{user: user, socket: socket.id}])
+            console.log("new queues:", classroomQueues.get(targetClassroom))
             io.emit("queue-change")
         }
     })
@@ -1056,6 +1059,7 @@ io.on("connect", (socket) => {
 
     socket.on("move-student", (data) => {
         const targetSocket = data.socketToMove
+        console.log("trying to move targetSocket", "is targetConnected?", connections.flatMap((s)=>s.id).includes(targetSocket))
         connections.forEach(listeningSocket => {
             if(listeningSocket.id === targetSocket) {
                 listeningSocket.emit("move-me")
