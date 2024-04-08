@@ -639,7 +639,7 @@ const ClassDetails = () => {
                     return (
                       <div key={ta._id} className="p-6 bg-indigo-200 rounded-lg shadow-xl flex flex-col justify-center items-center">
                         
-                        <h3 className="text-xl font-bold mb-4">{user?._id === ta._id ? <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
+                        <h3 className="text-xl font-bold mb-4">{user?._id === ta._id ? <Link to={`/me`} className="text-xl font-bold mb-4">
                                                         {"You!"} </Link> : <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
                                                         {ta.firstName} {ta.lastName}
                           </Link>}</h3>
@@ -696,9 +696,13 @@ const ClassDetails = () => {
                       <li key={ta._id} className="flex items-center justify-between space-x-3">
                         <div className="flex-1">
                           {/* <div className="font-medium text-gray-900">{ta.firstName} {ta.lastName}</div> */}
-                          <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
+                          {/* <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
                                                         {ta.firstName} {ta.lastName}
-                          </Link>
+                          </Link> */}
+                          <h3 className="text-xl font-bold mb-1">{user?._id === ta._id ? <Link to={`/me`} className="text-xl font-bold mb-4">
+                          {ta.firstName} {ta.lastName} </Link> : <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">
+                                                        {ta.firstName} {ta.lastName}
+                          </Link>}</h3>
                           <div className="text-gray-500">{ta.email}</div>
                         </div>
                         {isInstructor && (
@@ -719,9 +723,14 @@ const ClassDetails = () => {
                       <li key={student._id} className="flex items-center justify-between space-x-3">
                         <div className="flex-1">
                           {/* <div className="font-medium text-gray-900">{student.firstName} {student.lastName}</div> */}
-                          <Link to={`/users/${student._id}`} className="text-xl font-bold mb-4">
+                          {/* <Link to={`/users/${student._id}`} className="text-xl font-bold mb-4">
                                                         {student.firstName} {student.lastName}
-                          </Link>
+                          </Link> */}
+                          <h3 className="text-xl font-bold mb-1">{user?._id === student._id ? <Link to={`/me`} className="text-xl font-bold mb-4">
+                          {student.firstName} {student.lastName} </Link> : <Link to={`/users/${student._id}`} className="text-xl font-bold mb-4">
+                                                        {student.firstName} {student.lastName}
+                          </Link>}</h3>
+                          
                           <div className="text-gray-500">{student.email}</div>
                         </div>
                         {isInstructor && (
