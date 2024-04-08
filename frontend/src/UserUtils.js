@@ -506,20 +506,22 @@ export function sendNewVideoURL(videoURL) {
 
 /**
  * get the queue for a user's classroom 
+ * @param id: user id of the queue of interest
  * @returns queue if successful, null otherwise
  */
-export function getQueue() {
+export function getQueue(queueId) {
     const token = localStorage.getItem("token")
     if(!token) {
         return null
     }
-    return axios.get(url + "/api/getQueue", {
+    return axios.post(url + "/api/getQueue", {
+        id: queueId
+    },{
         headers: {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        console.log("getQueue called")
         if(result.status === 200) {
             return result.data.queue
         }

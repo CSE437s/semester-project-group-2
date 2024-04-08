@@ -1096,7 +1096,7 @@ const searchConnectionsForId = (id) => {
     return ids.includes(id)
 }
 
-app.get("/api/getQueue", (req, res) => {
+app.post("/api/getQueue", (req, res) => {
     passport.authenticate("jwt", { session: false }, (error, user) => {
         if (error) {
             res.status(500).send({ error: error })
@@ -1105,7 +1105,7 @@ app.get("/api/getQueue", (req, res) => {
             res.status(401).send({ error: "invalid auth" })
         }
         else {
-            const id = user._id.toString()
+            const id = req.body.id
             if (classroomQueues.has(id) === true) {
                 // only send sockets that are connected, then update the classroom queue to show this
                 const queue = classroomQueues.get(id)

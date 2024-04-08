@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { getCurrentUser, getNextStudentInLine, getQueue } from "../UserUtils"
 import { io } from "socket.io-client"
@@ -9,28 +9,17 @@ const Queue = () => {
     const [queue, setQueue] = useState()
     const [user, setUser] = useState()
     const [joined, setJoined] = useState(false)
+    const [queueIndex, setQueueIndex] = useState(-1)
     const socketRef = useRef()
     const { TAid } = useParams()
     const navigate = useNavigate()
     const url = process.env.REACT_APP_DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
 
-
     const move = () => {
         navigate(`/classrooms/${TAid}`)
     }
 
-
     const joinQueue = () => {
-        // if(!socket) {
-        //     const s = io(url, {
-        //         autoConnect: true,
-        //         extraHeaders: {
-        //             "ngrok-skip-browser-warning": true
-        //         }
-        //     })
-        //     addSocketListeners(s)
-        //     setSocket(s)
-        // }
         const socket = socketRef.current
         if(socket === null) {
             console.log("no socket")
@@ -46,6 +35,11 @@ const Queue = () => {
                 user: user
             })
             setJoined(true)
+            getQueue(TAid).then(q => {
+                if(queueIndex === -1) {
+                    setQueueIndex(q.length)
+                }
+            })
         }
     }
 
@@ -83,10 +77,8 @@ const Queue = () => {
                     socketToMove: studentSocket,
                     TAid: TAid
                 })
-                getQueue().then(q => {
-                    if(q.length !== queue?.length) {
-                        setQueue(q)
-                    }
+                getQueue(TAid).then(q => {
+                    setQueue(q)
                 })
             }).catch(e => console.log(e))
         }
@@ -103,40 +95,29 @@ const Queue = () => {
             }) 
         }  
         const socket = socketRef.current
-        console.log(socketRef)
         socket.connect()
         if(!socket) {
-            console.log("no socket 2")
+            console.log("the socket was never connected.")
+            alert("something went wrong. please try again!")
         }
         else {
             socket.on("queue-change", ()=> {
-                console.log(isStudent)
-                if(isStudent === false) {
-                    console.log("hi")
-                    getQueue().then(q => {
-                        setQueue(q)
-                        console.log(q)
-                    })
-                }
+                getQueue(TAid).then(q => {
+                    setQueue(q)
+                })
             })
         
             socket.on("move-me", move)
         
-            socket.on("connect", ()=>console.log("socket connected"))
-            socket.on("disconnect", ()=>console.log("socket disconnected"))
+            socket.on("connect", () => console.log("socket connected"))
+            socket.on("disconnect", () => console.log("socket disconnected"))
             socket.on('connect_error', (e)=>{
                 console.log("error", e)
             })
         }
         return () => {
-            // if(socket.readyState === 1) {
-                console.log("socket will disconnect")
-                socketRef.current.disconnect()
-            // }
+            socketRef.current.disconnect()
         }
-        // if(socket.connected === false) {
-        //     socket.connect()
-        // }
         //eslint-disable-next-line
     }, [])
 
@@ -153,10 +134,11 @@ const Queue = () => {
         return "th"
     }
     return (<>
-    <button onClick={()=>console.log(socketRef.current.connected)}>test connection</button>
     {isStudent === true ?
     <>
-        {joined === true ? <div>You are {queue ? queue.length + getSuffix(queue.length) : 1 + getSuffix(1)} in line </div> : <button onClick={joinQueue}>join queue</button> }
+
+    {console.log(queue)}
+        {joined === true ? <div>You are {queueIndex + getSuffix(queueIndex)} in line </div> : <button onClick={joinQueue}>join queue</button> }
     </>
     :
     <>
