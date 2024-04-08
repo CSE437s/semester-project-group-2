@@ -27,9 +27,9 @@ const Signup = () => {
 
     const handleSignup = async (e) => {
         e.preventDefault();
-        axios.post(url +"/api/signup", {
+        axios.post(url + "/api/signup", {
             "email": email,
-            "password": password, 
+            "password": password,
             "firstName": firstName,
             "lastName": lastName,
             "role": role,
@@ -39,14 +39,14 @@ const Signup = () => {
                 "ngrok-skip-browser-warning": true
             }
         }).then((data) => {
-            if(data.data.user) {
+            if (data.data.user) {
                 getUser(email, password).then(res => {
-                    if(!res.error) {
+                    if (!res.error) {
                         navigate("/dashboard")
                     }
                 })
             }
-            else if(data.error) {
+            else if (data.error) {
                 alert("something went wrong. please try again")
             }
         }).catch(e => console.log(e))
@@ -152,9 +152,9 @@ const Signup = () => {
                     </button>
                 </form>
             </div>
-            <div className="flex justify-center">
-    Already have an account? <Link to="/login" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2 sm:text-sm md:text-base">Log in</Link> here!
-</div>
+            <div className="flex justify-center sm:flex-row flex-col text-center">
+                Already have an account? <Link to="/login" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2  md:text-base">Log in</Link>
+            </div>
 
         </div>
     );

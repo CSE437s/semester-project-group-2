@@ -101,8 +101,8 @@ const Login = () => {
                     </div>
                 </form>
             </div>
-            <div className="flex justify-center">
-            Don't have an account? <Link to="/signup" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2">Sign up</Link> to get started!
+            <div className="flex sm:flex-row flex-col justify-center text-center">
+            Don't have an account? <Link to="/signup" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2">Sign up</Link>
             </div>
            
         </div>
