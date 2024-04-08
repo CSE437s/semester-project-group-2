@@ -58,7 +58,7 @@ const Signup = () => {
 
 
     return (
-        <div className="font-mono">
+        <div className="font-mono bg-gray-50 h-dvh">
             <header className="bg-indigo-300 p-0 py-5">
                 <div className="container flex justify-center items-center max-w-full">
                     <Link to="/home">
@@ -76,7 +76,7 @@ const Signup = () => {
                             First Name
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             type="text"
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
@@ -88,7 +88,7 @@ const Signup = () => {
                             Last Name
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             type="text"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
@@ -100,7 +100,7 @@ const Signup = () => {
                             Email
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -112,7 +112,7 @@ const Signup = () => {
                             Password
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -153,7 +153,7 @@ const Signup = () => {
                 </form>
             </div>
             <div className="flex justify-center">
-    Already have an account? <Link to="/login" className="font-semibold text-indigo-500 hover:underline ml-2 mr-2 sm:text-sm md:text-base">Log in</Link> here!
+    Already have an account? <Link to="/login" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2 sm:text-sm md:text-base">Log in</Link> here!
 </div>
 
         </div>

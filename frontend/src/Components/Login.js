@@ -49,7 +49,7 @@ const Login = () => {
     }
 
     return (
-        <div className="font-mono">
+        <div className="font-mono bg-gray-50 h-dvh">
             <header className="bg-indigo-300 p-0 py-5">
                 <div className="container flex justify-center items-center max-w-full">
                     <Link to="/home">
@@ -67,7 +67,7 @@ const Login = () => {
                             Email
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="email"
                             type="text"
                             name="email"
@@ -79,7 +79,7 @@ const Login = () => {
                             Password
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="bg-gray-50 hover:bg-gray-100 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="current_password"
                             type="password"
                             name="current_password"
@@ -102,7 +102,7 @@ const Login = () => {
                 </form>
             </div>
             <div className="flex justify-center">
-            Don't have an account? <Link to="/signup" className="font-semibold text-indigo-500 hover:underline ml-2 mr-2">Sign up</Link> to get started!
+            Don't have an account? <Link to="/signup" className="font-semibold text-indigo-500 hover:text-indigo-800 ml-2 mr-2">Sign up</Link> to get started!
             </div>
            
         </div>
