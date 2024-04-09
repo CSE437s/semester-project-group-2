@@ -135,10 +135,10 @@ const Classroom = () => {
         setElements([...newElements])
     }
     return (
-        <div className="font-mono bg-indigo-50 h-dvh ">
+        <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
             <Header user={user} />
             {isOwner? <>
-            <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
+            <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 m-3 mb-0`} onClick={() => {
                 if(editMode === true) {
                     saveElements()
                 }
@@ -191,6 +191,7 @@ const Classroom = () => {
                     }
                     else if(element.name.indexOf("chat") >= 0) {
                         return <Moveable
+                        className="overflow-y-scroll"
                         width={element.width}
                         height={element.height}
                         initialX={element.x}

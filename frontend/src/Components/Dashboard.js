@@ -128,11 +128,11 @@ const Dashboard = () => {
     <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
       <Header user={user} showSetOfficeHours={false} />
 
-      <div className="font-mono container mx-auto p-10 ">
+      <div className="font-mono container mx-auto sm:px-4 p-0 pt-10 ">
 
         {/* Display user's classes */}
         
-        <div className="mb-6">
+        <div className="">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {
               ["TA", "instructor", "student"].map((role) => {
@@ -156,20 +156,20 @@ const Dashboard = () => {
         </div>
 
         {!isLoading && user.role === "instructor" ? (
-          <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-400 rounded-lg shadow-md">
-            <label htmlFor="classCode" className="mr-2 font-bold">
+          <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-300 rounded-lg shadow-md">
+            <label htmlFor="classCode" className="mr-2 font-bold mb-2">
               Create A Class:
             </label>
             <div className="flex flex-wrap">
               <input
-                className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mb-2 mr-2"
+                className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mr-2 mb-2"
                 type="text"
                 placeholder="Class Name"
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
               />
               <input
-                className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mb-2 mr-2"
+                className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mr-2 mb-2"
                 type="text"
                 placeholder="Class Description"
                 value={classDescription}
@@ -177,19 +177,20 @@ const Dashboard = () => {
               />
               <input
                 id="classCode"
-                className="hover:bg-gray-100 bg-gray-50 border border-gray-300 p-2 rounded block mb-2 mr-2"
+                className="hover:bg-gray-100 bg-gray-50 border border-gray-300 p-2 rounded block mr-2 mb-2"
                 type="text"
                 placeholder="Class Code"
                 value={classCode}
                 onChange={(e) => setClassCode(e.target.value)}
               />
-            </div>
-            <button
-              className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+              <button
+              className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mb-2"
               type="submit"
             >
-              Create Class
+              +
             </button>
+            </div>
+            
           </form>
 
         ) : null}

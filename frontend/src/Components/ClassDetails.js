@@ -411,55 +411,49 @@ const ClassDetails = () => {
     <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
       <Header />
 
-      <div className="container mx-auto px-4 py-8 ">
+      <div className="container mx-auto sm:px-4 p-0 pt-4 ">
 
         {classDetails && (
           <>
             <div className="font-mono home-container">
 
               {/* class name and prof */}
-              <div className="container mx-auto mt-6 bg-indigo-300 p-10 mb-6 rounded-lg shadow-lg">
+              <div className="container mx-auto mt-6 bg-indigo-300 sm:p-10 p-5 mb-6 rounded-lg shadow-lg">
                 <div className="flex justify-between items-center">
-                  <h1 className="text-3xl font-bold mb-4">{classDetails.className}</h1>
+                  <h1 className="text-3xl font-bold">{classDetails.className}</h1>
                   {isInstructor ? (
                     <div className="flex space-x-4"> {/* Wrap buttons in a flex container */}
                       <button
-                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center"
+                        className="border border-indigo-500 border-solid relative hover:bg-indigo-500 text-black font-bold py-2 px-4 rounded transition duration-300 flex items-center"
                         onClick={toggleModal}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M8 12a2 2 0 100-4 2 2 0 000 4z" />
-                          <path fillRule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V5z" clipRule="evenodd" />
-                        </svg>
                         Manage Students
                       </button>
                       <button
-                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 !ml-2 rounded"
+                        className="border border-indigo-500 border-solid relative hover:bg-indigo-500 text-black font-bold py-2 px-4 mr-2 !ml-2 rounded"
                         onClick={() => {
                           deleteClass()
                         }}
                       >
-                        Delete Class
+                        X
                       </button>
                     </div>
                   ) : (
                     <div className="flex space-x-4"> {/* Wrap buttons in a flex container */}
                       <button
-                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center"
+                        className="border border-indigo-500 border-solid relative hover:bg-indigo-500 text-black font-bold py-2 px-4 rounded transition duration-300 flex items-center"
                         onClick={toggleModal}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 4a2 2 0 100-4 2 2 0 000 4zM3 7a2 2 0 100-4 2 2 0 000 4zM17 7a2 2 0 100-4 2 2 0 000 4zM10 11a2 2 0 100-4 2 2 0 000 4zM3 14a2 2 0 100-4 2 2 0 000 4zM17 14a2 2 0 100-4 2 2 0 000 4zM7 18a2 2 0 100-4 2 2 0 000 4zM13 18a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                        View Classmates
+                      
+                        Classmates
                       </button>
                       <button
-                        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded !ml-2 "
+                        className="border border-indigo-500 border-solid relative hover:bg-indigo-500 font-bold py-2 px-4 mr-2 rounded !ml-2 "
                         onClick={() => {
                           dropClass()
                         }}
                       >
-                        Drop Class
+                        X
                       </button>
                     </div>
                   )}
@@ -467,7 +461,7 @@ const ClassDetails = () => {
 
 
 
-                <p className="text-lg mb-4 text-gray-700">{classDetails.classDescription}</p>
+                <p className="text-lg mb-4 text-gray-700 mt-4">{classDetails.classDescription}</p>
                 <div className="">
                   <p className="text-black font-semibold">Professor:</p>
                   <p className="text-gray-700 mb-6">{instructorName}</p>
@@ -481,19 +475,20 @@ const ClassDetails = () => {
 
 
               {/* TAs */}
-              <div className="mb-8">
-                <div className="flex flex-row text-center items-center mb-6">
-                  <h2 className="text-3xl font-bold mr-4">Teaching Assistants</h2>
+              <div className="bg-indigo-300 rounded-lg shadow-xl mb-8 p-10">
+                <div className="flex flex-row mb-4 justify-between flex-wrap">
+                  <h2 className="sm:text-3xl text-2xl font-bold mb-2">Teaching Assistants</h2>
+                  <div className='flex flex-row w-max'>
                   <button
-                    className="bg-indigo-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    className="mr-2 border border-indigo-500 border-solid relative hover:bg-indigo-500 text-black font-bold py-2 px-4 rounded"
                     onClick={toggleTAHoursModal}
                   >
-                    View TA Schedules
+                    TA Hours
                   </button>
 
                   {isTA && (
                     <button
-                      className="ml-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center"
+                      className="border border-indigo-500 border-solid relative hover:bg-indigo-500 text-black font-bold py-2 px-4 rounded transition duration-300 flex items-center"
                       onClick={toggleScheduleModal}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -511,6 +506,8 @@ const ClassDetails = () => {
                       onScheduleSubmit={handleScheduleSubmit}
                     />
                   )}
+                  </div>
+                 
                 </div>
 
                 {isTAHoursModalOpen && (
@@ -544,7 +541,7 @@ const ClassDetails = () => {
                     const isOHNow = taSchedule && isCurrentlyOH(taSchedule.hours, currentTime);
 
                     return (
-                      <div key={ta._id} className="p-6 bg-indigo-300 rounded-lg shadow-xl flex flex-col justify-center items-center">
+                      <div key={ta._id} className="p-6 bg-indigo-50 rounded-lg shadow-xl flex flex-col justify-center items-center">
 
                         <h3 className="text-xl font-bold mb-4">{user?._id === ta._id ? <Link to={`/me`} className="text-xl font-bold mb-4">
                           {"You!"} </Link> : <Link to={`/users/${ta._id}`} className="text-xl font-bold mb-4">

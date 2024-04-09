@@ -84,7 +84,7 @@ export default function ChatContainer(props) {
     
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-8 mb-4 bg-indigo-200" style={{width: props.width, height: props.height}}>
+    <div className="container mx-auto px-4 py-8 bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-8 mb-4 bg-indigo-200 overflow-y-scroll" style={{width: props.width, height: props.height}}>
        <ChatsList />
        <InputText addMessage={addMessage} />
        
