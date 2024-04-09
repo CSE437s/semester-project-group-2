@@ -1,15 +1,30 @@
-name: CSE437-Deploy-Test
+name: Code Linter
 
-on: 
+on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
       - main
+
+# from the linter docs at https://github.com/marketplace/actions/lint-action
+# Down scope as necessary via https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
+permissions:
+  checks: write
+  contents: write
+
 jobs:
-  build-and-push: 
+  run-linters:
+    name: Run linters
     runs-on: ubuntu-latest
+
     steps:
-    - name: run linter
-      uses: wearerequired/lint-action@v2.3.0
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      # Install your linters here
+
+      - name: Run linters
+        uses: wearerequired/lint-action@v2
+ 
