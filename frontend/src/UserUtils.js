@@ -502,3 +502,52 @@ export function sendNewVideoURL(videoURL) {
         });
     })
 }
+
+/**
+ * finds classroom settings associated with currently logged in user (might have to change to take in TA id and look that up)
+ * @returns classroom settings in the databse
+ */
+export function getClassroomSettings() {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "redirect to login"}
+    }
+    return axios.get(url + "/api/classroomSettings", {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 201) {
+            return result.data.settings
+        }
+        return null
+    }).catch(e => null)
+}
+
+
+
+/**
+ * sets a TA's classroom settings
+ * @param new classroom settings object
+ * @returns true if successful, false otherwise
+ */
+export function setClassroomSettings(newSettings) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "redirect to login"}
+    }
+    return axios.post(url + "/api/setClassroomSettings", {
+        classroomSettings: newSettings
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 201) {
+            return true
+        }
+        return false
+    }).catch(e => false)
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
-import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent } from "../UserUtils";
+import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent, getClassroomSettings } from "../UserUtils";
 import Header from "./Header";
 import Moveable from "./Moveable";
 
@@ -24,6 +24,7 @@ const Classroom = () => {
         }).catch(e => console.log(e))
     }
 
+    // user initialization useEffect
     useEffect(() => {
         if (currentToken && !user) {
             getCurrentUser().then(user => {
@@ -41,19 +42,33 @@ const Classroom = () => {
         }
     }, [currentToken, api_url, TAid, user, elements]);
 
+    // // classroom settings useEffect
+    // useEffect(() => {
+    //     if(isOwner === true) {
+    //         getClassroomSettings().then(settings => {
+    //             console.log(settings)
+    //         })
+    //     }
+    // })
+
+    // save elements on elements change useEffect
     useEffect(() => {
         if(elements) {
             saveElements()
         }
     }, [elements, saveElements])
-    useEffect(() => {
-        findUser(TAid).then(TA => {
-            if (TA === null) {
-                console.log("TA was unable to be found")
-            }
-        }).catch(e => console.log(e))
-    }, [TAid, elements]); // Dependency: TAid
 
+    // this is literally doing nothing
+    // useEffect(() => {
+    //     findUser(TAid).then(TA => {
+    //         if (TA === null) {
+    //             console.log("TA was unable to be found")
+    //         }
+    //     }).catch(e => console.log(e))
+    // }, [TAid, elements]); // Dependency: TAid
+
+
+    // get hours useEffect
     useEffect(() => {
         getAllUserHours(TAid).then(hours => {
             if (hours) {

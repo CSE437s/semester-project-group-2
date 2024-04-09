@@ -1,11 +1,20 @@
 import { useState } from "react"
+import { setClassroomSettings } from "../UserUtils"
 
 const ClassroomSettings = () => {
     const [queueEnabled, setQueueEnabled] = useState()
     const [passwordEnabled, setPasswordEnabled] = useState()
-    const handleSettingsChange = () => {
-        const queueDesired = queueEnabled
-
+    const [password, setPassword] = useState("")
+    const handleSettingsChange = (e) => {
+        e.preventDefault()
+        const newSettings = {
+            queueEnabled: queueEnabled,
+            passwordEnabled: passwordEnabled,
+            password: passwordEnabled === true ? password : undefined
+        }
+        setClassroomSettings(newSettings).then(result => {
+            console.log(result)
+        })
     }
     return (<>
     <form onSubmit={handleSettingsChange}>
@@ -17,17 +26,18 @@ const ClassroomSettings = () => {
             }/>
         </div>
         <div>
-            <label for="password-protected">Password protected room</label>
+            <label htmlFor="password-protected">Password protected room</label>
             <input id="password-protected" type="checkbox" onChange={(e)=>{
                 setPasswordEnabled(e.target.checked)
                 }
             } />
             {passwordEnabled === true && <div>
                 Room Password:
-                <input className="bg-slate-500" id="password" autoComplete="new-password" type="password" />
+                <input className="bg-slate-500" id="password" autoComplete="new-password" type="password" onChange={(e)=>setPassword(e.target.value)}/>
                 </div>
             }
         </div>
+        <input type="submit" />
     </form>
     
     </>)
