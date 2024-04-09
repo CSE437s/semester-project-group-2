@@ -785,8 +785,13 @@ app.post("/api/getClassroomComponents", (req, res) => {
         }
         else {
             userModel.findById(req.body.userId).then(TAuser => {
-                res.status(200).send({ components: TAuser.classroomComponents })
-            }).catch(e => res.status(500).send({ error: e }))
+                if(TAuser !== null) {
+                    res.status(200).send({ components: TAuser.classroomComponents })
+                }
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({ error: e })
+            })
         }
     })(req, res)
 })

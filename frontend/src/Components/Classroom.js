@@ -36,20 +36,21 @@ const Classroom = () => {
             })
             if (!elements) {
                 getClassroomComponents(TAid).then(components => {
+                    console.log(components)
                     setElements(components)
-                })
+                }).catch(e => console.log(e))
             }
         }
     }, [currentToken, api_url, TAid, user, elements]);
 
-    // // classroom settings useEffect
-    // useEffect(() => {
-    //     if(isOwner === true) {
-    //         getClassroomSettings().then(settings => {
-    //             console.log(settings)
-    //         })
-    //     }
-    // })
+    // classroom settings useEffect
+    useEffect(() => {
+        if(isOwner === true) {
+            getClassroomSettings().then(settings => {
+                console.log(settings)
+            })
+        }
+    }, []) // only have it execute on component mount
 
     // save elements on elements change useEffect
     useEffect(() => {
@@ -185,6 +186,7 @@ const Classroom = () => {
                     else if(element.name.indexOf("whiteboard") >= 0) {
                         return <>
                         <Moveable
+                            key={element.name}
                             width={element.width}
                             height={element.height}
                             initialX={element.x}
@@ -206,26 +208,28 @@ const Classroom = () => {
                     }
                     else if(element.name.indexOf("chat") >= 0) {
                         return <Moveable
-                        width={element.width}
-                        height={element.height}
-                        initialX={element.x}
-                        initialY={element.y}
-                        component="chat"
-                        movingStop={(newX, newY) => {
-                            handleDrag(newX, newY, element.name)
-                        }}
-                        resizingStop={(size)=>{
-                            handleResize(element, size)
-                        }}
-                        isOwner={isOwner}
-                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
-                            handleDelete(element.name)
-                        }}>Remove</buttton>}
-                        >
+                            key={element.name}
+                            width={element.width}
+                            height={element.height}
+                            initialX={element.x}
+                            initialY={element.y}
+                            component="chat"
+                            movingStop={(newX, newY) => {
+                                handleDrag(newX, newY, element.name)
+                            }}
+                            resizingStop={(size)=>{
+                                handleResize(element, size)
+                            }}
+                            isOwner={isOwner}
+                            deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                                handleDelete(element.name)
+                            }}>Remove</buttton>}
+                            >
                     </Moveable>
                     }
                     else {
                         return <Moveable
+                        key={element.name}
                         width={element.width}
                         height={element.height}
                         initialX={element.x}

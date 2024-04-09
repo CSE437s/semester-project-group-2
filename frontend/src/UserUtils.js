@@ -416,7 +416,6 @@ export function setClassroomComponents(newComponents) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        console.log(result)
         if(result.status === 200) {
             return true
         }
@@ -518,7 +517,8 @@ export function getClassroomSettings() {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 201) {
+        console.log(result)
+        if(result.status === 200) {
             return result.data.settings
         }
         return null
