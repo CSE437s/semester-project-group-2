@@ -1,0 +1,15 @@
+name: CSE437-Deploy-Test
+
+on: 
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build: 
+    runs-on: macos
+    steps:
+    - name: run linter
+      uses: wearerequired/lint-action@v2.3.0
