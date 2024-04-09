@@ -13,7 +13,6 @@ const Classroom = () => {
     const [user, setCurrentUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
     const [elements, setElements] = useState()
-    const [newComponentName, setNewComponentName] = useState("whiteboard")
     const { TAid } = useParams();
     const currentToken = localStorage.getItem("token");
     const [isLoading, setIsLoading] = useState(true);

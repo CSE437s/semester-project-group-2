@@ -1,5 +1,4 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
 import {
   changeRoleInClass, findUser, getCurrentUser, logout, getUserHoursForClass, DropStudentFromClass,
@@ -18,7 +17,6 @@ const ClassDetails = () => {
   const [teachingAssistants, setTeachingAssistants] = useState([]);
   // eslint-disable-next-line
   const [taSchedules, setTASchedules] = useState([]);
-  const [isNavOpen, setIsNavOpen] = useState(false);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [instructorName, setInstructorName] = useState("")
