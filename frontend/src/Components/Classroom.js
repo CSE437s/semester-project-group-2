@@ -17,12 +17,43 @@ const Classroom = () => {
     const { TAid } = useParams();
     const currentToken = localStorage.getItem("token");
     const [isLoading, setIsLoading] = useState(true);
+
+    const [featureState, setFeatureState] = useState({
+        whiteboard: false,
+        videocall: false,
+        chat: false
+    });
+
+    const toggleFeature = (feature) => {
+        setFeatureState(prev => {
+            const isFeatureActive = !prev[feature];
+            if (isFeatureActive) {
+                handleAdd(feature);
+            } else {
+                handleDelete(feature);
+            }
+            return { ...prev, [feature]: isFeatureActive };
+        });
+    };
+
     //eslint-disable-next-line
     const saveElements = () => {
         setClassroomComponents(elements).then(_ => {
             // window.location.reload()
         }).catch(e => console.log(e))
     }
+
+    useEffect(() => {
+        if (Array.isArray(elements)) { 
+          let newFeatureState = {
+              whiteboard: elements.some(element => element.name && element.name.includes('whiteboard')),
+              videocall: elements.some(element => element.name && element.name === 'videocall'),
+              chat: elements.some(element => element.name && element.name === 'chat')
+          };
+      
+          setFeatureState(newFeatureState);
+        }
+      }, [elements]);
 
     useEffect(() => {
         if (currentToken && !user) {
@@ -40,7 +71,7 @@ const Classroom = () => {
             }
         }
     }, [currentToken, api_url, TAid, user, elements]);
-
+    console.log(elements)
     useEffect(() => {
         if(elements) {
             saveElements()
@@ -102,10 +133,12 @@ const Classroom = () => {
     const handleDrag = (x, y, elementName) => {
         const widgetName = elementName
         const targetElement = findElement(widgetName)
+        const HEADER_HEIGHT = 150;
+        const newY = Math.max(y, HEADER_HEIGHT);
         if (targetElement) {
 
             targetElement.x = x
-            targetElement.y = y
+            targetElement.y = newY
             setClassroomComponents(elements).then(_ => {
                 // window.location.reload()
             }).catch(e => console.log(e))
@@ -116,17 +149,38 @@ const Classroom = () => {
     
 
     const handleAdd = (elementName) => {
-        addClassroomComponent(elementName, 100, 100, 300, 300).then(newComponent => {
-            console.log(newComponent)
-            // if(newComponent) {
-                console.log(newComponent)
-                const newarray = [...elements]
-                newarray.push(newComponent)
-                setElements(newarray)
-            // }
-            
-        }).catch(e => console.log(e))
-    }
+        let defaultDimensions;
+        const margin = 20;
+        const innerWidth = window.innerWidth - margin * 4;
+        const innerHeight = window.innerHeight - 150;
+      
+        const whiteboardWidth = Math.floor(innerWidth * 0.3);
+        const videoCallWidth = Math.floor(innerWidth * 0.5);
+        const chatWidth = Math.floor(innerWidth * 0.2);
+      
+        const whiteboardX = margin;
+        const videoCallX = whiteboardX + whiteboardWidth + margin;
+        const chatX = videoCallX + videoCallWidth + margin;
+      
+        switch (elementName) {
+          case 'whiteboard':
+            defaultDimensions = { x: whiteboardX, y: 150, width: whiteboardWidth, height: innerHeight };
+            break;
+          case 'videocall':
+            defaultDimensions = { x: videoCallX, y: 150, width: videoCallWidth, height: innerHeight };
+            break;
+          case 'chat':
+            defaultDimensions = { x: chatX, y: 150, width: chatWidth, height: innerHeight };
+            break;
+          default:
+            defaultDimensions = { x: 100, y: 100, width: 300, height: 300 };
+        }
+      
+        addClassroomComponent(elementName, defaultDimensions.x, defaultDimensions.y, defaultDimensions.width, defaultDimensions.height).then(newComponent => {
+          const newElements = [...elements, newComponent];
+          setElements(newElements);
+        }).catch(e => console.error('Error adding component:', e));
+      }
 
     const handleDelete = (elementName) => {
         console.log('removing', elementName)
@@ -135,31 +189,53 @@ const Classroom = () => {
         setElements([...newElements])
     }
     return (
-        <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
+        <div className="font-mono">
             <Header user={user} />
-            {isOwner? <>
-            <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 m-3 mb-0`} onClick={() => {
-                if(editMode === true) {
-                    saveElements()
-                }
-                setEditMode(!editMode)
-            }}> { editMode === true ? "save changes" : "add widgets" }</button>
-            <br></br>
-            {editMode === true ? <span className="">
-                    <select className="mx-3" name="components" id="select-components" onChange={(e)=>{
-                            setNewComponentName(e.target.value)
-                    }}>
-                        <option value="whiteboard">Whiteboard</option>
-                        <option value="videocall">Video Call</option>
-                        <option value="chat">Text Chat</option>
-                    </select>
-                    <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
-                        handleAdd(newComponentName)
-                    }}> add</button>
-                </span> : <></> 
-            }</>
-            : <></>
-            }
+            {isOwner && (
+               <div className="bg-gray-100 border-b border-gray-300 px-4 py-2">
+               <div className="flex items-center justify-start space-x-4">
+                   <button
+                       className={`p-2 ${editMode ? "text-white bg-indigo-600" : "text-indigo-600 bg-transparent"} hover:bg-indigo-500 rounded`}
+                       onClick={() => setEditMode(!editMode)}
+                   >
+                       {editMode ? (
+                           <>
+                               <i className="fas fa-save mr-2"></i>
+                               Save Changes
+                           </>
+                       ) : (
+                           <>
+                               <i className="fas fa-edit mr-2"></i>
+                               Edit Mode
+                           </>
+                       )}
+                   </button>
+                   {/* Similar structure for the other buttons */}
+                   <button
+                       className={`p-2 ${featureState.whiteboard ? "text-white bg-indigo-600" : "text-indigo-600 bg-transparent"} hover:bg-indigo-500 rounded`}
+                       onClick={() => toggleFeature('whiteboard')}
+                   >
+                       <i className={`mr-2 fas ${featureState.whiteboard ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                       Whiteboard
+                   </button>
+                   <button
+                       className={`p-2 ${featureState.videocall ? "text-white bg-indigo-600" : "text-indigo-600 bg-transparent"} hover:bg-indigo-500 rounded`}
+                       onClick={() => toggleFeature('videocall')}
+                   >
+                       <i className={`mr-2 fas ${featureState.videocall ? 'fa-video-slash' : 'fa-video'}`}></i>
+                       Video Call
+                   </button>
+                   <button
+                       className={`p-2 ${featureState.chat ? "text-white bg-indigo-600" : "text-indigo-600 bg-transparent"} hover:bg-indigo-500 rounded`}
+                       onClick={() => toggleFeature('chat')}
+                   >
+                       <i className={`mr-2 fas ${featureState.chat ? 'fa-comments-slash' : 'fa-comments'}`}></i>
+                       Text Chat
+                   </button>
+               </div>
+           </div>
+           
+            )}
             {
                 elements && 
                 elements.map((element) => {
@@ -182,16 +258,13 @@ const Classroom = () => {
                                 handleResize(element, size)
                             }}
                             isOwner={isOwner}
-                            deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
-                                handleDelete(element.name)
-                            }}>Remove</buttton>}
+                  
                             >
                         </Moveable>
                         </>
                     }
                     else if(element.name.indexOf("chat") >= 0) {
                         return <Moveable
-                        className="overflow-y-scroll"
                         width={element.width}
                         height={element.height}
                         initialX={element.x}
@@ -204,9 +277,6 @@ const Classroom = () => {
                             handleResize(element, size)
                         }}
                         isOwner={isOwner}
-                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
-                            handleDelete(element.name)
-                        }}>Remove</buttton>}
                         >
                     </Moveable>
                     }
@@ -224,9 +294,6 @@ const Classroom = () => {
                             handleResize(element, size)
                         }}
                         isOwner={isOwner}
-                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
-                            handleDelete(element.name)
-                        }}>Remove</buttton>}
                         >
                     </Moveable>
 
