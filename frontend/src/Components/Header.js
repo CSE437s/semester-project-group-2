@@ -3,44 +3,41 @@ import LogoutButton from "./LogoutButton";
 import { useNavigate, Link } from 'react-router-dom';
 import { getCurrentUser } from "../UserUtils";
 
-
 const Header = (props) => {
-    const [hasClassroom, setHasClassroom] = useState();
-    const [userId, setId] = useState();
+    const [hasClassroom, setHasClassroom] = useState(false);
+    const [userId, setUserId] = useState(null);
     const [isNavOpen, setIsNavOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // only run this if on dashboard-- was messing up the ability to use the header component on other pages TODO fix
-        // if (pathname === '/dashboard') {
-        var user = props.user;
-        if (!user) {
+        if (!props.user) {
             const token = localStorage.getItem("token")
             if (token) {
-                getCurrentUser().then(u => {
-                    user = u.data.user
-                    console.log(user)
-                    setId(user._id)
-                }).catch(e => console.log(e))
+                getCurrentUser()
+                    .then(u => {
+                        setUserId(u.data.user._id);
+                        if (u.data.user.classesAsTA.length > 0 || u.data.user.classesAsInstructor.length > 0) {
+                            setHasClassroom(true);
+                        }
+                    })
+                    .catch(e => {
+                        console.log(e);
+                        navigate("/login");
+                    });
+            } else {
+                navigate("/login");
             }
-            else {
-                navigate("/login")
-            }
-        }
-        else {
-            setId(user._id);
-            if (user.classesAsTA.length > 0 || user.classesAsInstructor.length > 0) {
+        } else {
+            setUserId(props.user._id);
+            if (props.user.classesAsTA.length > 0 || props.user.classesAsInstructor.length > 0) {
                 setHasClassroom(true);
             }
         }
-        // }
     }, [props.user, navigate]);
+
     return (
         <div>
-            
-
             <header className="bg-indigo-50 p-0 py-5 z-10">
-
                 <div className="container flex justify-between items-center max-w-full">
                     <Link to="/home">
                         <div className="flex items-center">
@@ -49,43 +46,71 @@ const Header = (props) => {
                         </div>
                     </Link>
 
-                    {/* hamburgie menu */}
-                    <div className="lg:hidden font-mono">
-                        <div className="HAMBURGER-ICON space-y-2 mr-10" onClick={() => setIsNavOpen((prev) => !prev)}>
-                            <span className="block h-0.5 w-8 animate-pulse bg-black"></span>
-                            <span className="block h-0.5 w-8 animate-pulse bg-black"></span>
-                            <span className="block h-0.5 w-8 animate-pulse bg-black"></span>
-                        </div>
+                    {/* Hamburger menu */}
+                    <div className="lg:hidden font-mono z-10">
+                        <button
+                            className="HAMBURGER-ICON focus:outline-non mr-10 flex items-center"
+                            onClick={() => setIsNavOpen(prev => !prev)}
+                        >
+                            <svg
+                            
+                                className="h-8 w-8 text-gray-600 flex items-center"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                className="h-10 w-10"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                            </svg>
+                        </button>
 
                         {isNavOpen && (
-                            <div className="MOBILE-MENU absolute top-0 right-0 px-8 py-8 bg-indigo-200 font-mono">
-                                <div className="CROSS-ICON" onClick={() => setIsNavOpen(false)}>
-                                    <svg
-                                        className="h-8 w-8 text-gray-600"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
+                            <div className="MOBILE-MENU absolute top-0 right-0 bg-white z-20 shadow-md p-4 rounded-md">
+                                <div className="flex items-center justify-between mb-4">
+                            
+                                    <button
+                                        className="CLOSE-ICON focus:outline-none"
+                                        onClick={() => setIsNavOpen(false)}
                                     >
-                                        <line x1="18" y1="6" x2="6" y2="18" />
-                                        <line x1="6" y1="6" x2="18" y2="18" />
-                                    </svg>
+                                        <svg
+                                            className="h-6 w-6 text-gray-600"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                    </button>
                                 </div>
-                                <ul className="flex flex-col items-center justify-between min-h-[250px]">
-                                    <li className="border-b border-gray-400 my-8 uppercase">
-                                        <a href="/dashboard">Dashboard</a>
+                                <ul className="flex flex-col space-y-4">
+                                    <li>
+                                        <Link to="/dashboard" className="text-gray-800 hover:text-gray-600">
+                                            Dashboard
+                                        </Link>
                                     </li>
-                                    <li className="border-b border-gray-400 my-8 uppercase">
-                                        <a href="/me">My Profile</a>
+                                    <li>
+                                        <Link to="/me" className="text-gray-800 hover:text-gray-600">
+                                            My Profile
+                                        </Link>
                                     </li>
                                     {hasClassroom && (
-                                        <li className="border-b border-gray-400 my-8 uppercase">
-                                            <a href={`/classrooms/${userId}`}>My Classroom</a>
+                                        <li>
+                                            <Link to={`/classrooms/${userId}`} className="text-gray-800 hover:text-gray-600">
+                                                My Classroom
+                                            </Link>
                                         </li>
                                     )}
-                                    <li className="border-b border-gray-400 my-8 uppercase">
+                                    <li>
                                         <LogoutButton />
                                     </li>
                                 </ul>
@@ -93,59 +118,38 @@ const Header = (props) => {
                         )}
                     </div>
 
-                    {/* normal menu */}
-
+                    {/* Normal menu */}
                     <nav className="hidden lg:flex mr-10">
-                        <div>
-                            {hasClassroom && window.location.href.indexOf("classrooms") < 0 ?
-                                <button
-                                    className="text-gray-800 font-bold py-2 mr-10 rounded hover:text-gray-600"
-                                    onClick={() => navigate("/classrooms/" + userId)}
-                                >
-                                    My Classroom
-                                </button>
-                                : <>{hasClassroom}</>
-                            }
-
-                        </div>
-                        {
-                            window.location.href.indexOf("dashboard") < 0 ?
-                                <button
-                                    className="text-gray-800 font-bold mr-10 rounded hover:text-gray-600"
-                                    onClick={() => navigate("/dashboard")}
-                                >
-                                    Back to Classes
-                                </button>
-                                :
-                                <></>
-                        }
-                        {
-                            window.location.href.indexOf("me") < 0 ?
-                                <button
-                                    className="text-gray-800 font-bold py-2 mr-10 rounded hover:text-gray-700"
-                                    onClick={() => navigate("/me")}
-                                >
-                                    My Profile
-                                </button>
-                                :
-                                <></>
-                        }
-
+                        {hasClassroom && window.location.href.indexOf("classrooms") < 0 && (
+                            <button
+                                className="text-gray-800 font-bold py-2 mr-10 rounded hover:text-gray-600"
+                                onClick={() => navigate("/classrooms/" + userId)}
+                            >
+                                My Classroom
+                            </button>
+                        )}
+                        {window.location.href.indexOf("dashboard") < 0 && (
+                            <button
+                                className="text-gray-800 font-bold mr-10 rounded hover:text-gray-600"
+                                onClick={() => navigate("/dashboard")}
+                            >
+                                Back to Classes
+                            </button>
+                        )}
+                        {window.location.href.indexOf("me") < 0 && (
+                            <button
+                                className="text-gray-800 font-bold py-2 mr-10 rounded hover:text-gray-700"
+                                onClick={() => navigate("/me")}
+                            >
+                                My Profile
+                            </button>
+                        )}
                         <LogoutButton />
-
-
                     </nav>
                 </div>
             </header>
-          
-            <div className="border-0.5 border-gray-800 border-solid relative" >
-               
-
-            </div>
-
+            <div className="border-0.5 border-gray-800 border-solid relative"></div>
         </div>
-
-
     );
 };
 
