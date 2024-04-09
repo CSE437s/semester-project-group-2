@@ -3,7 +3,7 @@ import LogoutButton from './LogoutButton';
 import { useEffect, useState } from 'react';
 import {
   changeRoleInClass, findUser, getCurrentUser, logout, getUserHoursForClass, DropStudentFromClass,
-  DeleteClass,
+  DeleteClass,deleteUserHours
 } from '../UserUtils';
 import { getClassByID } from '../ClassUtils';
 import SimpleModal from './SimpleModal';
@@ -214,17 +214,26 @@ const ClassDetails = () => {
       alert('Only instructors can demote TAs to students.');
       return;
     }
+    if (!window.confirm('Are you sure you want to demote this TA to a student? This will delete their office hours.')) {
+      return;
+    }
     setIsLoading(true);
     changeRoleInClass(taId, classId, "TA", "student").then(res => {
       if (res === true) {
         setTeachingAssistants(prevTAs => prevTAs.filter(ta => ta._id !== taId));
         setStudents(prevStudents => [...prevStudents, teachingAssistants.find(ta => ta._id === taId)]);
-
-        alert("TA successfully demoted to student.");
+        deleteUserHours(taId, classId).then(hourRes => {
+          if(hourRes){
+            alert('TA successfully demoted to student.');
+          } else {
+            alert('TA demoted, but failed to delete hours.');
+          }
+        });
       } else {
         alert("There was an error demoting the TA.");
       }
     }).finally(() => {
+      window.location.reload();
       setIsLoading(false);
     });
   };
@@ -235,6 +244,10 @@ const ClassDetails = () => {
       alert('Only instructors can promote students to TAs.');
       return;
     }
+    if (!window.confirm('Are you sure you want to promote this student to a TA?')) {
+      return;
+    }
+
     setIsLoading(true);
 
     changeRoleInClass(studentId, classId, "student", "TA").then(res => {

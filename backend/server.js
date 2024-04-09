@@ -465,6 +465,34 @@ app.post("/api/addHours", (req, res) => {
     })(req, res);
 });
 
+app.post("/api/deleteHours", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            return res.status(500).send({ error: "Internal server error." });
+        }
+        if (!user) {
+            return res.status(401).send({ error: "Unauthorized access." });
+        }
+
+        const searchCriteria = {
+            userId: req.body.userId,
+            classId: req.body.classId
+        };
+
+        hoursModel.findOneAndDelete(searchCriteria)
+            .then(deletedDocument => {
+                if(deletedDocument) {
+                    res.status(200).send({ message: "Hours document deleted successfully.", deletedDocument });
+                } else {
+                    res.status(404).send({ message: "No matching document found to delete." });
+                }
+            })
+            .catch(deleteError => {
+                res.status(500).send({ error: deleteError.message });
+            });
+    })(req, res);
+});
+
 app.get('/api/hours', (req, res) => {
     const { userId, classId } = req.query;
     hoursModel.findOne({ userId: userId, classId: classId })
