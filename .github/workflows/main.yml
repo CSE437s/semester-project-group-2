@@ -27,4 +27,8 @@ jobs:
 
       - name: Run linters
         uses: wearerequired/lint-action@v2
+      - name: Install modules
+        run: yarn
+      - name: Run ESLint
+        run: eslint . --ext .js,.jsx
  
