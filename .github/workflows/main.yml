@@ -1,25 +1,33 @@
+# help from https://binary-studio.com/blog/2021/12/21/lint-your-project-with-github-actions/
+
 name: Linter
 
-on:
+on: 
   push:
     branches:
       - main
-  pull_request:
+  pull_request: 
     branches:
       - main
 
-# from the linter docs at https://github.com/marketplace/actions/lint-action
-# Down scope as necessary via https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
-permissions:
-  checks: write
-  contents: write
+env:
+  NODE_VERSION: 20
 
-jobs:
-  eslint:
-    runs-on: ubuntu-latest
+jobs: # list of things to do
+  linting:
+    name: ESLint
+    runs-on: ubuntu-latest # on which machine to run
     steps:
-      - uses: actions/setup-node@v4.0.2
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
         with:
-          node-version: 20.12.1
-      - uses: actions/checkout@v1
-      - uses: stefanoeb/eslint-action@1.0.2
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Code Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Code Linting
+        run: npm run lint
