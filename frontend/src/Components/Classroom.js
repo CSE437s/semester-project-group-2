@@ -8,7 +8,7 @@ import Moveable from "./Moveable";
 
 const Classroom = () => {
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
-    const x = 6;
+   // const x = 6;
     const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const [editMode, setEditMode] = useState(false)
     const [user, setCurrentUser] = useState(null);

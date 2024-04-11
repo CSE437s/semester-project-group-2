@@ -22,7 +22,7 @@ const ProfilePicture = () => {
         console.error("Error fetching user data:", error);
       });
     }
-  }, []);
+  }, [photoURL]);
 
   return (
     <div>
