@@ -30,9 +30,4 @@ jobs: # list of things to do
         run: npm ci
 
       - name: Code Linting
-        uses: reviewdog/action-eslint@v1
-        with:
-          workdir: "frontend/"
-          eslint_flags: "--cache --ext .js,.jsx,.ts,.tsx ."
-          level: error
-          fail_on_error: true
+        run: npx eslint frontend --max-warnings 0
