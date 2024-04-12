@@ -512,6 +512,20 @@ export function getClassroomSettings() {
         return {error: "redirect to login"}
     }
     return axios.get(url + "/api/classroomSettings", {
+
+/**
+ * get the queue for a user's classroom 
+ * @param id: user id of the queue of interest
+ * @returns queue if successful, null otherwise
+ */
+export function getQueue(queueId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/getQueue", {
+        id: queueId
+    },{
         headers: {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true
@@ -540,14 +554,42 @@ export function setClassroomSettings(newSettings) {
     return axios.post(url + "/api/setClassroomSettings", {
         classroomSettings: newSettings
     }, {
+        if(result.status === 200) {
+            return result.data.queue
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            return []
+        }
+        return null
+    })
+}
+
+
+/**
+ * get the next student ID from the queue
+ * @returns student ID if successful, null otherwise
+ */
+export function getNextStudentInLine() {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.get(url + "/api/pullOffQueue", {
         headers: {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 201) {
-            return true
+        if(result.status === 200) {
+            return result.data 
         }
-        return false
-    }).catch(e => false)
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            console.log("no such student")
+        }
+        return null
+    })
 }
