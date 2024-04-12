@@ -6,12 +6,13 @@ import Moveable from "./Moveable";
 
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
-const Classroom = () => {
+const Classroom = (props) => {
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
     const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const [editMode, setEditMode] = useState(false)
     const [user, setCurrentUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
+    const [queueEnabled, setQueueEnabled] = useState()
     const [elements, setElements] = useState()
     const [newComponentName, setNewComponentName] = useState("whiteboard")
     const { TAid } = useParams();
@@ -24,12 +25,27 @@ const Classroom = () => {
         }).catch(e => console.log(e))
     }
 
+    // room settings useEffect
+    useEffect(() => {
+        const settings = props.settings
+        // settings object: 
+        // queueEnabled: boolean
+        // passwordEnabled: boolean
+        // password: if password enabled, password. otherwise, undefined
+        
+        //handle queue enabling:
+        if(settings.queueEnabled === true && !queueEnabled) {
+            setQueueEnabled(true)
+        }
+
+    })
     // user initialization useEffect
     useEffect(() => {
         if (currentToken && !user) {
             getCurrentUser().then(user => {
                 const u = user.data.user
                 setCurrentUser(u)
+                if(props.settings.queueEnabled === true && u._id) // todo, make it so that the student that was let in is the only student who can view the component
                 if (u._id === TAid) {
                     setIsOwner(true)
                 }
