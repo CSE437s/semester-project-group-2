@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
-import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent } from "../UserUtils";
+import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent, getClassroomSettings } from "../UserUtils";
 import Header from "./Header";
 import Moveable from "./Moveable";
 
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
-const Classroom = () => {
+const Classroom = (props) => {
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
     const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const [editMode, setEditMode] = useState(false)
     const [user, setCurrentUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
+    const [queueEnabled, setQueueEnabled] = useState()
     const [elements, setElements] = useState()
     const [newComponentName, setNewComponentName] = useState("whiteboard")
     const { TAid } = useParams();
@@ -24,36 +25,67 @@ const Classroom = () => {
         }).catch(e => console.log(e))
     }
 
+    // room settings useEffect
+    useEffect(() => {
+        const settings = props.settings
+        // settings object: 
+        // queueEnabled: boolean
+        // passwordEnabled: boolean
+        // password: if password enabled, password. otherwise, undefined
+        
+        //handle queue enabling:
+        if(settings.queueEnabled === true && !queueEnabled) {
+            setQueueEnabled(true)
+        }
+
+    })
+    // user initialization useEffect
     useEffect(() => {
         if (currentToken && !user) {
             getCurrentUser().then(user => {
                 const u = user.data.user
                 setCurrentUser(u)
+                if(props.settings.queueEnabled === true && u._id) // todo, make it so that the student that was let in is the only student who can view the component
                 if (u._id === TAid) {
                     setIsOwner(true)
                 }
             })
             if (!elements) {
                 getClassroomComponents(TAid).then(components => {
+                    console.log(components)
                     setElements(components)
-                })
+                }).catch(e => console.log(e))
             }
         }
     }, [currentToken, api_url, TAid, user, elements]);
 
+    // classroom settings useEffect
+    useEffect(() => {
+        if(isOwner === true) {
+            getClassroomSettings().then(settings => {
+                console.log(settings)
+            })
+        }
+    }, []) // only have it execute on component mount
+
+    // save elements on elements change useEffect
     useEffect(() => {
         if(elements) {
             saveElements()
         }
     }, [elements, saveElements])
-    useEffect(() => {
-        findUser(TAid).then(TA => {
-            if (TA === null) {
-                console.log("TA was unable to be found")
-            }
-        }).catch(e => console.log(e))
-    }, [TAid, elements]); // Dependency: TAid
 
+    // this is literally doing nothing
+    // useEffect(() => {
+    //     findUser(TAid).then(TA => {
+    //         if (TA === null) {
+    //             console.log("TA was unable to be found")
+    //         }
+    //     }).catch(e => console.log(e))
+    // }, [TAid, elements]); // Dependency: TAid
+
+
+    // get hours useEffect
     useEffect(() => {
         getAllUserHours(TAid).then(hours => {
             if (hours) {
@@ -170,6 +202,7 @@ const Classroom = () => {
                     else if(element.name.indexOf("whiteboard") >= 0) {
                         return <>
                         <Moveable
+                            key={element.name}
                             width={element.width}
                             height={element.height}
                             initialX={element.x}
@@ -191,26 +224,28 @@ const Classroom = () => {
                     }
                     else if(element.name.indexOf("chat") >= 0) {
                         return <Moveable
-                        width={element.width}
-                        height={element.height}
-                        initialX={element.x}
-                        initialY={element.y}
-                        component="chat"
-                        movingStop={(newX, newY) => {
-                            handleDrag(newX, newY, element.name)
-                        }}
-                        resizingStop={(size)=>{
-                            handleResize(element, size)
-                        }}
-                        isOwner={isOwner}
-                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
-                            handleDelete(element.name)
-                        }}>Remove</buttton>}
-                        >
+                            key={element.name}
+                            width={element.width}
+                            height={element.height}
+                            initialX={element.x}
+                            initialY={element.y}
+                            component="chat"
+                            movingStop={(newX, newY) => {
+                                handleDrag(newX, newY, element.name)
+                            }}
+                            resizingStop={(size)=>{
+                                handleResize(element, size)
+                            }}
+                            isOwner={isOwner}
+                            deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                                handleDelete(element.name)
+                            }}>Remove</buttton>}
+                            >
                     </Moveable>
                     }
                     else {
                         return <Moveable
+                        key={element.name}
                         width={element.width}
                         height={element.height}
                         initialX={element.x}

@@ -83,6 +83,12 @@ const userSchema = new mongoose.Schema(
       required: false,
       unique: false,
       default: "white"
+    },
+    classroomSettings: {
+      type: Object,
+      required: false,
+      unique: false,
+      default: null
     }
   },
   { timestamps: true }

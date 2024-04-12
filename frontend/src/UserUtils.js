@@ -416,7 +416,6 @@ export function setClassroomComponents(newComponents) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        console.log(result)
         if(result.status === 200) {
             return true
         }
@@ -503,6 +502,16 @@ export function sendNewVideoURL(videoURL) {
     })
 }
 
+/**
+ * finds classroom settings associated with currently logged in user (might have to change to take in TA id and look that up)
+ * @returns classroom settings in the databse
+ */
+export function getClassroomSettings() {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "redirect to login"}
+    }
+    return axios.get(url + "/api/classroomSettings", {
 
 /**
  * get the queue for a user's classroom 
@@ -522,6 +531,29 @@ export function getQueue(queueId) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
+        console.log(result)
+        if(result.status === 200) {
+            return result.data.settings
+        }
+        return null
+    }).catch(e => null)
+}
+
+
+
+/**
+ * sets a TA's classroom settings
+ * @param new classroom settings object
+ * @returns true if successful, false otherwise
+ */
+export function setClassroomSettings(newSettings) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "redirect to login"}
+    }
+    return axios.post(url + "/api/setClassroomSettings", {
+        classroomSettings: newSettings
+    }, {
         if(result.status === 200) {
             return result.data.queue
         }
@@ -550,7 +582,6 @@ export function getNextStudentInLine() {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        console.log(result)
         if(result.status === 200) {
             return result.data 
         }

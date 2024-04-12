@@ -785,8 +785,13 @@ app.post("/api/getClassroomComponents", (req, res) => {
         }
         else {
             userModel.findById(req.body.userId).then(TAuser => {
-                res.status(200).send({ components: TAuser.classroomComponents })
-            }).catch(e => res.status(500).send({ error: e }))
+                if(TAuser !== null) {
+                    res.status(200).send({ components: TAuser.classroomComponents })
+                }
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({ error: e })
+            })
         }
     })(req, res)
 })
@@ -918,6 +923,53 @@ app.get("/api/logout", (req, res) => {
         }
     })
 })
+
+app.get("/api/classroomSettings", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            userModel.findById(user._id).then(foundUser => {
+                if(foundUser.classroomSettings) {
+                    res.status(200).send({settings: foundUser.classroomSettings})
+                }
+                else {
+                    res.status(404).send({error: "no classroom settings found"})
+                }
+            })
+        }
+    })(req, res)
+})
+
+app.post("/api/setClassroomSettings", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            userModel.findByIdAndUpdate(user._id, {
+                classroomSettings: req.body.classroomSettings
+            }).then(update => {
+                console.log(update)
+                if(update) {
+                    res.status(201).send({message: "success"})
+                }
+                else {
+                    res.status(500).send({error: "unable to change settings"})
+                }
+            })
+        }
+    })(req, res)
+})
+
+
 
 
 // route for file upload
