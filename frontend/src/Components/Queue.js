@@ -29,7 +29,7 @@ const Queue = () => {
         if(socket.connected === false) {
             socket.connect()
         }
-        if(socket.connected == true) {
+        if(socket.connected === true) {
             socket.emit("join-queue", {
                 taId: TAid,
                 user: user

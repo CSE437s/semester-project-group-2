@@ -924,7 +924,7 @@ app.get("/api/logout", (req, res) => {
     })
 })
 
-app.get("/api/classroomSettings", (req, res) => {
+app.post("/api/getClassroomSettings", (req, res) => {
     passport.authenticate("jwt", { session: false }, (error, user) => {
         if (error) {
             res.status(500).send({ error: error })
@@ -933,7 +933,7 @@ app.get("/api/classroomSettings", (req, res) => {
             res.status(401).send({ error: "invalid auth" })
         }
         else {
-            userModel.findById(user._id).then(foundUser => {
+            userModel.findById(req.body.TAid).then(foundUser => {
                 if(foundUser.classroomSettings) {
                     res.status(200).send({settings: foundUser.classroomSettings})
                 }
@@ -946,7 +946,7 @@ app.get("/api/classroomSettings", (req, res) => {
 })
 
 app.post("/api/setClassroomSettings", (req, res) => {
-    passport.authenticate("jwt", { session: false }, (error, user) => {
+    passport.authenticate("jwt", { session: false }, async (error, user) => {
         if (error) {
             res.status(500).send({ error: error })
         }
@@ -954,6 +954,11 @@ app.post("/api/setClassroomSettings", (req, res) => {
             res.status(401).send({ error: "invalid auth" })
         }
         else {
+            const settings = req.body.classroomSettings
+            if(settings.passwordEnabled === true) {
+                const hashedPassword = await bcrypt.hash(req.body.classroomSettings.password, Number(bcrypt.genSalt(10)))
+                settings.password = hashedPassword
+            }
             userModel.findByIdAndUpdate(user._id, {
                 classroomSettings: req.body.classroomSettings
             }).then(update => {
@@ -969,6 +974,30 @@ app.post("/api/setClassroomSettings", (req, res) => {
     })(req, res)
 })
 
+app.post("/api/compareClassroomPassword", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            userModel.findById(req.body.TAid).then(TA => {
+                console.log(req.body.password, TA.classroomSettings)
+                bcrypt.compare(req.body.password, TA.classroomSettings.password).then(status => {
+                    console.log(status)
+                    if(status === true) {
+                        res.status(200).send({password: "correct"})
+                    }
+                    else {
+                        res.status(401).send({password: "incorrect"})
+                    }
+                })
+            })
+        }
+    })(req, res)
+})
 
 
 

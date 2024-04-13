@@ -2,8 +2,8 @@ import { useState } from "react"
 import { setClassroomSettings } from "../UserUtils"
 
 const ClassroomSettings = () => {
-    const [queueEnabled, setQueueEnabled] = useState()
-    const [passwordEnabled, setPasswordEnabled] = useState()
+    const [queueEnabled, setQueueEnabled] = useState(false)
+    const [passwordEnabled, setPasswordEnabled] = useState(false)
     const [password, setPassword] = useState("")
     const handleSettingsChange = (e) => {
         e.preventDefault()

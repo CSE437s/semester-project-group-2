@@ -506,13 +506,25 @@ export function sendNewVideoURL(videoURL) {
  * finds classroom settings associated with currently logged in user (might have to change to take in TA id and look that up)
  * @returns classroom settings in the databse
  */
-export function getClassroomSettings() {
+export function getClassroomSettings(id) {
     const token = localStorage.getItem("token")
     if(!token) {
         return {error: "redirect to login"}
     }
-    return axios.get(url + "/api/classroomSettings", {
-
+    return axios.post(url + "/api/getClassroomSettings", {
+        TAid: id
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 200) {
+            return result.data.settings
+        }
+        return null
+    }).catch(e => null)
+}
 /**
  * get the queue for a user's classroom 
  * @param id: user id of the queue of interest
@@ -530,10 +542,15 @@ export function getQueue(queueId) {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true
         }
+        
     }).then(result => {
-        console.log(result)
         if(result.status === 200) {
-            return result.data.settings
+            return result.data.queue
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            return []
         }
         return null
     }).catch(e => null)
@@ -554,16 +571,16 @@ export function setClassroomSettings(newSettings) {
     return axios.post(url + "/api/setClassroomSettings", {
         classroomSettings: newSettings
     }, {
-        if(result.status === 200) {
-            return result.data.queue
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+    }).then(result => {
+        if(result.status === 201) {
+            return true
         }
-        return null
-    }).catch(e => {
-        if(e.response.status === 404) {
-            return []
-        }
-        return null
-    })
+        return false
+    }).catch(e => false)
 }
 
 
@@ -589,6 +606,39 @@ export function getNextStudentInLine() {
     }).catch(e => {
         if(e.response.status === 404) {
             console.log("no such student")
+        }
+        return null
+    })
+}
+
+
+/**
+ * Tests classroom password with user input to see if correct
+ * @param password 
+ * @param  TAid 
+ * @returns true if password is correct, false if it is incorrect, null if something else went wrong
+ */
+export function testClassroomPassword(password, TAid) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/compareClassroomPassword", {
+        password: password,
+        TAid: TAid
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 200) {
+            return true
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 401) {
+            return false
         }
         return null
     })
