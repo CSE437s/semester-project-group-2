@@ -1165,7 +1165,6 @@ app.get("/api/pullOffQueue", (req, res) => {
                 const queue = classroomQueues.get(id)
                 const nextInLine = queue.shift()
                 studentsBeingHelped.set(id, nextInLine)
-                console.log(studentsBeingHelped)
                 res.status(200).send({nextStudent: nextInLine.user, socket: nextInLine.socket})
             }
         }
@@ -1187,7 +1186,6 @@ app.post("/api/getCurrentStudent", (req, res) => {
                 res.status(404).send({error: "queue doesn't exist"})
             }
             else {
-                console.log("being helped:", studentsBeingHelped)
                 if(studentsBeingHelped.has(id) === false) {
                     res.status(404).send({message: "there is no TA with this id helping a studennt"})
                 }

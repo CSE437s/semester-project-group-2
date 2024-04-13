@@ -72,7 +72,6 @@ const Queue = (props) => {
     const nextStudent = () => {
         if(queue && queue.length > 0) {
             getNextStudentInLine().then(studentObject => {
-                props.onPull()
                 const studentSocket = studentObject.socket
                 socketRef.current.emit("move-student",  {
                     socketToMove: studentSocket,

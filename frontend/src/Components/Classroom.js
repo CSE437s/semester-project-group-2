@@ -8,13 +8,10 @@ import Queue from "./Queue";
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
 const Classroom = () => {
-    const DEBUGGING = process.env.REACT_APP_DEBUGGING;
-    const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const [editMode, setEditMode] = useState(false)
     const [user, setCurrentUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
     const [elements, setElements] = useState()
-    const [studentBeingHelped, setStudentBeingHelped] = useState()
     const [settings, setSettings] = useState()
     const [newComponentName, setNewComponentName] = useState("whiteboard")
     const { TAid } = useParams();
@@ -44,7 +41,6 @@ const Classroom = () => {
                     setIsOwner(true)
                 }
                 if(sett) {
-                    console.log(studentBeingHelped)
                     if(sett.queueEnabled === true && u._id !== TAid && (student === null || u._id !== student._id)) {
                         navigate(`/classrooms/waiting/${TAid}`)
                     }
@@ -55,20 +51,18 @@ const Classroom = () => {
                     setElements(components)
                 }).catch(e => console.log(e))
             }
-            // if studentBeingHelped has changed
-            // const student = await getCurrentStudent()
-            // if(student )
         }
         getInfo()
         //eslint-disable-next-line
-    }, [settings, studentBeingHelped]) // rerun when settings are changed
+    }, [settings]) // rerun when settings are changed
 
     // save elements on elements change useEffect
     useEffect(() => {
         if(elements) {
             saveElements()
         }
-    }, [elements, saveElements])
+        //eslint-disable-next-line
+    }, [elements])
 
     // get hours useEffect
     useEffect(() => {
@@ -135,12 +129,10 @@ const Classroom = () => {
     const handleAdd = (elementName) => {
         addClassroomComponent(elementName, 100, 100, 300, 300).then(newComponent => {
             console.log(newComponent)
-            // if(newComponent) {
-                console.log(newComponent)
-                const newarray = [...elements]
-                newarray.push(newComponent)
-                setElements(newarray)
-            // }
+            console.log(newComponent)
+            const newarray = [...elements]
+            newarray.push(newComponent)
+            setElements(newarray)
             
         }).catch(e => console.log(e))
     }
@@ -163,10 +155,7 @@ const Classroom = () => {
             }}> { editMode === true ? "save changes" : "add widgets" }</button>
             <br></br>
             { isOwner === true && <ClassroomSettings />}
-            { settings?.queueEnabled === true && <Queue onPull={()=>{
-                // getCurrentStudent().then((student) => setStudentBeingHelped(student._id))
-                console.log(studentBeingHelped)
-            }}/> }
+            { settings?.queueEnabled === true && <Queue /> }
             {editMode === true ? <span className="">
                     <select className="mx-3" name="components" id="select-components" onChange={(e)=>{
                             setNewComponentName(e.target.value)

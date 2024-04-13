@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 import Queue from "./Queue"
 import { useEffect, useState } from "react"
-import { findUser, getClassroomSettings, getCurrentStudent, getCurrentUser, testClassroomPassword } from "../UserUtils"
+import { findUser, getClassroomSettings, getCurrentUser, testClassroomPassword } from "../UserUtils"
 import Header from "./Header"
 
 const JoinClassroom = () => {
@@ -30,13 +30,6 @@ const JoinClassroom = () => {
                     }
                 })
             }
-            // else {
-            //     getCurrentStudent().then(student => {
-            //         if(student !== null && student._id === user._id) {
-            //             navigate(`/classrooms/${TAid}`)
-            //         }
-            //     })
-            // }
         }
     }
 
@@ -64,13 +57,13 @@ const JoinClassroom = () => {
     return (<>
         <Header />
         {user?._id !== TAid ? 
-        <>
+        <div>
         You are currently waiting to join { TA ? TA.firstName + "'s classroom" : "a classroom"}. Please wait here until redirected. Refreshing will lose your place in line. 
-        </>
+        </div>
         :
-        <>
+        <div>
         Here is your classroom waiting page. Queue information can be found below.
-        </>
+        </div>
         }
         <Queue />
     </>)
