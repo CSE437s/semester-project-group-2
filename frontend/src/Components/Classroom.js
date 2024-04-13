@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
-import { getCurrentUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent, getClassroomSettings } from "../UserUtils";
+import { useNavigate, useParams } from 'react-router-dom';
+import { getCurrentUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent, getClassroomSettings, getCurrentStudent } from "../UserUtils";
 import Header from "./Header";
 import Moveable from "./Moveable";
 import ClassroomSettings from "./ClassroomSettings";
-
+import Queue from "./Queue";
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
 const Classroom = () => {
@@ -14,45 +14,54 @@ const Classroom = () => {
     const [user, setCurrentUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
     const [elements, setElements] = useState()
+    const [studentBeingHelped, setStudentBeingHelped] = useState()
+    const [settings, setSettings] = useState()
     const [newComponentName, setNewComponentName] = useState("whiteboard")
     const { TAid } = useParams();
     const currentToken = localStorage.getItem("token");
     const [isLoading, setIsLoading] = useState(true);
-    //eslint-disable-next-line
+
+    const navigate = useNavigate()
+
     const saveElements = () => {
         setClassroomComponents(elements).then(_ => {
-            // window.location.reload()
         }).catch(e => console.log(e))
     }
 
-    // user initialization useEffect
+    // classroom settings useEffect
     useEffect(() => {
-        if (currentToken && !user) {
-            getCurrentUser().then(user => {
+        const getInfo = async () => {
+            const sett = await getClassroomSettings(TAid)
+            if(!settings) {
+                setSettings(sett)
+            }
+            if (currentToken && !user) {
+                const user = await getCurrentUser()
                 const u = user.data.user
                 setCurrentUser(u)
-                // if(props.settings.queueEnabled === true && u._id) // todo, make it so that the student that was let in is the only student who can view the component
+                const student = await getCurrentStudent(TAid)
                 if (u._id === TAid) {
                     setIsOwner(true)
                 }
-            })
+                if(sett) {
+                    console.log(studentBeingHelped)
+                    if(sett.queueEnabled === true && u._id !== TAid && (student === null || u._id !== student._id)) {
+                        navigate(`/classrooms/waiting/${TAid}`)
+                    }
+                }
+            }
             if (!elements) {
                 getClassroomComponents(TAid).then(components => {
                     setElements(components)
                 }).catch(e => console.log(e))
             }
+            // if studentBeingHelped has changed
+            // const student = await getCurrentStudent()
+            // if(student )
         }
-    }, [currentToken, api_url, TAid, user, elements]);
-
-    // classroom settings useEffect
-    useEffect(() => {
-        if(isOwner === true) {
-            getClassroomSettings().then(settings => {
-                console.log(settings)
-            })
-        }
+        getInfo()
         //eslint-disable-next-line
-    }, []) // only have it execute on component mount
+    }, [settings, studentBeingHelped]) // rerun when settings are changed
 
     // save elements on elements change useEffect
     useEffect(() => {
@@ -60,16 +69,6 @@ const Classroom = () => {
             saveElements()
         }
     }, [elements, saveElements])
-
-    // this is literally doing nothing
-    // useEffect(() => {
-    //     findUser(TAid).then(TA => {
-    //         if (TA === null) {
-    //             console.log("TA was unable to be found")
-    //         }
-    //     }).catch(e => console.log(e))
-    // }, [TAid, elements]); // Dependency: TAid
-
 
     // get hours useEffect
     useEffect(() => {
@@ -164,6 +163,10 @@ const Classroom = () => {
             }}> { editMode === true ? "save changes" : "add widgets" }</button>
             <br></br>
             { isOwner === true && <ClassroomSettings />}
+            { settings?.queueEnabled === true && <Queue onPull={()=>{
+                // getCurrentStudent().then((student) => setStudentBeingHelped(student._id))
+                console.log(studentBeingHelped)
+            }}/> }
             {editMode === true ? <span className="">
                     <select className="mx-3" name="components" id="select-components" onChange={(e)=>{
                             setNewComponentName(e.target.value)
@@ -202,9 +205,9 @@ const Classroom = () => {
                                 handleResize(element, size)
                             }}
                             isOwner={isOwner}
-                            deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                            deleteButton={<button className="px-2 text-sm hover:cursor-pointer" onClick={() => {
                                 handleDelete(element.name)
-                            }}>Remove</buttton>}
+                            }}>Remove</button>}
                             >
                         </Moveable>
                         </>
@@ -224,9 +227,9 @@ const Classroom = () => {
                                 handleResize(element, size)
                             }}
                             isOwner={isOwner}
-                            deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                            deleteButton={<button className="px-2 text-sm hover:cursor-pointer" onClick={() => {
                                 handleDelete(element.name)
-                            }}>Remove</buttton>}
+                            }}>Remove</button>}
                             >
                     </Moveable>
                     }
@@ -245,9 +248,9 @@ const Classroom = () => {
                             handleResize(element, size)
                         }}
                         isOwner={isOwner}
-                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                        deleteButton={<button className="px-2 text-sm hover:cursor-pointer" onClick={() => {
                             handleDelete(element.name)
-                        }}>Remove</buttton>}
+                        }}>Remove</button>}
                         >
                     </Moveable>
 

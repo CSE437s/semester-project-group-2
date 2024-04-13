@@ -1022,6 +1022,7 @@ const io = require("socket.io")(server, {
 // thank you to this random guy who helped me use sockets for this purpose: https://www.youtube.com/watch?v=Br4uaXHrODg
 
 const classroomQueues = new Map()
+const studentsBeingHelped = new Map()
 var connections = []
 const printIDs = (connections) => {
     var ids = ""
@@ -1114,20 +1115,17 @@ io.on("connect", (socket) => {
             }
             else {
                 queue.push({user: user, socket: socket.id})
-                console.log("new queues:", classroomQueues.get(targetClassroom))
                 io.emit("queue-change") // alert the TA that the queue has changed
             }
         }
         else { // if the queue doesn't exist, make one and put the student in it
             classroomQueues.set(targetClassroom, [{user: user, socket: socket.id}])
-            console.log("new queues:", classroomQueues.get(targetClassroom))
             io.emit("queue-change")
         }
     })
 
     socket.on("quit-queue", (data) => {
         const targetClassroom = data.taId
-        console.log("LEAVING QUEUE")
         if(classroomQueues.has(targetClassroom)){
             const queue = classroomQueues.get(targetClassroom)
             const newQueue = queue.filter((s) => s.socket !== socket.id)
@@ -1166,7 +1164,37 @@ app.get("/api/pullOffQueue", (req, res) => {
             else {
                 const queue = classroomQueues.get(id)
                 const nextInLine = queue.shift()
+                studentsBeingHelped.set(id, nextInLine)
+                console.log(studentsBeingHelped)
                 res.status(200).send({nextStudent: nextInLine.user, socket: nextInLine.socket})
+            }
+        }
+    })(req, res)
+})
+
+app.post("/api/getCurrentStudent", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            console.log(error)
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = req.body.TAid
+            if(studentsBeingHelped.has(id) === false) {
+                res.status(404).send({error: "queue doesn't exist"})
+            }
+            else {
+                console.log("being helped:", studentsBeingHelped)
+                if(studentsBeingHelped.has(id) === false) {
+                    res.status(404).send({message: "there is no TA with this id helping a studennt"})
+                }
+                else {
+                    const student = studentsBeingHelped.get(id)
+                    res.status(200).send({currentStudent: student.user})
+                }
             }
         }
     })(req, res)

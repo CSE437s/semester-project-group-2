@@ -19,7 +19,7 @@ const ClassroomSettings = () => {
     return (<>
     <form onSubmit={handleSettingsChange}>
         <div>
-            <label for="queue">Enable Queue</label>
+            <label htmlFor="queue">Enable Queue</label>
             <input id="queue" type="checkbox" onChange={(e)=>{
                 setQueueEnabled(e.target.checked)
                 }

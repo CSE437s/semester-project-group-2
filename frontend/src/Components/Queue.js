@@ -4,7 +4,7 @@ import { getCurrentUser, getNextStudentInLine, getQueue } from "../UserUtils"
 import { io } from "socket.io-client"
 
 
-const Queue = () => {
+const Queue = (props) => {
     const [isStudent, setIsStudent] = useState(null)
     const [queue, setQueue] = useState()
     const [user, setUser] = useState()
@@ -72,6 +72,7 @@ const Queue = () => {
     const nextStudent = () => {
         if(queue && queue.length > 0) {
             getNextStudentInLine().then(studentObject => {
+                props.onPull()
                 const studentSocket = studentObject.socket
                 socketRef.current.emit("move-student",  {
                     socketToMove: studentSocket,

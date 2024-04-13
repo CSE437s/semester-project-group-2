@@ -611,6 +611,35 @@ export function getNextStudentInLine() {
     })
 }
 
+/**
+ * get the student being helped now
+ * @returns student object if successful, null otherwise
+ */
+export function getCurrentStudent(id) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/getCurrentStudent", {
+        TAid: id
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 200) {
+            return result.data.currentStudent 
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            console.log("no such student")
+        }
+        return null
+    })
+}
+
 
 /**
  * Tests classroom password with user input to see if correct
