@@ -11,27 +11,6 @@ const JoinClassroom = () => {
     const {TAid} = useParams()
 
     const navigate = useNavigate()
-    const handleEnter = () => {
-        if(settings){ 
-            if(settings.queueEnabled === false && settings.passwordEnabled === false) {
-                navigate(`/classrooms/${TAid}`)
-            }
-            else if(settings.queueEnabled === false) {
-                const password = prompt("put the password in dweeb")
-                testClassroomPassword(password, TAid).then(result => {
-                    if(result === true) {
-                        navigate(`/classrooms/${TAid}`)
-                    }
-                    else if(result === false) {
-                        alert("Wrong password. Please try again or contact your TA.")
-                    }
-                    else {
-                        alert("Something went wrong. Please try again later.")
-                    }
-                })
-            }
-        }
-    }
 
     useEffect(() => {
         if(!TA) {
@@ -47,13 +26,29 @@ const JoinClassroom = () => {
         }
         if(!settings) {
             getClassroomSettings(TAid).then(newSettings => {
+                if(newSettings.queueEnabled === false && newSettings.passwordEnabled === false) {
+                    navigate(`/classrooms/${TAid}`)
+                }
+                else if(newSettings.queueEnabled === false) {
+                    const password = prompt("put the password in dweeb")
+                    console.log(password, TAid)
+                    testClassroomPassword(password, TAid).then(result => {
+                        if(result === true) {
+                            navigate(`/classrooms/${TAid}`)
+                        }
+                        else if(result === false) {
+                            alert("Wrong password. Please try again or contact your TA.")
+                        }
+                        else {
+                            alert("Something went wrong. Please try again later.")
+                        }
+                    })
+                }
                 setSettings(newSettings)
             })
         }
-        // handle different settings:
-        handleEnter()
         //eslint-disable-next-line
-    }, [TA, user, settings]) // only run the getters if the variables have changed 
+    }, []) // only run the getters if the variables have changed 
     return (<>
         <Header />
         {user?._id !== TAid ? 
