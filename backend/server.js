@@ -796,6 +796,28 @@ app.post("/api/getClassroomComponents", (req, res) => {
     })(req, res)
 })
 
+app.get("/api/getMyClassroomComponents", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = user._id.toString()
+            userModel.findById(id).then(TAuser => {
+                if(TAuser !== null) {
+                    res.status(200).send({ components: TAuser.classroomComponents })
+                }
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({ error: e })
+            })
+        }
+    })(req, res)
+})
+
 app.post("/api/setClassroomComponents", (req, res) => {
     passport.authenticate("jwt", { session: false }, (error, user) => {
         if (error) {
@@ -934,6 +956,28 @@ app.post("/api/getClassroomSettings", (req, res) => {
         }
         else {
             userModel.findById(req.body.TAid).then(foundUser => {
+                if(foundUser.classroomSettings) {
+                    res.status(200).send({settings: foundUser.classroomSettings})
+                }
+                else {
+                    res.status(404).send({error: "no classroom settings found"})
+                }
+            })
+        }
+    })(req, res)
+})
+
+app.get("/api/getMyClassroomSettings", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = user._id.toString()
+            userModel.findById(id).then(foundUser => {
                 if(foundUser.classroomSettings) {
                     res.status(200).send({settings: foundUser.classroomSettings})
                 }

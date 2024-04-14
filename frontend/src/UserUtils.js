@@ -386,16 +386,28 @@ export function getClassroomComponents(userId) {
     if(!token) {
         return {error: "no auth token available"}
     }
-    return axios.post(url + "/api/getClassroomComponents", {
-        userId: userId
-    }, {
-        headers: {
-            Authorization: "Bearer " + token,
-            "ngrok-skip-browser-warning": true
-        }
-    }).then(result => {
-        return result.data.components
-    }).catch(e => e)
+    if(userId) {
+        return axios.post(url + "/api/getClassroomComponents", {
+            userId: userId
+        }, {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+        }).then(result => {
+            return result.data.components
+        }).catch(e => e)
+    }
+    else {
+        return axios.get(url + "/api/getMyClassroomComponents", {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+        }).then(result => {
+            return result.data.components
+        }).catch(e => e)
+    }
 }
 
 /**
@@ -504,6 +516,7 @@ export function sendNewVideoURL(videoURL) {
 
 /**
  * finds classroom settings associated with currently logged in user (might have to change to take in TA id and look that up)
+ * @param id if none provided, will use stored user token
  * @returns classroom settings in the databse
  */
 export function getClassroomSettings(id) {
@@ -511,19 +524,34 @@ export function getClassroomSettings(id) {
     if(!token) {
         return {error: "redirect to login"}
     }
-    return axios.post(url + "/api/getClassroomSettings", {
-        TAid: id
-    }, {
-        headers: {
-            Authorization: "Bearer " + token,
-            "ngrok-skip-browser-warning": true
-        }
-    }).then(result => {
-        if(result.status === 200) {
-            return result.data.settings
-        }
-        return null
-    }).catch(e => null)
+    if(id) {
+        return axios.post(url + "/api/getClassroomSettings", {
+            TAid: id
+        }, {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+        }).then(result => {
+            if(result.status === 200) {
+                return result.data.settings
+            }
+            return null
+        }).catch(e => null)
+    }
+    else {
+        return axios.get(url + "/api/getMyClassroomSettings", {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+        }).then(result => {
+            if(result.status === 200) {
+                return result.data.settings
+            }
+            return null
+        }).catch(e => null) 
+    }
 }
 /**
  * get the queue for a user's classroom 
