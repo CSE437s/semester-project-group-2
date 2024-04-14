@@ -32,6 +32,10 @@ const Classroom = () => {
             if(!settings) {
                 setSettings(sett)
             }
+            if(sett === null) {
+                navigate("/login")
+                return
+            }
             if (currentToken && !user) {
                 const user = await getCurrentUser()
                 const u = user.data.user
@@ -47,9 +51,12 @@ const Classroom = () => {
                 }
             }
             if (!elements) {
-                getClassroomComponents(TAid).then(components => {
-                    setElements(components)
-                }).catch(e => console.log(e))
+                const components = await getClassroomComponents(TAid)
+                if(components === null) {
+                    navigate("/login")
+                    return
+                }
+                setElements(components)
             }
         }
         getInfo()
@@ -66,7 +73,12 @@ const Classroom = () => {
 
     // get hours useEffect
     useEffect(() => {
-        getAllUserHours(TAid).then(hours => {
+        const userPromise = getAllUserHours(TAid)
+        if(userPromise === null) {
+            navigate("/login")
+            return
+        }
+        userPromise.then(hours => {
             if (hours) {
                 // setOHSchedule(hours);
                 setIsLoading(false);

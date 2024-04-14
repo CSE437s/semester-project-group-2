@@ -142,13 +142,22 @@ const Queue = (props) => {
     </>
     :
     <>
-        <div>
-            Students Waiting: {queue ? queue.length : 0}
-            {queue && queue.map((item) => {
-                return <div key={item.user?._id}>{item.user.firstName + " " + item.user.lastName}</div>
-            })}
+        <div className="bg-indigo-300 rounded-lg p-10 w-fit">
+            <div>
+                Students Waiting: <span className="text-white">{queue ? queue.length : 0}</span>
+               
+                {queue && <ol className="pl-10">
+                    {
+                    queue.map((item) => {
+                        return <li className="list-decimal" key={item.user?._id}>{item.user.firstName + " " + item.user.lastName}</li>
+                    })
+                    }
+                    </ol>
+                }
+                
+            </div>
+            <button className="bg-indigo-600 text-white px-5 py-2 mt-10 rounded-sm hover:bg-indigo-900" onClick={nextStudent}>help next student</button>
         </div>
-        <button onClick={nextStudent}>help next student</button>
     </>
     
     
