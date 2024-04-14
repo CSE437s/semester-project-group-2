@@ -59,7 +59,6 @@ const ClassroomSettings = () => {
                 </div>
             }
         </div>
-        }
         <input type="submit" />
     </form>
     
