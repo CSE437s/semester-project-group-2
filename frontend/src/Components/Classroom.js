@@ -90,6 +90,7 @@ const Classroom = () => {
             console.log("Error getting TA document:", error);
             setIsLoading(false)
         });
+        //eslint-disable-next-line
     }, [TAid]); // Dependencies: classId and TAid
 
     const findElement = (elementName) => {
