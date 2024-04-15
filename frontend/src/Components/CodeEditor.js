@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react"
 import AceEditor from "react-ace"
 import { io } from "socket.io-client"
+import "ace-builds/src-noconflict/mode-java";
+import 'ace-builds/src-noconflict/theme-github'
+import 'ace-builds/src-noconflict/theme-cobalt'
 
 
 
@@ -34,12 +37,21 @@ const CodeEditor = (props) => {
         }
     })
 
+    console.log(props.lang)
+
     return (<>
         <AceEditor 
             mode={props.lang}
             theme={props.theme}
             onChange={handleCode}
             value={code}
+            width={props.width}
+            height={props.height}
+            setOptions={{
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true,
+                enableSnippets: true
+            }}
         />
     </>)
 }
