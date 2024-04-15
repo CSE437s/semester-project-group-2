@@ -11,6 +11,7 @@ const NewRoom = (props) => {
     if(!token) {
         navigate("/login")
     }
+    console.log(props.height)
     return (<>
     <JitsiMeeting
         roomName = { props.type + "-Room" + props.roomName }
@@ -20,6 +21,8 @@ const NewRoom = (props) => {
         }}
         lang = 'en'
         getIFrameRef = { (iframeRef) => { 
+            iframeRef.style.height = `${props.height}px`// props.height; 
+            iframeRef.style.width = `${props.width}px`// props.width; 
             if(props.URL) {
                 console.log("not creating a new room")
                 iframeRef.children[0].setAttribute("src", props.URL)
@@ -36,9 +39,10 @@ const NewRoom = (props) => {
                 }).catch(e => console.log(e))
             }
             console.log(iframeRef); 
-            iframeRef.style.height = props.height; 
-            iframeRef.style.width = props.width; 
         } }
+        onReadyToClose={() => {
+            alert("The video call is about to close!")
+        }}
         />
     </>)
 }

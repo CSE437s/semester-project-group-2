@@ -117,6 +117,7 @@ const Moveable = (props) => {
                     position: "absolute",
                     bottom:0,
                     right: 0,
+                    zIndex:1 
                 }} 
                 onMouseDown={startWatchingResize}
                 className="bg-resize  p-3 bg-no-repeat bg-cover"

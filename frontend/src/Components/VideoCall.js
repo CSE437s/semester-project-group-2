@@ -57,7 +57,7 @@ const VideoCall = (props) => {
 
     const handleSubmit = (e) => {
         const newRoomName = Math.random() * 10 + "." + Date.now();
-        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} />);
+        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} height={props.height} width={props.width}/>);
     };
 
     return (<>
