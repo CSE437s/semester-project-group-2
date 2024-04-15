@@ -52,7 +52,7 @@ const JoinClassroom = () => {
     return (<>
         <Header />
         {user?._id !== TAid ? 
-        <div>
+        <div className="px-10">
         You are currently waiting to join { TA ? TA.firstName + "'s classroom" : "a classroom"}. Please wait here until redirected. Refreshing will lose your place in line. 
         </div>
         :
