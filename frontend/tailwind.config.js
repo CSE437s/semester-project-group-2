@@ -8,12 +8,11 @@ module.exports = {
       backgroundImage: {
         "eraser": "url('../public/eraser.svg')",
         "clear": "url('../public/clear.svg')",
-        "resize": "url('../public/resize.svg')"
+        "resize": "url('../public/resize.svg')",
+        "settings": "url('../public/settings.svg')"
       },
       borderWidth: {
         '0.5': '0.5px',
-        "resize": "url('../public/resize.svg')",
-        "settings": "url('../public/settings.svg')"
       },
       animation: {
         'spin-short': 'spin 1s linear 0.2',
