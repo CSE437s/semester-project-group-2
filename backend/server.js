@@ -516,7 +516,7 @@ app.post("/api/getHours", (req, res) => {
             res.status(401).send({ error: "invalid auth" })
         }
         else {
-            hoursModel.findOne({ userId: req.body.userId})
+            hoursModel.find({ userId: req.body.userId})
                 .then(hoursData => {
                     if (hoursData) {
                         res.status(200).send({ hours: hoursData });

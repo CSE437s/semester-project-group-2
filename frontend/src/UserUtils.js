@@ -14,31 +14,31 @@ export function getUser(email, pass) {
         email: email,
         password: pass,
     })
-    .then((res) => {
-        if(res.data.error ===  "\"incorrect password\"") {
-            alert("incorrect password")
-        }
-        else {
-            localStorage.setItem("token", res.data.token)
-            return axios.get(url + "/api/profile", {
-                headers: {
-                    Authorization: "Bearer " + res.data.token,
-                    "ngrok-skip-browser-warning": true
-                }
-            }).then(profileRes => {
-                if(profileRes) {
-                    return profileRes
-                }
-                else {
-                    return {"message": "unable to find the profile"}
-                }
-            }).catch(e => {
-                return {"error": e}
-            })
-        }
-    }).catch((error) => {
-        return {"error": error}
-    })
+        .then((res) => {
+            if (res.data.error === "\"incorrect password\"") {
+                alert("incorrect password")
+            }
+            else {
+                localStorage.setItem("token", res.data.token)
+                return axios.get(url + "/api/profile", {
+                    headers: {
+                        Authorization: "Bearer " + res.data.token,
+                        "ngrok-skip-browser-warning": true
+                    }
+                }).then(profileRes => {
+                    if (profileRes) {
+                        return profileRes
+                    }
+                    else {
+                        return { "message": "unable to find the profile" }
+                    }
+                }).catch(e => {
+                    return { "error": e }
+                })
+            }
+        }).catch((error) => {
+            return { "error": error }
+        })
 }
 
 /**
@@ -47,9 +47,9 @@ export function getUser(email, pass) {
  */
 export function getCurrentUser() {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         console.log(" no token ")
-        return {"error": "token is not stored"}
+        return { "error": "token is not stored" }
     }
     return axios.get(url + "/api/profile", {
         headers: {
@@ -57,22 +57,22 @@ export function getCurrentUser() {
             "ngrok-skip-browser-warning": true
         }
     }).then(profileRes => {
-        if(profileRes) {
+        if (profileRes) {
             return profileRes
         }
         else {
-            return {"message": "unable to find the profile"}
+            return { "message": "unable to find the profile" }
         }
     }).catch(e => {
         console.log(e)
-        if(e.response) {
-            if(e.response.status === 401) {
+        if (e.response) {
+            if (e.response.status === 401) {
                 console.log("token has expired")
-                return {"message": "token has expired. logout and redirect to login", status: 401}
+                return { "message": "token has expired. logout and redirect to login", status: 401 }
             }
-        } 
+        }
         else {
-            return {error: e}
+            return { error: e }
         }
     })
 }
@@ -84,7 +84,7 @@ export function getCurrentUser() {
  */
 export function getEnrolledCourses(userId) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/userClasses", {
@@ -124,7 +124,7 @@ export function logout() {
  */
 export function findUser(userId) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/findUser", {
@@ -136,7 +136,7 @@ export function findUser(userId) {
         }
     }).then(res => {
         const user = res.data.user
-        if(user) {
+        if (user) {
             return user
         }
         return null
@@ -184,19 +184,19 @@ export function getUserHoursForClass(userId, classId) {
     return getAllUserHours(userId)
         .then(hoursData => {
             console.log(`Received hours data:`, hoursData);
-            if (hoursData && hoursData.classId === classId) {
-                console.log(`Hours for class ${classId}:`, hoursData.hours);
-                return hoursData;
+            if (!Array.isArray(hoursData)) {
+                hoursData = [hoursData];
+            }
+            const matchingHours = hoursData.filter(entry => entry.classId === classId);
+            if (matchingHours.length > 0) {
+                console.log(`Hours for class ${classId}:`, matchingHours);
+                return matchingHours[0];
             } else {
-                console.log(`No hours found for class ${classId} or mismatch in class IDs`);
+                console.log(`No hours found for class ${classId}`);
                 return [];
             }
         })
-        .catch(e => {
-            console.error(`Error fetching hours for user ${userId} and class ${classId}:`, e);
-            return null;
-        });
-}
+    }
 
 
 /**
@@ -209,7 +209,7 @@ export function getUserHoursForClass(userId, classId) {
  */
 export function addUserHours(userId, className, classId, hours) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/addHours", {
@@ -223,9 +223,9 @@ export function addUserHours(userId, className, classId, hours) {
             "ngrok-skip-browser-warning": true
         }
     }).then(res => {
-        if(res.status === 200) {
+        if (res.status === 200) {
             return true
-        } 
+        }
         else {
             return false
         }
@@ -270,11 +270,11 @@ export function deleteUserHours(userId, classId) {
  */
 export function changeRoleInClass(userId, classId, oldRole, newRole) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/changeRoleInClass", {
-        userId: userId, 
+        userId: userId,
         classId: classId,
         oldRole: oldRole,
         newRole: newRole
@@ -284,7 +284,7 @@ export function changeRoleInClass(userId, classId, oldRole, newRole) {
             "ngrok-skip-browser-warning": true
         }
     }).then(res => {
-        if(res.data.message === "successfully updated") {
+        if (res.data.message === "successfully updated") {
             return true
         }
         return false
@@ -300,7 +300,7 @@ export function changeRoleInClass(userId, classId, oldRole, newRole) {
  */
 export function updateUserName(userId, firstName, lastName) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/updateUserName", {
@@ -313,7 +313,7 @@ export function updateUserName(userId, firstName, lastName) {
             "ngrok-skip-browser-warning": true
         }
     }).then(res => {
-        if(res.data.message === "updated successfully") {
+        if (res.data.message === "updated successfully") {
             return true
         }
         return false
@@ -330,20 +330,20 @@ export function updateUserName(userId, firstName, lastName) {
  */
 export function DropStudentFromClass(userId, classId, isTA) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/dropStudentFromClass", {
         userId: userId,
         classId: classId,
-        isTA : isTA
+        isTA: isTA
     }, {
         headers: {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true
         }
     }).then(res => {
-        if(res.data.message === "updated successfully") {
+        if (res.data.message === "updated successfully") {
             return true
         }
         return false
@@ -357,7 +357,7 @@ export function DropStudentFromClass(userId, classId, isTA) {
  */
 export function DeleteClass(classId) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/deleteClass", {
@@ -368,7 +368,7 @@ export function DeleteClass(classId) {
             "ngrok-skip-browser-warning": true
         }
     }).then(res => {
-        if(res.data.message === "deleted successfully") {
+        if (res.data.message === "deleted successfully") {
             return true
         }
         return false
@@ -387,12 +387,12 @@ export function DeleteClass(classId) {
  */
 export function addClassroomComponent(type, x, y, width, height) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/addClassroomComponent", {
         componentName: type,
-        x: x, 
+        x: x,
         y: y,
         width: width,
         height: height
@@ -402,7 +402,7 @@ export function addClassroomComponent(type, x, y, width, height) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 200) {
+        if (result.status === 200) {
             return result.data.newComponent
         }
         return null
@@ -415,8 +415,8 @@ export function addClassroomComponent(type, x, y, width, height) {
  */
 export function getClassroomComponents(userId) {
     const token = localStorage.getItem("token")
-    if(!token) {
-        return {error: "no auth token available"}
+    if (!token) {
+        return { error: "no auth token available" }
     }
     return axios.post(url + "/api/getClassroomComponents", {
         userId: userId
@@ -437,7 +437,7 @@ export function getClassroomComponents(userId) {
  */
 export function setClassroomComponents(newComponents) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/setClassroomComponents", {
@@ -449,7 +449,7 @@ export function setClassroomComponents(newComponents) {
         }
     }).then(result => {
         console.log(result)
-        if(result.status === 200) {
+        if (result.status === 200) {
             return true
         }
         return false
@@ -463,7 +463,7 @@ export function setClassroomComponents(newComponents) {
 export function updateUserBio(userId, bio) {
     console.log("we get to UserUtils.js");
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/updateUserBio", {
@@ -475,7 +475,7 @@ export function updateUserBio(userId, bio) {
             "ngrok-skip-browser-warning": true
         }
     }).then(res => {
-        if(res.data.message === "updated successfully") {
+        if (res.data.message === "updated successfully") {
             return true
         }
         return false
@@ -489,7 +489,7 @@ export function updateUserBio(userId, bio) {
 export function updateUserBGColor(userId, color) {
     //console.log("we get to UserUtils.js");
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/updateUserBGColor", {
@@ -501,17 +501,17 @@ export function updateUserBGColor(userId, color) {
             "ngrok-skip-browser-warning": true
         }
     }).then(res => {
-        if(res.data.message === "updated successfully") {
+        if (res.data.message === "updated successfully") {
             return true
         }
         return false
     }).catch(e => e)
 }
-  
+
 export function sendNewVideoURL(videoURL) {
     const token = localStorage.getItem("token")
-    if(!token) {
-        return {error: "redirect to login"}
+    if (!token) {
+        return { error: "redirect to login" }
     }
     return getCurrentUser().then(u => {
         const user = u.data.user
@@ -527,7 +527,7 @@ export function sendNewVideoURL(videoURL) {
                 "ngrok-skip-browser-warning": true
             },
         }).then(result => {
-            if(result.status === 201) {
+            if (result.status === 201) {
                 return true
             }
             return false
