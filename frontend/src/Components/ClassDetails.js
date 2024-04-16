@@ -91,7 +91,7 @@ const ClassDetails = () => {
       }))
       return userDetails.filter(Boolean)
     };
-  
+
     function getHoursByUserAndClass(userId, classId) {
 
       return getUserHoursForClass(userId, classId);
@@ -156,7 +156,7 @@ const ClassDetails = () => {
       console.log("TAsate" + isUserTA);
     }
   }, [user, classDetails]);
-  
+
   const dropClass = async () => {
     const confirmDrop = window.confirm("Are you sure you want to drop this class?");
     if (confirmDrop) {
@@ -164,7 +164,7 @@ const ClassDetails = () => {
       console.log("Dropping class with ID:", classId);
       console.log("User ID:", userId);
       console.log("Is TA:", isTA);
-  
+
       DropStudentFromClass(userId, classId, isTA)
         .then((res) => {
           if (res === true) {
@@ -176,7 +176,7 @@ const ClassDetails = () => {
         });
     }
   };
-  
+
 
   const deleteClass = async () => {
     const confirmDrop = window.confirm("Are you sure you want to delete this class?");
@@ -408,7 +408,7 @@ const ClassDetails = () => {
                       let formattedSchedule = [];
                       if (taSchedule && taSchedule.hours) {
                         formattedSchedule = formatSchedule(taSchedule.hours);
-                      }                    
+                      }
                       const hasScheduledHours = formattedSchedule && formattedSchedule.some(schedule => schedule.hours.length > 0);
                       return { ...ta, isOHNow, taSchedule, formattedSchedule, hasScheduledHours };
                     })
