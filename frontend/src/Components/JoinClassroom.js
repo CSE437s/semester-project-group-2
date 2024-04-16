@@ -25,24 +25,31 @@ const JoinClassroom = () => {
             })
         }
         if(!settings) {
-            getClassroomSettings(TAid).then(newSettings => {
-                if(newSettings.queueEnabled === false && newSettings.passwordEnabled === false) {
+            getClassroomSettings(TAid).then(async newSettings => {
+                const getUser = await getCurrentUser()
+                if(!getUser) {
+                    return 
+                }
+                const user2 = getUser.data.user
+                if(user2._id === TAid || (newSettings.queueEnabled === false && newSettings.passwordEnabled === false)) {
                     navigate(`/classrooms/${TAid}`)
                 }
                 else if(newSettings.queueEnabled === false) {
                     const password = prompt("put the password in dweeb")
                     console.log(password, TAid)
-                    testClassroomPassword(password, TAid).then(result => {
-                        if(result === true) {
-                            navigate(`/classrooms/${TAid}`)
-                        }
-                        else if(result === false) {
-                            alert("Wrong password. Please try again or contact your TA.")
-                        }
-                        else {
-                            alert("Something went wrong. Please try again later.")
-                        }
-                    })
+                    if(password) {
+                        testClassroomPassword(password, TAid).then(result => {
+                            if(result === true) {
+                                navigate(`/classrooms/${TAid}`)
+                            }
+                            else if(result === false) {
+                                alert("Wrong password. Please try again or contact your TA.")
+                            }
+                            else {
+                                alert("Something went wrong. Please try again later.")
+                            }
+                        })
+                    }
                 }
                 setSettings(newSettings)
             })
