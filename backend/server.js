@@ -1047,4 +1047,12 @@ io.on("connect", (socket) => {
         io.emit("chat", chat)
     })
 
+    socket.on("code-written", (data) => {
+        connections.forEach((listeningSocket) => {
+            if (listeningSocket.id !== socket.id) {
+                listeningSocket.emit("read-code", data)
+            }
+        })
+    })
+
 })

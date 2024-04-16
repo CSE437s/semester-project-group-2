@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import Whiteboard from "./Whiteboard"
 import ChatContainer from "./ChatContainer"
 import VideoCall from "./VideoCall"
+import CodeEditor from "./CodeEditor"
 const Moveable = (props) => {
     // help starting: https://stackoverflow.com/questions/60792300/how-to-create-a-resizable-component-in-react
     // then i did moveable myself B) 
@@ -91,9 +92,11 @@ const Moveable = (props) => {
             {props.isOwner === true &&
                 <div id="handle" className="bg-gray-500 py-1 hover:cursor-move" onMouseDown={startWatchingMove}  style={{
                     position: "absolute",
+                    top: -16, // half of the height of the handle
                     zIndex: 1,
                     width: "100%",
-                    height: "fit-content"
+                    height: "fit-content", // this works out to be 32px
+                    marginBottom: "14px"
                 }}>
                     {props.deleteButton}
                 </div>
@@ -109,15 +112,20 @@ const Moveable = (props) => {
                     props.component === "whiteboard" ? 
                         <Whiteboard width={specs.width} height={specs.height}/> : 
                         (props.component === "chat" ? 
-                            <ChatContainer width={specs.width} height={specs.height} /> :
+                            <ChatContainer width={specs.width} height={specs.height} /> 
+                            :
+                            (props.component === "code" ? 
+                                <CodeEditor lang={props.lang} theme={props.theme} width={specs.width} height={specs.height} />
+                            :
                             <VideoCall width={specs.width} height={specs.height} />)
+                )
                 }
                 {props.isOwner === true && 
                 <button id="handle" style={{
                     position: "absolute",
                     bottom:0,
                     right: 0,
-                    zIndex:1 
+                    zIndex: 1
                 }} 
                 onMouseDown={startWatchingResize}
                 className="bg-resize  p-3 bg-no-repeat bg-cover"
