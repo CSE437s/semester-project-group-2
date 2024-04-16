@@ -16,7 +16,7 @@ const Dashboard = () => {
   const [userClasses, setUserClasses] = useState([]);
   const [user, setUser] = useState(null)
   const currentToken = localStorage.getItem("token")
-
+  console.log(userClasses)
   useEffect(() => {
     if (!user) {
       const currentUser = getCurrentUser()
@@ -95,21 +95,29 @@ const Dashboard = () => {
 
   const handleJoinClassSubmit = (e) => {
     e.preventDefault();
-
-    joinClass(joinClassCode, user._id, "student").then((result) => {// all users are added to a course as a student at first
+      const isAlreadyEnrolled = ["TA", "instructor", "student"].some(role => 
+      userClasses[role].some(classInfo => classInfo.classCode === joinClassCode)
+    );
+  
+    if (isAlreadyEnrolled) {
+      alert("You are already enrolled in this class.");
+      setJoinClassCode("");
+      return; 
+    }
+  
+    joinClass(joinClassCode, user._id, "student").then((result) => {
       if (result === true) {
-        window.location.reload();// force automatic reload to see the joined class
-      }
-      else {
+        window.location.reload();
+      } else {
         alert("Class not found. Please check the code and try again.");
       }
       setJoinClassCode("");
     }).catch(error => {
       console.error("Error joining class:", error);
       alert("Failed to join class. Please try again.");
-    })
+    });
   };
-
+  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">

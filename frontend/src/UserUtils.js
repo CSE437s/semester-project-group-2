@@ -149,9 +149,9 @@ export function findUser(userId) {
  * @returns array of hour objects if successful, null otherwise
  */
 export function getAllUserHours(userId) {
-    const token = localStorage.getItem("token")
-    if(!token) {
-        return null
+    const token = localStorage.getItem("token");
+    if (!token) {
+        return Promise.reject("Token is not stored");
     }
     return axios.post(url + "/api/getHours", {
         userId: userId
@@ -161,13 +161,15 @@ export function getAllUserHours(userId) {
             "ngrok-skip-browser-warning": true
         }
     }).then(res => {
-        if(res.error) {
+        if (res.error) {
             return null;
+        } else {
+            return res.data.hours;
         }
-        else {
-            return res.data.hours
-        }
-    })
+    }).catch(e => {
+        console.log(`Error fetching hours: ${e}`);
+        return null;
+    });
 }
 
 /**
@@ -179,21 +181,23 @@ export function getAllUserHours(userId) {
 export function getUserHoursForClass(userId, classId) {
     console.log(`Getting hours for user: ${userId} and class: ${classId}`);
 
-    return getAllUserHours(userId).then(hoursData => {
-        console.log(`Received hours data:`, hoursData);
-
-        if (hoursData && hoursData.classId === classId) {
-            console.log(`Hours for class ${classId}:`, hoursData.hours);
-            return hoursData;
-        } else {
-            console.log(`No hours found for class ${classId} or mismatch in class IDs`);
-            return [];
-        }
-    }).catch(e => {
-        console.error(`Error fetching hours for user ${userId} and class ${classId}:`, e);
-        return null;
-    });
+    return getAllUserHours(userId)
+        .then(hoursData => {
+            console.log(`Received hours data:`, hoursData);
+            if (hoursData && hoursData.classId === classId) {
+                console.log(`Hours for class ${classId}:`, hoursData.hours);
+                return hoursData;
+            } else {
+                console.log(`No hours found for class ${classId} or mismatch in class IDs`);
+                return [];
+            }
+        })
+        .catch(e => {
+            console.error(`Error fetching hours for user ${userId} and class ${classId}:`, e);
+            return null;
+        });
 }
+
 
 /**
  * add hours to database and ID to user's list of IDs
