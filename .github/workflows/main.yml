@@ -31,3 +31,6 @@ jobs: # list of things to do
 
       - name: Code Linting
         run: npx eslint frontend --max-warnings 0
+        
+      - name: Run Tests
+        run: npm run jest-test
