@@ -88,7 +88,11 @@ const userSchema = new mongoose.Schema(
       type: Object,
       required: false,
       unique: false,
-      default: null
+      default: {
+        queueEnabled: false,
+        passwordEnabled: false,
+        password: undefined
+      }
     }
   },
   { timestamps: true }
