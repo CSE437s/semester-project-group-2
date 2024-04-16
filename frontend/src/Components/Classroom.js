@@ -1,61 +1,84 @@
 import { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
-import { getCurrentUser, findUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent } from "../UserUtils";
+import { useNavigate, useParams } from 'react-router-dom';
+import { getCurrentUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent, getClassroomSettings, getCurrentStudent } from "../UserUtils";
 import Header from "./Header";
 import Moveable from "./Moveable";
-
+import ClassroomSettings from "./ClassroomSettings";
+import Queue from "./Queue";
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
 const Classroom = () => {
-    const DEBUGGING = process.env.REACT_APP_DEBUGGING;
-    const api_url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
     const [editMode, setEditMode] = useState(false)
     const [user, setCurrentUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
     const [elements, setElements] = useState()
+    const [settings, setSettings] = useState()
     const [newComponentName, setNewComponentName] = useState("whiteboard")
     const { TAid } = useParams();
     const currentToken = localStorage.getItem("token");
     const [isLoading, setIsLoading] = useState(true);
-    //eslint-disable-next-line
+
+    const navigate = useNavigate()
+
     const saveElements = () => {
         setClassroomComponents(elements).then(_ => {
-            // window.location.reload()
         }).catch(e => console.log(e))
     }
 
+    // classroom settings useEffect
     useEffect(() => {
-        if (currentToken && !user) {
-            getCurrentUser().then(user => {
+        const getInfo = async () => {
+            const sett = await getClassroomSettings(TAid)
+            if(!settings) {
+                setSettings(sett)
+            }
+            if(sett === null) {
+                navigate("/login")
+                return
+            }
+            if (currentToken && !user) {
+                const user = await getCurrentUser()
                 const u = user.data.user
                 setCurrentUser(u)
+                const student = await getCurrentStudent(TAid)
                 if (u._id === TAid) {
                     setIsOwner(true)
                 }
-            })
+                if(sett) {
+                    if(sett.queueEnabled === true && u._id !== TAid && (student === null || u._id !== student._id)) {
+                        navigate(`/classrooms/waiting/${TAid}`)
+                    }
+                }
+            }
             if (!elements) {
-                getClassroomComponents(TAid).then(components => {
-                    setElements(components)
-                })
+                const components = await getClassroomComponents(TAid)
+                if(components === null) {
+                    navigate("/login")
+                    return
+                }
+                setElements(components)
             }
         }
-    }, [currentToken, api_url, TAid, user, elements]);
+        getInfo()
+        //eslint-disable-next-line
+    }, [settings]) // rerun when settings are changed
 
+    // save elements on elements change useEffect
     useEffect(() => {
         if(elements) {
             saveElements()
         }
-    }, [elements, saveElements])
-    useEffect(() => {
-        findUser(TAid).then(TA => {
-            if (TA === null) {
-                console.log("TA was unable to be found")
-            }
-        }).catch(e => console.log(e))
-    }, [TAid, elements]); // Dependency: TAid
+        //eslint-disable-next-line
+    }, [elements])
 
+    // get hours useEffect
     useEffect(() => {
-        getAllUserHours(TAid).then(hours => {
+        const userPromise = getAllUserHours(TAid)
+        if(userPromise === null) {
+            navigate("/login")
+            return
+        }
+        userPromise.then(hours => {
             if (hours) {
                 // setOHSchedule(hours);
                 setIsLoading(false);
@@ -67,6 +90,7 @@ const Classroom = () => {
             console.log("Error getting TA document:", error);
             setIsLoading(false)
         });
+        //eslint-disable-next-line
     }, [TAid]); // Dependencies: classId and TAid
 
     const findElement = (elementName) => {
@@ -118,12 +142,10 @@ const Classroom = () => {
     const handleAdd = (elementName) => {
         addClassroomComponent(elementName, 100, 100, 300, 300).then(newComponent => {
             console.log(newComponent)
-            // if(newComponent) {
-                console.log(newComponent)
-                const newarray = [...elements]
-                newarray.push(newComponent)
-                setElements(newarray)
-            // }
+            console.log(newComponent)
+            const newarray = [...elements]
+            newarray.push(newComponent)
+            setElements(newarray)
             
         }).catch(e => console.log(e))
     }
@@ -137,45 +159,91 @@ const Classroom = () => {
     return (
         <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
             <Header user={user} />
-            {isOwner? <>
-            <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 m-3 mb-0`} onClick={() => {
-                if(editMode === true) {
-                    saveElements()
-                }
-                setEditMode(!editMode)
-            }}> { editMode === true ? "save changes" : "add widgets" }</button>
-            <br></br>
-            {editMode === true ? <span className="">
-                    <select className="mx-3" name="components" id="select-components" onChange={(e)=>{
-                            setNewComponentName(e.target.value)
-                    }}>
-                        <option value="whiteboard">Whiteboard</option>
-                        <option value="videocall">Video Call</option>
-                        <option value="chat">Text Chat</option>
-                        <option value="code">Code Editor</option>
-                    </select>
-                    <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
-                        handleAdd(newComponentName)
-                    }}> add</button>
-                </span> : <></> 
-            }</>
-            : <></>
-            }
-            {
-                elements && 
-                elements.map((element) => {
-                    if(!element || element === null || !element.name) {
-                        console.log("no such element")
-                        return <></>
+            <div id="classroom">
+                { isOwner === true && <span  className="absolute pt-5 pr-5 right-0"><ClassroomSettings /></span>}
+                {isOwner? <>
+                <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
+                    if(editMode === true) {
+                        saveElements()
                     }
-                    else if(element.name.indexOf("whiteboard") >= 0) {
-                        return <>
-                        <Moveable
+                    setEditMode(!editMode)
+                }}> { editMode === true ? "save changes" : "add widgets" }</button>
+                <br></br>
+                { settings?.queueEnabled === true && <Queue /> }
+                {editMode === true ? <span className="">
+                        <select className="mx-3" name="components" id="select-components" onChange={(e)=>{
+                                setNewComponentName(e.target.value)
+                        }}>
+                            <option value="whiteboard">Whiteboard</option>
+                            <option value="videocall">Video Call</option>
+                            <option value="chat">Text Chat</option>
+                        </select>
+                        <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
+                            handleAdd(newComponentName)
+                        }}> add</button>
+                    </span> : <></> 
+                }</>
+                : <></>
+                }
+                {
+                    elements && 
+                    elements.map((element) => {
+                        if(!element || element === null || !element.name) {
+                            console.log("no such element")
+                            return <></>
+                        }
+                        else if(element.name.indexOf("whiteboard") >= 0) {
+                            return <>
+                            <Moveable
+                                key={element.name}
+                                width={element.width}
+                                height={element.height}
+                                initialX={element.x}
+                                initialY={element.y}
+                                component="whiteboard"
+                                movingStop={(newX, newY) => {
+                                    handleDrag(newX, newY, element.name)
+                                }}
+                                resizingStop={(size)=>{
+                                    handleResize(element, size)
+                                }}
+                                isOwner={isOwner}
+                                deleteButton={<button className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                                    handleDelete(element.name)
+                                }}>Remove</button>}
+                                >
+                            </Moveable>
+                            </>
+                        }
+                        else if(element.name.indexOf("chat") >= 0) {
+                            return <Moveable
+                                key={element.name}
+                                width={element.width}
+                                height={element.height}
+                                initialX={element.x}
+                                initialY={element.y}
+                                component="chat"
+                                movingStop={(newX, newY) => {
+                                    handleDrag(newX, newY, element.name)
+                                }}
+                                resizingStop={(size)=>{
+                                    handleResize(element, size)
+                                }}
+                                isOwner={isOwner}
+                                deleteButton={<button className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                                    handleDelete(element.name)
+                                }}>Remove</button>}
+                                >
+                        </Moveable>
+                        }
+                        else {
+                            return <Moveable
+                            key={element.name}
                             width={element.width}
                             height={element.height}
                             initialX={element.x}
                             initialY={element.y}
-                            component="whiteboard"
+                            component="video"
                             movingStop={(newX, newY) => {
                                 handleDrag(newX, newY, element.name)
                             }}
@@ -183,79 +251,16 @@ const Classroom = () => {
                                 handleResize(element, size)
                             }}
                             isOwner={isOwner}
-                            deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                            deleteButton={<button className="px-2 text-sm hover:cursor-pointer" onClick={() => {
                                 handleDelete(element.name)
-                            }}>Remove</buttton>}
+                            }}>Remove</button>}
                             >
                         </Moveable>
-                        </>
-                    }
-                    else if(element.name.indexOf("chat") >= 0) {
-                        return <Moveable
-                        className="overflow-y-scroll"
-                        width={element.width}
-                        height={element.height}
-                        initialX={element.x}
-                        initialY={element.y}
-                        component="chat"
-                        movingStop={(newX, newY) => {
-                            handleDrag(newX, newY, element.name)
-                        }}
-                        resizingStop={(size)=>{
-                            handleResize(element, size)
-                        }}
-                        isOwner={isOwner}
-                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
-                            handleDelete(element.name)
-                        }}>Remove</buttton>}
-                        >
-                    </Moveable>
-                    }
-                    else if (element.name.indexOf("code") >= 0)  {
-                        return <Moveable
-                            className="overflow-y-scroll"
-                            width={element.width}
-                            height={element.height}
-                            initialX={element.x}
-                            initialY={element.y}
-                            component="code"
-                            movingStop={(newX, newY) => {
-                                handleDrag(newX, newY, element.name)
-                            }}
-                            resizingStop={(size)=>{
-                                handleResize(element, size)
-                            }}
-                            isOwner={isOwner}
-                            deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
-                                handleDelete(element.name)
-                            }}>Remove</buttton>}
-                            lang="java"
-                            theme="cobalt"
-                        />
-                    }
-                    else {
-                        return <Moveable
-                        width={element.width}
-                        height={element.height}
-                        initialX={element.x}
-                        initialY={element.y}
-                        component="video"
-                        movingStop={(newX, newY) => {
-                            handleDrag(newX, newY, element.name)
-                        }}
-                        resizingStop={(size)=>{
-                            handleResize(element, size)
-                        }}
-                        isOwner={isOwner}
-                        deleteButton={<buttton className="px-2 text-sm hover:cursor-pointer" onClick={() => {
-                            handleDelete(element.name)
-                        }}>Remove</buttton>}
-                        >
-                    </Moveable>
 
-                    }
-                })
-            }
+                        }
+                    })
+                }
+            </div>
         </div>
 
     );

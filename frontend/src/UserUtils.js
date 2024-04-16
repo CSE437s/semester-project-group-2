@@ -414,16 +414,28 @@ export function getClassroomComponents(userId) {
     if(!token) {
         return {error: "no auth token available"}
     }
-    return axios.post(url + "/api/getClassroomComponents", {
-        userId: userId
-    }, {
-        headers: {
-            Authorization: "Bearer " + token,
-            "ngrok-skip-browser-warning": true
-        }
-    }).then(result => {
-        return result.data.components
-    }).catch(e => e)
+    if(userId) {
+        return axios.post(url + "/api/getClassroomComponents", {
+            userId: userId
+        }, {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+        }).then(result => {
+            return result.data.components
+        }).catch(e => e)
+    }
+    else {
+        return axios.get(url + "/api/getMyClassroomComponents", {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+        }).then(result => {
+            return result.data.components
+        }).catch(e => e)
+    }
 }
 
 /**
@@ -444,7 +456,6 @@ export function setClassroomComponents(newComponents) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        console.log(result)
         if(result.status === 200) {
             return true
         }
@@ -528,5 +539,192 @@ export function sendNewVideoURL(videoURL) {
             }
             return false
         });
+    })
+}
+
+/**
+ * finds classroom settings associated with currently logged in user (might have to change to take in TA id and look that up)
+ * @param id if none provided, will use stored user token
+ * @returns classroom settings in the databse
+ */
+export function getClassroomSettings(id) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "redirect to login"}
+    }
+    if(id) {
+        return axios.post(url + "/api/getClassroomSettings", {
+            TAid: id
+        }, {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+        }).then(result => {
+            if(result.status === 200) {
+                return result.data.settings
+            }
+            return null
+        }).catch(e => null)
+    }
+    else {
+        return axios.get(url + "/api/getMyClassroomSettings", {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+        }).then(result => {
+            if(result.status === 200) {
+                return result.data.settings
+            }
+            return null
+        }).catch(e => null) 
+    }
+}
+/**
+ * get the queue for a user's classroom 
+ * @param id: user id of the queue of interest
+ * @returns queue if successful, null otherwise
+ */
+export function getQueue(queueId) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/getQueue", {
+        id: queueId
+    },{
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+        
+    }).then(result => {
+        if(result.status === 200) {
+            return result.data.queue
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            return []
+        }
+        return null
+    }).catch(e => null)
+}
+
+
+
+/**
+ * sets a TA's classroom settings
+ * @param new classroom settings object
+ * @returns true if successful, false otherwise
+ */
+export function setClassroomSettings(newSettings) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return {error: "redirect to login"}
+    }
+    return axios.post(url + "/api/setClassroomSettings", {
+        classroomSettings: newSettings
+    }, {
+            headers: {
+                Authorization: "Bearer " + token,
+                "ngrok-skip-browser-warning": true
+            }
+    }).then(result => {
+        if(result.status === 201) {
+            return true
+        }
+        return false
+    }).catch(e => false)
+}
+
+
+/**
+ * get the next student ID from the queue
+ * @returns student ID if successful, null otherwise
+ */
+export function getNextStudentInLine() {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.get(url + "/api/pullOffQueue", {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 200) {
+            return result.data 
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            console.log("no such student")
+        }
+        return null
+    })
+}
+
+/**
+ * get the student being helped now
+ * @returns student object if successful, null otherwise
+ */
+export function getCurrentStudent(id) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/getCurrentStudent", {
+        TAid: id
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 200) {
+            return result.data.currentStudent 
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 404) {
+            console.log("no such student")
+        }
+        return null
+    })
+}
+
+
+/**
+ * Tests classroom password with user input to see if correct
+ * @param password 
+ * @param  TAid 
+ * @returns true if password is correct, false if it is incorrect, null if something else went wrong
+ */
+export function testClassroomPassword(password, TAid) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/compareClassroomPassword", {
+        password: password,
+        TAid: TAid
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 200) {
+            return true
+        }
+        return null
+    }).catch(e => {
+        if(e.response.status === 401) {
+            return false
+        }
+        return null
     })
 }

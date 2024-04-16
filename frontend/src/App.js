@@ -16,6 +16,9 @@ import ForgotPassword from "./Components/ForgotPassword";
 import ProfilePage from './Components/ProfilePage';
 import Moveable from './Components/Moveable';
 import CodeEditor from './Components/CodeEditor';
+import ClassroomSettings from './Components/ClassroomSettings';
+import Queue from './Components/Queue';
+import JoinClassroom from './Components/JoinClassroom';
 
 
 
@@ -33,12 +36,16 @@ const App = () => {
         <Route path="/me" element={<UserDetails />} />
         <Route path="/create-class" element={<CreateClassForm />} />
         <Route path="/classrooms/:TAid" element={<Classroom />} />
+        <Route path="/classrooms/waiting/:TAid" element={<JoinClassroom />} />
+        <Route path="/classrooms/:TAid" element={<Classroom />} />
         <Route path="/whiteboard" element={<Whiteboard height={500} width={500}/>} /> 
         <Route path="/code" element={<CodeEditor lang="java" />} /> 
         <Route path="/passwordReset" element={<ResetPassword />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
         <Route path="/users/:userId" element={<ProfilePage/>} />
         <Route path="/resize" element={<Moveable/>} />
+        <Route path="/settings" element={<ClassroomSettings />} />
+        <Route path="/queue/:TAid" element={<Queue />} />
 
       </Routes>
     </Router>

@@ -813,8 +813,35 @@ app.post("/api/getClassroomComponents", (req, res) => {
         }
         else {
             userModel.findById(req.body.userId).then(TAuser => {
-                res.status(200).send({ components: TAuser.classroomComponents })
-            }).catch(e => res.status(500).send({ error: e }))
+                if(TAuser !== null) {
+                    res.status(200).send({ components: TAuser.classroomComponents })
+                }
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({ error: e })
+            })
+        }
+    })(req, res)
+})
+
+app.get("/api/getMyClassroomComponents", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = user._id.toString()
+            userModel.findById(id).then(TAuser => {
+                if(TAuser !== null) {
+                    res.status(200).send({ components: TAuser.classroomComponents })
+                }
+            }).catch(e => {
+                console.log(e)
+                res.status(500).send({ error: e })
+            })
         }
     })(req, res)
 })
@@ -947,6 +974,104 @@ app.get("/api/logout", (req, res) => {
     })
 })
 
+app.post("/api/getClassroomSettings", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            userModel.findById(req.body.TAid).then(foundUser => {
+                if(foundUser.classroomSettings) {
+                    res.status(200).send({settings: foundUser.classroomSettings})
+                }
+                else {
+                    res.status(404).send({error: "no classroom settings found"})
+                }
+            })
+        }
+    })(req, res)
+})
+
+app.get("/api/getMyClassroomSettings", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = user._id.toString()
+            userModel.findById(id).then(foundUser => {
+                if(foundUser.classroomSettings) {
+                    res.status(200).send({settings: foundUser.classroomSettings})
+                }
+                else {
+                    res.status(404).send({error: "no classroom settings found"})
+                }
+            })
+        }
+    })(req, res)
+})
+
+app.post("/api/setClassroomSettings", (req, res) => {
+    passport.authenticate("jwt", { session: false }, async (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const settings = req.body.classroomSettings
+            if(settings.passwordEnabled === true) {
+                const hashedPassword = await bcrypt.hash(req.body.classroomSettings.password, Number(bcrypt.genSalt(10)))
+                settings.password = hashedPassword
+            }
+            userModel.findByIdAndUpdate(user._id, {
+                classroomSettings: req.body.classroomSettings
+            }).then(update => {
+                console.log(update)
+                if(update) {
+                    res.status(201).send({message: "success"})
+                }
+                else {
+                    res.status(500).send({error: "unable to change settings"})
+                }
+            })
+        }
+    })(req, res)
+})
+
+app.post("/api/compareClassroomPassword", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            userModel.findById(req.body.TAid).then(TA => {
+                console.log(req.body.password, TA.classroomSettings)
+                bcrypt.compare(req.body.password, TA.classroomSettings.password).then(status => {
+                    console.log(status)
+                    if(status === true) {
+                        res.status(200).send({password: "correct"})
+                    }
+                    else {
+                        res.status(401).send({password: "incorrect"})
+                    }
+                })
+            })
+        }
+    })(req, res)
+})
+
+
 
 // route for file upload
 app.post("/api/fileUpload", upload.single('myFile'), (req, res, next) => {
@@ -967,6 +1092,9 @@ const io = require("socket.io")(server, {
 
 //WHITEBOARD SOCKETS
 // thank you to this random guy who helped me use sockets for this purpose: https://www.youtube.com/watch?v=Br4uaXHrODg
+
+const classroomQueues = new Map()
+const studentsBeingHelped = new Map()
 var connections = []
 const printIDs = (connections) => {
     var ids = ""
@@ -975,10 +1103,10 @@ const printIDs = (connections) => {
     }
     return ids
 }
+
 io.on("connect", (socket) => {
     connections.push(socket) // keep track of all connected sockets
-    console.log("Socket:", socket.id, "has connected")
-    console.log("connected sockets:", printIDs(connections))
+    console.log("sockets connected:", connections.length)
     socket.on("begin-draw", (data) => {
         connections.forEach((listeningSocket) => {
             if (listeningSocket.id !== socket.id) { // only draw the new points on the canvas' that DONT belong to original socket
@@ -1040,7 +1168,7 @@ io.on("connect", (socket) => {
                 return item;
             }
         })
-        console.log("connected sockets", printIDs(connections))
+        
     })
 
     socket.on("chat", chat => {
@@ -1055,4 +1183,126 @@ io.on("connect", (socket) => {
         })
     })
 
+    socket.on("join-queue", (data) => {
+        const targetClassroom = data.taId
+        const user = data.user
+        if(classroomQueues.has(targetClassroom)) {
+            const queue = classroomQueues.get(targetClassroom)
+            console.log(queue, queue.includes(socket.id))
+            const idsInQueue = queue.flatMap(item => item.user._id)
+            if(idsInQueue.includes(user._id) === true) {
+                console.log("socket is already in the queue.")
+            }
+            else {
+                queue.push({user: user, socket: socket.id})
+                io.emit("queue-change") // alert the TA that the queue has changed
+            }
+        }
+        else { // if the queue doesn't exist, make one and put the student in it
+            classroomQueues.set(targetClassroom, [{user: user, socket: socket.id}])
+            io.emit("queue-change")
+        }
+    })
+
+    socket.on("quit-queue", (data) => {
+        const targetClassroom = data.taId
+        if(classroomQueues.has(targetClassroom)){
+            const queue = classroomQueues.get(targetClassroom)
+            const newQueue = queue.filter((s) => s.socket !== socket.id)
+            classroomQueues.set(targetClassroom, newQueue)
+        }
+        else {
+            console.log("trying to leave a queue that does not exist")
+        }
+    })
+
+    socket.on("move-student", (data) => {
+        const targetSocket = data.socketToMove
+        console.log("trying to move targetSocket", "is targetConnected?", connections.flatMap((s)=>s.id).includes(targetSocket))
+        connections.forEach(listeningSocket => {
+            if(listeningSocket.id === targetSocket) {
+                listeningSocket.emit("move-me")
+            }
+        })
+    })
+
+})
+
+app.get("/api/pullOffQueue", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = user._id.toString()
+            if(classroomQueues.has(id) === false) {
+                res.status(404).send({error: "queue doesn't exist"})
+            }
+            else {
+                const queue = classroomQueues.get(id)
+                const nextInLine = queue.shift()
+                studentsBeingHelped.set(id, nextInLine)
+                res.status(200).send({nextStudent: nextInLine.user, socket: nextInLine.socket})
+            }
+        }
+    })(req, res)
+})
+
+app.post("/api/getCurrentStudent", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            console.log(error)
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = req.body.TAid
+            if(studentsBeingHelped.has(id) === false) {
+                res.status(404).send({error: "queue doesn't exist"})
+            }
+            else {
+                if(studentsBeingHelped.has(id) === false) {
+                    res.status(404).send({message: "there is no TA with this id helping a studennt"})
+                }
+                else {
+                    const student = studentsBeingHelped.get(id)
+                    res.status(200).send({currentStudent: student.user})
+                }
+            }
+        }
+    })(req, res)
+})
+
+const searchConnectionsForId = (id) => {
+    const ids = connections.flatMap(s => s.id)
+    return ids.includes(id)
+}
+
+app.post("/api/getQueue", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            const id = req.body.id
+            if (classroomQueues.has(id) === true) {
+                // only send sockets that are connected, then update the classroom queue to show this
+                const queue = classroomQueues.get(id)
+                const connectedSockets = queue.filter((sock) => searchConnectionsForId(sock.socket) === true)
+                classroomQueues.set(id, connectedSockets)
+                res.status(200).send({ queue: classroomQueues.get(id) })
+            }
+            else {
+                res.status(404).send({error: "there is no existing queue for the user"})
+            }
+        }
+    })(req, res)
 })

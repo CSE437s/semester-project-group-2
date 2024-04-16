@@ -294,7 +294,7 @@ const ClassDetails = () => {
 
   const rerouteToClassroom = (e) => {
     const TAid = e.target.value;
-    navigate(`/classrooms/${TAid}`);
+    navigate(`/classrooms/waiting/${TAid}`);
   };
 
   function isCurrentlyOH(hoursArray, currentTime) {
