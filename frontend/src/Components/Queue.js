@@ -86,6 +86,11 @@ const Queue = (props) => {
 
     
     useEffect(() => {
+        if(!queue) {
+            getQueue(TAid).then(q => {
+                setQueue(q)
+            })
+        }
         if(!socketRef.current){ // i.e., we have not created a socket yet
             socketRef.current = io(url, {
                 autoConnect: true,
