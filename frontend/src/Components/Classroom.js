@@ -177,6 +177,7 @@ const Classroom = () => {
                             <option value="whiteboard">Whiteboard</option>
                             <option value="videocall">Video Call</option>
                             <option value="chat">Text Chat</option>
+                            <option value="code">Code Editor</option>
                         </select>
                         <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
                             handleAdd(newComponentName)
@@ -233,6 +234,29 @@ const Classroom = () => {
                                 deleteButton={<button className="px-2 text-sm hover:cursor-pointer" onClick={() => {
                                     handleDelete(element.name)
                                 }}>Remove</button>}
+                                >
+                        </Moveable>
+                        }
+                        else if(element.name.indexOf("code") >= 0) {
+                            return <Moveable
+                                key={element.name}
+                                width={element.width}
+                                height={element.height}
+                                initialX={element.x}
+                                initialY={element.y}
+                                component="code"
+                                movingStop={(newX, newY) => {
+                                    handleDrag(newX, newY, element.name)
+                                }}
+                                resizingStop={(size)=>{
+                                    handleResize(element, size)
+                                }}
+                                isOwner={isOwner}
+                                deleteButton={<button className="px-2 text-sm hover:cursor-pointer" onClick={() => {
+                                    handleDelete(element.name)
+                                }}>Remove</button>}
+                                lang="java"
+                                theme="github"
                                 >
                         </Moveable>
                         }
