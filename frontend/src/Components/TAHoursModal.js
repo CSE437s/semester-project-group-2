@@ -30,10 +30,10 @@ const TAHoursModal = ({ hoursData, tas, onClose }) => {
 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
   <div className="relative mx-auto shadow-lg rounded-lg bg-white max-h-[90vh] w-full max-w-4xl">
     <div className="text-center text-lg leading-6 font-medium text-gray-900 py-5">TA Office Hours</div>
-    <div className="flex justify-start mr-8 mt-4">
+    <div className="flex justify-start mr-8 mt-4 overflow-x-scroll">
       {tas.map((ta, index) => (
-        <div key={ta._id} className="flex items-center ml-4">
-          <span className={`inline-block w-4 h-4 mr-2 mb-2 ${colorMapping[ta._id]}`}></span>
+        <div key={ta._id} className="flex ml-4">
+          <span className={`inline-block w-4 mt-2 h-4 mr-2 mb-2 ${colorMapping[ta._id]}`}></span>
           <span className="mb-2">{`${ta.firstName} ${ta.lastName}`}</span>
         </div>
       ))}
