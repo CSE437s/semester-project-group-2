@@ -70,6 +70,18 @@ const UserDetails = () => {
         }
     };
 
+    const handleColorChange = async (event) => {
+        const color = event.target.value;
+        try {
+            await updateColor(color);
+            setBackgroundColor(color);
+            document.getElementById('userDetailsContainer').style.backgroundColor = color;
+        } catch (error) {
+            console.error("Error saving background color:", error);
+            alert("Failed to save background color. Please try again.");
+        }
+    };
+
 
     const handleFirstNameBlur = () => {
         setEditingFirstName(false);
@@ -308,26 +320,28 @@ const UserDetails = () => {
                             onChange={uploadProfilePicture}
                             className="hidden"
                         /> */}
+
+
                     </div>
 
                     <button onClick={() => navigate("/forgotPassword")} className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2 mb-2">
                         Reset Password
                     </button>
 
-                    {/* dropdown button */}
-
                     {/* {isTA && ( */}
                     <div className="relative inline-block text-left">
                         <div>
                             <button
                                 type="button"
-                                className="w-full bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded inline-flex items-center"
-                                onClick={toggleDropdown}
+                                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-2 rounded inline-flex items-center"
                             >
-                                Page Background
-                                <svg className="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-                                </svg>
+                                <input
+                                    type="color"
+                                    value={backgroundColor}
+                                    onChange={handleColorChange}
+                                    className="w-6 h-6 border-2 border-gray-300 rounded-full cursor-pointer"
+                                />
+
                             </button>
                         </div>
 
