@@ -36,7 +36,6 @@ const UserDetails = () => {
 
     const adjustHeight = (event) => {
         const textarea = event.target;
-
         textarea.style.height = `${textarea.scrollHeight}px`;
     };
 
@@ -336,24 +335,24 @@ const UserDetails = () => {
                         <div className={`origin-top-right absolute right-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none ${dropdownOpen ? "block" : "hidden"}`} role="menu" aria-orientation="vertical">
                             <div className="py-1" role="none">
                                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("pink");
-                                    saveBackgroundColor("pink");
+                                    setBackgroundColor("#F0C9E0");
+                                    saveBackgroundColor("#F0C9E0");
                                 }} role="menuitem">Pink</button>
                                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("blue");
-                                    saveBackgroundColor("blue");
+                                    setBackgroundColor("#3F66DC");
+                                    saveBackgroundColor("#3F66DC");
                                 }} role="menuitem">Blue</button>
                                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("purple");
-                                    saveBackgroundColor("purple");
+                                    setBackgroundColor("#BDABDA");
+                                    saveBackgroundColor("#BDABDA");
                                 }} role="menuitem">Purple</button>
                                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("grey");
-                                    saveBackgroundColor("grey");
+                                    setBackgroundColor("#C6C6C6");
+                                    saveBackgroundColor("#C6C6C6");
                                 }} role="menuitem">Grey</button>
                                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("white");
-                                    saveBackgroundColor("white");
+                                    setBackgroundColor("#F6F6F6");
+                                    saveBackgroundColor("#F6F6F6");
                                 }} role="menuitem">White</button>
                             </div>
                         </div>
