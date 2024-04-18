@@ -109,15 +109,10 @@ const Classroom = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
                     </svg>
-                    {/* Add your "Add Widgets" button here */}
-                    <button className="bg-indigo-500 text-white hover:bg-indigo-700 hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5 ml-12">
-                        Add Widgets
-                    </button>
                 </div>
             </div>
         );
     }
-    
 
     const handleResize = (element, newSize) => {
         const elementToChange = findElement(element.name)
@@ -163,25 +158,16 @@ const Classroom = () => {
     }
     return (
         <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
-        <Header user={user} />
-        <div id="classroom">
-            <div className="flex items-center pt-2">
-                {isOwner === true && (
-                    <span className="">
-                        <ClassroomSettings />
-                    </span>
-                )}
-                <button className={`${editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200"} hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2`} onClick={() => {
+            <Header user={user} />
+            <div id="classroom">
+                { isOwner === true && <span  className="absolute pt-5 pr-5 right-0"><ClassroomSettings /></span>}
+                {isOwner? <>
+                <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
                     if(editMode === true) {
                         saveElements()
                     }
                     setEditMode(!editMode)
-                }}>
-                    {editMode === true ? "save changes" : "add widgets"}
-                </button>
-            </div>
-
-            {isOwner? <>
+                }}> { editMode === true ? "save changes" : "add widgets" }</button>
                 <br></br>
                 { settings?.queueEnabled === true && <Queue /> }
                 {editMode === true ? <span className="">

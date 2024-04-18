@@ -22,7 +22,7 @@ const ProfilePage = () => {
     return (
         <div className="font-mono min-h-screen" style={{ backgroundColor: backgroundColor }}>
             <Header />
-            <div className="container mx-auto px-4 py-8 pb-10">
+            <div className="container mx-auto px-4 py-8">
                 {user && (
                     <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
                         <h1 className="text-3xl font-bold text-center mb-4 overflow-hidden">{user.firstName} {user.lastName}</h1>
