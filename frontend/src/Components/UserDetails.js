@@ -36,7 +36,7 @@ const UserDetails = () => {
 
     const adjustHeight = (event) => {
         const textarea = event.target;
-        textarea.style.height = 'auto';
+
         textarea.style.height = `${textarea.scrollHeight}px`;
     };
 
@@ -193,7 +193,7 @@ const UserDetails = () => {
     }
 
     return (
-        <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen pb-8" style={{ backgroundColor: backgroundColor }}>
+        <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen pb-40" style={{ backgroundColor: backgroundColor }}>
             <Header user={user} />
 
 
