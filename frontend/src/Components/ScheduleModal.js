@@ -101,7 +101,7 @@ const ScheduleModal = ({ onClose, userId, className, classId, onScheduleSubmit }
         </div>
         <div className="flex justify-end p-5 border-t border-gray-200">
           <button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-2"
+            className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded m-2"
             onClick={onClose}
           >
             Cancel

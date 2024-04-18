@@ -433,7 +433,7 @@ const ClassDetails = () => {
                         )}
                         {isOHNow && (
                           <button
-                            className="mt-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out"
+                            className="mt-auto bg-green-500 hover:bg-green-600 text-indigo-50 font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out"
                             value={_id}
                             onClick={rerouteToClassroom}
                           >
@@ -449,7 +449,7 @@ const ClassDetails = () => {
               </div>
 
               <SimpleModal isOpen={isModalOpen} close={toggleModal}>
-                <div className="bg-white p-6 rounded-lg shadow-lg space-y-6">
+                <div className="bg-white p-6 rounded-lg space-y-6">
                   <input
                     type="text"
                     placeholder="Search by name or email"
@@ -475,7 +475,7 @@ const ClassDetails = () => {
                         </div>
                         {isInstructor && (
                           <button
-                            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded whitespace-nowrap"
+                            className="px-4 py-2 bg-red-400 hover:bg-red-500 text-white font-bold rounded whitespace-nowrap"
                             onClick={() => demoteToStudent(ta._id)}
                           >
                             Demote to Student

@@ -33,8 +33,8 @@ const TAHoursModal = ({ hoursData, tas, onClose }) => {
     <div className="flex justify-start mr-8 mt-4">
       {tas.map((ta, index) => (
         <div key={ta._id} className="flex items-center ml-4">
-          <span className={`inline-block w-4 h-4 mr-2 ${colorMapping[ta._id]}`}></span>
-          <span>{`${ta.firstName} ${ta.lastName}`}</span>
+          <span className={`inline-block w-4 h-4 mr-2 mb-2 ${colorMapping[ta._id]}`}></span>
+          <span className="mb-2">{`${ta.firstName} ${ta.lastName}`}</span>
         </div>
       ))}
     </div>
@@ -84,7 +84,7 @@ const TAHoursModal = ({ hoursData, tas, onClose }) => {
       </table>
     </div>
     <div className="flex justify-center p-5 border-t border-gray-200">
-      <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded m-2" onClick={onClose}>
+      <button className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded m-2" onClick={onClose}>
         Close
       </button>
     </div>
