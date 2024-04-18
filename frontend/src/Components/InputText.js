@@ -19,7 +19,7 @@ export default function InputText({ addMessage }) {
                 onChange={e => setMessage(e.target.value)}
             ></textarea>
             <button
-                className="ml-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+                className="ml-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mt-2"
                 onClick={addAMessage}
             >
                 Enter
