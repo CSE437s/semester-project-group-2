@@ -675,79 +675,65 @@ app.post("/api/deleteClass", (req, res) => {
 
 //im sorry i know this is horrendous
 app.post("/api/dropStudentFromClass", (req, res) => {
-    userId = req.body.userId;
-    classId = req.body.classId;
-
     passport.authenticate("jwt", { session: false }, (error, user) => {
         if (error) {
             res.status(500).send({ error: error });
         } else if (!user) {
             res.status(401).send({ error: "invalid auth" });
         } else {
-            if (req.body.isTA == false) { //if student
-                userModel.findByIdAndUpdate(
-                    user._id,
-                    { $pull: { classesAsStudent: { _id: req.body.id } } },
-                    { new: true }
-                ).then(updatedUser => {
-                    if (updatedUser) {
-                        classModel.findByIdAndUpdate(
-                            req.body.classId,
-                            { $pull: { students: { _id: user._id } } },
-                            { new: true }
-                        ).then(updatedClass => {
-                            if (updatedClass) {
-                                res.status(201).send({ message: "updated successfully" });
-                            } else {
-                                res.status(500).send({ error: "unable to update class" });
-                            }
-                        }).catch(e => {
-                            console.log(e);
-                            res.status(500).send({ error: "unable to update class: " + e.message });
-                        });
-                    }
-                    else {
-                        res.status(500).send({ error: "unable to update user" });
-                    }
-                }).catch(e => {
-                    console.log(e);
-                    res.status(500).send({ error: "unable to update user: " + e.message });
-                });
-            }
-            else { //if TA
-                userModel.findByIdAndUpdate(
-                    user._id,
-                    { $pull: { classesAsTA: { _id: req.body.id } } },
-                    { new: true }
-                ).then(updatedUser => {
-                    if (updatedUser) {
-                        classModel.findByIdAndUpdate(
-                            req.body.classId,
-                            { $pull: { TAs: { _id: user._id } } },
-                            { new: true }
-                        ).then(updatedClass => {
-                            if (updatedClass) {
-                                res.status(201).send({ message: "updated successfully" });
-                            } else {
-                                res.status(500).send({ error: "unable to update class" });
-                            }
-                        }).catch(e => {
-                            console.log(e);
-                            res.status(500).send({ error: "unable to update class: " + e.message });
-                        });
-                    }
-                    else {
-                        res.status(500).send({ error: "unable to update user" });
-                    }
-                }).catch(e => {
-                    console.log(e);
-                    res.status(500).send({ error: "unable to update user: " + e.message });
-                });
-            }
+            const { classId, userId, isTA } = req.body;
 
+            // find user by id
+            userModel.findById(userId)
+                .then(async foundUser => {
+                    if (foundUser) {
+                        if (!isTA) {
+                            // remove class from classesAsStudent
+                            foundUser.classesAsStudent = foundUser.classesAsStudent.filter(c => c._id.toString() !== classId);
+                            foundUser.markModified('classesAsStudent'); // tell mongoose fields have been modified
+                        }
+                        
+                        if (isTA) {
+                            //remove class from classesAsTA
+                            foundUser.classesAsTA = foundUser.classesAsTA.filter(c => c._id.toString() !== classId);
+                            foundUser.markModified('classesAsTA'); // tell mongoose fields have been modified
+                        }
+
+                        await foundUser.save();
+                        
+                        // update class model
+                        const updateQuery = isTA ? 
+                            { $pull: { TAs: { _id: user._id } } } :
+                            { $pull: { students: { _id: user._id } } };
+
+                        classModel.findByIdAndUpdate(
+                            classId,
+                            updateQuery,
+                            { new: true }
+                        ).then(updatedClass => {
+                            if (updatedClass) {
+                                res.status(201).send({ message: "updated successfully" });
+                            } else {
+                                res.status(500).send({ error: "unable to update class" });
+                            }
+                        }).catch(e => {
+                            console.log(e);
+                            res.status(500).send({ error: "unable to update class: " + e.message });
+                        });
+                    } else {
+                        res.status(404).send({ error: "User not found" });
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    res.status(500).send({ error: "internal server error" });
+                });
         }
     })(req, res);
 });
+
+
+
 
 const contains = (array, element) => {
     if(!array) {

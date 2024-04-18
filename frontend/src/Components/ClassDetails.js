@@ -161,18 +161,11 @@ const ClassDetails = () => {
     const confirmDrop = window.confirm("Are you sure you want to drop this class?");
     if (confirmDrop) {
       const userId = user._id;
-      console.log("Dropping class with ID:", classId);
-      console.log("User ID:", userId);
-      console.log("Is TA:", isTA);
-
       DropStudentFromClass(userId, classId, isTA)
         .then((res) => {
-          if (res === true) {
-            alert("Successfully dropped class!");
+            //alert("Successfully dropped class!");
             navigate("/dashboard");
-          } else {
-            alert("There was an error dropping the class");
-          }
+          
         });
     }
   };
