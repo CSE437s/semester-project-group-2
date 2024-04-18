@@ -35,6 +35,7 @@ const Login = () => {
         getUser(email, pass).then(userResult => {
             if(userResult.error) {
                 console.log("something went wrong", userResult.error)
+                alert("Please check your email");
             }
             navigate("/dashboard")
         }).catch(e => console.log(e))
