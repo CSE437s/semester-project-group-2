@@ -163,9 +163,9 @@ const ClassDetails = () => {
       const userId = user._id;
       DropStudentFromClass(userId, classId, isTA)
         .then((res) => {
-            //alert("Successfully dropped class!");
-            navigate("/dashboard");
-          
+          //alert("Successfully dropped class!");
+          navigate("/dashboard");
+
         });
     }
   };
@@ -297,7 +297,7 @@ const ClassDetails = () => {
                         Manage Students
                       </button>
                       <button
-                        className="border border-red-500 border-solid relative bg-red-400 hover:bg-red-500 text-black font-bold py-2 px-4 mr-2 !ml-2 rounded"
+                        className="relative bg-red-400 hover:bg-red-500 text-black font-bold py-2 px-4 mr-2 !ml-2 rounded"
                         onClick={() => {
                           deleteClass()
                         }}
@@ -315,7 +315,7 @@ const ClassDetails = () => {
                         Classmates
                       </button>
                       <button
-                        className="border border-red-500 border-solid relative bg-red-400 hover:bg-red-500 font-bold py-2 px-4 mr-2 rounded !ml-2 "
+                        className="relative bg-red-400 hover:bg-red-500 font-bold py-2 px-4 mr-2 rounded !ml-2 "
                         onClick={() => {
                           dropClass()
                         }}
@@ -407,8 +407,12 @@ const ClassDetails = () => {
                     })
                     .sort((a, b) => b.isOHNow - a.isOHNow)
                     .map(({ _id, firstName, lastName, isOHNow, formattedSchedule, hasScheduledHours }) => (
-                      <div key={_id} className="p-6 bg-indigo-50 rounded-lg shadow-xl flex flex-col justify-center items-center">
-                        <h3 className="text-xl font-bold mb-4">{user?._id === _id ? <Link to={`/me`}>{"You!"}</Link> : <Link to={`/users/${_id}`}>{firstName} {lastName}</Link>}</h3>
+                      <div key={_id} className="hover:bg-indigo-100 p-6 bg-indigo-50 rounded-lg shadow-xl flex flex-col justify-center items-center">
+                        <div className="text-center">
+                          <div className="overflow-x-scroll" style={{ width: '10rem' }}>
+                            <h3 className="text-xl font-bold mb-4">{user?._id === _id ? <Link to={`/me`}>{"You!"}</Link> : <Link to={`/users/${_id}`}>{firstName} {lastName}</Link>}</h3>
+                          </div>
+                        </div>
                         {hasScheduledHours ? (
                           <div className="text-center mb-4">
                             <p className="font-semibold">Office Hours:</p>
@@ -429,23 +433,20 @@ const ClassDetails = () => {
                         )}
                         {isOHNow && (
                           <button
-                            className="mt-auto bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out"
+                            className="mt-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out"
                             value={_id}
                             onClick={rerouteToClassroom}
                           >
-                            {user?._id === _id ? "Your Classroom" : 'Join Office Hours Now'}
+                            {user?._id === _id ? "Your Classroom" : 'Join Office Hours'}
                           </button>
                         )}
                       </div>
+
                     ))}
                 </div>
 
 
               </div>
-
-
-
-
 
               <SimpleModal isOpen={isModalOpen} close={toggleModal}>
                 <div className="bg-white p-6 rounded-lg shadow-lg space-y-6">
