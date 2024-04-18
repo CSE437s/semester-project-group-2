@@ -93,6 +93,10 @@ const UserDetails = () => {
         updateUserInfo();
     };
 
+    const handleEditIconClick = () => {
+        setEditingFirstName(true);
+    };
+
     // const uploadProfilePicture = async (e) => {
     //     const photo = e.target.files[0]
     //     const renamedPhoto = new File([photo], cleanFileName(photo.name), { type: photo.type });
@@ -214,7 +218,8 @@ const UserDetails = () => {
                 <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
                     <h1 className="text-3xl font-bold text-center mb-4 flex justify-center items-center gap-3">
 
-                        <img src="/edit_icon.png" alt="Logo" className="h-5 w-auto" />
+                    <img src="/edit_icon.png" alt="Logo" className="h-5 w-auto cursor-pointer" onClick={handleEditIconClick} />
+
 
                         {editingFirstName ? (
                             <input
@@ -230,7 +235,7 @@ const UserDetails = () => {
                             <span
 
                                 onClick={() => setEditingFirstName(true)}
-                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 cursor-pointer"
+                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 cursor-pointer overflow-hidden"
                             >
                                 {firstName}
 
@@ -249,7 +254,7 @@ const UserDetails = () => {
                         ) : (
                             <span
                                 onClick={() => setEditingLastName(true)}
-                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 cursor-pointer"
+                                className="text-3xl font-bold text-center hover:border hover:border-indigo-500 hover:bg-indigo-100 cursor-pointer overflow-hidden"
                             >
                                 {lastName}</span>
                         )}
@@ -343,32 +348,6 @@ const UserDetails = () => {
                                 />
 
                             </button>
-                        </div>
-
-                        {/* dropdown menu */}
-                        <div className={`origin-top-right absolute right-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none ${dropdownOpen ? "block" : "hidden"}`} role="menu" aria-orientation="vertical">
-                            <div className="py-1" role="none">
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("#F0C9E0");
-                                    saveBackgroundColor("#F0C9E0");
-                                }} role="menuitem">Pink</button>
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("#3F66DC");
-                                    saveBackgroundColor("#3F66DC");
-                                }} role="menuitem">Blue</button>
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("#BDABDA");
-                                    saveBackgroundColor("#BDABDA");
-                                }} role="menuitem">Purple</button>
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("#C6C6C6");
-                                    saveBackgroundColor("#C6C6C6");
-                                }} role="menuitem">Grey</button>
-                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
-                                    setBackgroundColor("#F6F6F6");
-                                    saveBackgroundColor("#F6F6F6");
-                                }} role="menuitem">White</button>
-                            </div>
                         </div>
                     </div>
                     {/* )} */}
