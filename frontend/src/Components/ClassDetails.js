@@ -297,12 +297,12 @@ const ClassDetails = () => {
                         Manage Students
                       </button>
                       <button
-                        className="relative bg-red-400 hover:bg-red-500 text-black font-bold py-2 px-4 mr-2 !ml-2 rounded"
+                        className="relative border border-red-400 hover:bg-red-400 text-black font-bold py-2 px-4 mr-2 !ml-2 rounded"
                         onClick={() => {
                           deleteClass()
                         }}
                       >
-                        X
+                        Delete Class
                       </button>
                     </div>
                   ) : (
@@ -315,18 +315,16 @@ const ClassDetails = () => {
                         Classmates
                       </button>
                       <button
-                        className="relative bg-red-400 hover:bg-red-500 font-bold py-2 px-4 mr-2 rounded !ml-2 "
+                        className="relative border border-red-400 hover:bg-red-400 font-bold py-2 px-4 mr-2 rounded !ml-2 "
                         onClick={() => {
                           dropClass()
                         }}
                       >
-                        X
+                        Drop Class
                       </button>
                     </div>
                   )}
                 </div>
-
-
 
                 <p className="text-lg mb-4 text-gray-700 mt-4">{classDetails.classDescription}</p>
                 <div className="">

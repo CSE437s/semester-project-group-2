@@ -136,7 +136,7 @@ const Dashboard = () => {
     <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
       <Header user={user} showSetOfficeHours={false} />
 
-      <div className="font-mono container mx-auto sm:px-4 p-0 pt-10 ">
+      <div className="font-mono container mx-auto sm:px-4 p-0 pt-10 pb-2">
 
         {/* Display user's classes */}
 
