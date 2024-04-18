@@ -42,7 +42,7 @@ const ClassroomSettings = () => {
     return (<>
     {showForm === true ? 
     <>
-        <button onClick={()=>setShowForm(!showForm)} className="hover:animate-spin-short absolute right-5 bg-settings p-6 bg-no-repeat bg-cover m-2"></button>
+        <button onClick={()=>setShowForm(!showForm)} className="hover:animate-spin-short bg-settings p-6 bg-no-repeat bg-cover m-2"></button>
         <form onSubmit={handleSettingsChange} className="w-fit bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-8 bg-indigo-200">
             <div>
                 <label htmlFor="queue">Enable Queue</label>

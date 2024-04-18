@@ -208,7 +208,7 @@ const UserDetails = () => {
     }
 
     return (
-        <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen pb-5" style={{ backgroundColor: backgroundColor }}>
+        <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen pb-10" style={{ backgroundColor: backgroundColor }}>
             <Header user={user} />
 
 
