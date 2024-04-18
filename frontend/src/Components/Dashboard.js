@@ -147,7 +147,7 @@ const Dashboard = () => {
                 const coursesAsRole = userClasses[role];
                 return coursesAsRole.map((course) => (
                   <Link key={course._id} to={`/class/${course._id}`} className="">
-                    <div className="p-4 bg-indigo-300 mb-6 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48 hover:bg-indigo-400">
+                    <div className="p-4 bg-indigo-300 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48 hover:bg-indigo-400">
                       <div>
                         <h3 className="font-bold text-lg mb-2">{course.className}</h3>
                         <p className="text-gray-700 flex-grow">{course.classDescription}</p>
@@ -164,7 +164,7 @@ const Dashboard = () => {
         </div>
 
         {!isLoading && user.role === "instructor" ? (
-          <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-300 rounded-lg shadow-md">
+          <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-300 rounded-lg shadow-md mt-6">
             <label htmlFor="classCode" className="mr-2 font-bold mb-2">
               Create A Class:
             </label>
@@ -172,14 +172,14 @@ const Dashboard = () => {
               <input
                 className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mr-2 mb-2"
                 type="text"
-                placeholder="Class Name"
+                placeholder="CSE131"
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
               />
               <input
                 className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mr-2 mb-2"
                 type="text"
-                placeholder="Class Description"
+                placeholder="Intro to Comp Sci"
                 value={classDescription}
                 onChange={(e) => setClassDescription(e.target.value)}
               />
@@ -187,7 +187,7 @@ const Dashboard = () => {
                 id="classCode"
                 className="hover:bg-gray-100 bg-gray-50 border border-gray-300 p-2 rounded block mr-2 mb-2"
                 type="text"
-                placeholder="Class Code"
+                placeholder="Join Code"
                 value={classCode}
                 onChange={(e) => setClassCode(e.target.value)}
               />
@@ -205,7 +205,7 @@ const Dashboard = () => {
 
 
         {!isLoading && user.role === "student" ? (
-          <form onSubmit={handleJoinClassSubmit} className="mb-6 p-4 bg-indigo-300 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
+          <form onSubmit={handleJoinClassSubmit} className="mb-6 mt-6 p-4 bg-indigo-300 rounded-lg shadow-md mb-6 flex items-center font-mono p-5 bg-indigo-200">
             <label htmlFor="joinClassCode" className="mr-2 font-bold flex-wrap shrink">
               Join a Class:
             </label>
@@ -213,7 +213,7 @@ const Dashboard = () => {
               id="joinClassCode"
               className="hover:bg-gray-100 grow bg-gray-50 border border-gray-300 p-2 rounded block mr-2 max-w-48 w-1/2"
               type="text"
-              placeholder="Code"
+              placeholder="Join Code"
               value={joinClassCode}
               onChange={(e) => setJoinClassCode(e.target.value)}
             />
