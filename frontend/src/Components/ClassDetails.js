@@ -440,6 +440,11 @@ const ClassDetails = () => {
                             {user?._id === _id ? "Your Classroom" : 'Join Office Hours'}
                           </button>
                         )}
+
+                        {!isOHNow && (
+                          <h2 className="mt-auto bg-red-400 text-indigo-50 font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out">Office Hours Closed</h2>
+                        )}
+
                       </div>
 
                     ))}
