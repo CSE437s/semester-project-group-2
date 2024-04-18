@@ -297,7 +297,7 @@ const ClassDetails = () => {
                         Manage Students
                       </button>
                       <button
-                        className="border border-indigo-500 border-solid relative hover:bg-indigo-500 text-black font-bold py-2 px-4 mr-2 !ml-2 rounded"
+                        className="border border-red-500 border-solid relative bg-red-400 hover:bg-red-500 text-black font-bold py-2 px-4 mr-2 !ml-2 rounded"
                         onClick={() => {
                           deleteClass()
                         }}
@@ -315,7 +315,7 @@ const ClassDetails = () => {
                         Classmates
                       </button>
                       <button
-                        className="border border-indigo-500 border-solid relative hover:bg-indigo-500 font-bold py-2 px-4 mr-2 rounded !ml-2 "
+                        className="border border-red-500 border-solid relative bg-red-400 hover:bg-red-500 font-bold py-2 px-4 mr-2 rounded !ml-2 "
                         onClick={() => {
                           dropClass()
                         }}
