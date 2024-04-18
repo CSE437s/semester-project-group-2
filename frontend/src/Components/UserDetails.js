@@ -15,7 +15,6 @@ const UserDetails = () => {
     const [lastName, setLastName] = useState("");
     const [editingFirstName, setEditingFirstName] = useState(false);
     const [editingLastName, setEditingLastName] = useState(false);
-    const [dropdownOpen, setDropdownOpen] = useState(false); //dropdown for color theme
 
     const [backgroundColor, setBackgroundColor] = useState("");
     //const [isTA, setIsTA] = useState(false);
@@ -48,25 +47,6 @@ const UserDetails = () => {
         } catch (error) {
             console.error("Error updating bio:", error);
             alert("Failed to update bio. Please try again.");
-        }
-    };
-
-
-    const toggleDropdown = () => {
-        setDropdownOpen(!dropdownOpen);
-    };
-
-    const saveBackgroundColor = async (color) => {
-        try {
-            await updateColor(color);
-
-            setDropdownOpen(false);
-            setBackgroundColor(color);
-            document.getElementById('userDetailsContainer').style.backgroundColor = color;
-
-        } catch (error) {
-            console.error("Error saving background color:", error);
-            alert("Failed to save background color. Please try again.");
         }
     };
 
