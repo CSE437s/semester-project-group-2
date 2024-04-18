@@ -9,7 +9,6 @@ const ProfilePage = () => {
     const [backgroundColor, setBackgroundColor] = useState("white"); 
 
     useEffect(() => {
-
         findUser(userId)
             .then((userData) => {
                 setUser(userData);
@@ -40,10 +39,9 @@ const ProfilePage = () => {
                                 <p className="text-black font-semibold">Bio:</p>
                             </div>
                             <div>
-                                <p className="text-gray-700">{user.bio || 'No bio available'}</p>
+                                <p className="text-gray-700 break-all">{user.bio || 'No bio available'}</p>
                             </div>
                         </div>
-
                     </div>
                 )}
             </div>

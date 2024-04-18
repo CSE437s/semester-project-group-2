@@ -122,7 +122,7 @@ const ClassDetails = () => {
                   if (instructor) {
                     setInstructorId(instructor._id);
                     setInstructorName(instructor.firstName + " " + instructor.lastName);
-                    setIsLoading(false); // Set loading to false after all async operations are complete
+                    setIsLoading(false);
                   }
                 }).catch(error => {
                   console.error("Error fetching instructor details: ", error);
@@ -289,7 +289,7 @@ const ClassDetails = () => {
                 <div className="flex justify-between items-center">
                   <h1 className="text-3xl font-bold">{classDetails.className}</h1>
                   {isInstructor ? (
-                    <div className="flex space-x-4"> {/* Wrap buttons in a flex container */}
+                    <div className="flex space-x-4">
                       <button
                         className="border border-indigo-500 border-solid relative hover:bg-indigo-500 text-black font-bold py-2 px-4 rounded transition duration-300 flex items-center"
                         onClick={toggleModal}
@@ -306,7 +306,7 @@ const ClassDetails = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="flex space-x-4"> {/* Wrap buttons in a flex container */}
+                    <div className="flex space-x-4">
                       <button
                         className="border border-indigo-500 border-solid relative hover:bg-indigo-500 text-black font-bold py-2 px-4 rounded transition duration-300 flex items-center"
                         onClick={toggleModal}
@@ -334,12 +334,7 @@ const ClassDetails = () => {
                   <p className="text-gray-700 mb-6">{instructorName}</p>
 
                 </div>
-
-
-
-
               </div>
-
 
               {/* TAs */}
               <div className="bg-indigo-300 rounded-lg shadow-xl mb-8 p-10">
@@ -410,7 +405,7 @@ const ClassDetails = () => {
                       <div key={_id} className="hover:bg-indigo-100 p-6 bg-indigo-50 rounded-lg shadow-xl flex flex-col justify-center items-center">
                         <div className="text-center">
                           <div className="overflow-x-scroll" style={{ width: '10rem' }}>
-                            <h3 className="text-xl font-bold mb-4">{user?._id === _id ? <Link to={`/me`}>{"You!"}</Link> : <Link to={`/users/${_id}`}>{firstName} {lastName}</Link>}</h3>
+                            <h3 className="text-xl font-bold mb-4 hover:underline">{user?._id === _id ? <Link to={`/me`}>{"You!"}</Link> : <Link to={`/users/${_id}`}>{firstName} {lastName}</Link>}</h3>
                           </div>
                         </div>
                         {hasScheduledHours ? (

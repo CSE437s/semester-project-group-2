@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, updateUserName, updateUserBio, updateUserBGColor } from "../UserUtils";
 import Header from "./Header";
+import { useRef } from "react";
 
 const UserDetails = () => {
 
@@ -31,12 +32,19 @@ const UserDetails = () => {
     //     })
     // }
 
+    const bioRef = useRef(null);
+
+    const adjustHeight = (event) => {
+        const textarea = event.target;
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    };
+
     const handleBioBlur = async () => {
         try {
             console.log(bio);
             setEditingBio(false);
             updateBio();
-
 
         } catch (error) {
             console.error("Error updating bio:", error);
@@ -52,17 +60,17 @@ const UserDetails = () => {
     const saveBackgroundColor = async (color) => {
         try {
             await updateColor(color);
-    
+
             setDropdownOpen(false);
             setBackgroundColor(color);
             document.getElementById('userDetailsContainer').style.backgroundColor = color;
-            
+
         } catch (error) {
             console.error("Error saving background color:", error);
             alert("Failed to save background color. Please try again.");
         }
     };
-    
+
 
     const handleFirstNameBlur = () => {
         setEditingFirstName(false);
@@ -93,6 +101,8 @@ const UserDetails = () => {
     //     }).catch(e => console.log(e));
     // }
 
+
+
     useEffect(() => {
         if (currentToken) {
             getCurrentUser().then(u => {
@@ -106,20 +116,20 @@ const UserDetails = () => {
                     //setIsTA(user.isTA || false);
                     setBio(user.bio || '');
                     setBackgroundColor(user.bg_color || 'white');
-                   
+
                     document.getElementById('userDetailsContainer').style.backgroundColor = user.bg_color || 'white';
-                   
+
                 }
             }).catch((error) => {
                 console.log(error);
-                
+
             });
-            
+
         }
         else {
             navigate("/login")
         }
-    
+
     }, [navigate, currentToken]);
 
 
@@ -168,7 +178,7 @@ const UserDetails = () => {
 
     const updateColor = async (color) => {
         try {
-            
+
             updateUserBGColor(user._id, color).then(res => {
                 console.log(res)
                 if (res === true) {
@@ -183,7 +193,7 @@ const UserDetails = () => {
     }
 
     return (
-        <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen" style={{backgroundColor: backgroundColor}}>
+        <div id="userDetailsContainer" className="font-mono flex flex-col min-h-screen pb-8" style={{ backgroundColor: backgroundColor }}>
             <Header user={user} />
 
 
@@ -256,31 +266,35 @@ const UserDetails = () => {
                 </div>
 
                 {/* {isTA && ( */}
-                <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg h-40">
+                <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg flex flex-col">
                     <div className="flex">
                         <div className="mr-4">
                             <p className="text-black font-semibold">Bio:</p>
                         </div>
-                        <div>
+                        <div className="flex-grow rounded-lg hover:bg-indigo-100">
                             {editingBio ? (
-                                <input
+                                <textarea
+                                    ref={bioRef}
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
                                     onBlur={handleBioBlur}
+                                    onFocus={adjustHeight}
+                                    onInput={adjustHeight}
                                     autoFocus
-                                    className="text-gray-700"
-                                    style={{ border: 'none', width: '100%', maxWidth: '500px', overflow: 'hidden' }}
+                                    className="rounded-lg bg-indigo-100 text-gray-700 w-full resize-none border-none outline-none"
+                                    style={{ overflow: 'hidden' }}
                                 />
                             ) : (
-                                <p className="text-gray-700" onClick={() => setEditingBio(true)}>
+                                <p className="text-gray-700 break-all" onClick={() => setEditingBio(true)}>
                                     {bio || 'Click to add a bio'}
                                 </p>
                             )}
                         </div>
                     </div>
                 </div>
+
                 {/* )} */}
-                
+
 
                 <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
                     <div className="flex items-center">
@@ -301,7 +315,7 @@ const UserDetails = () => {
                         Reset Password
                     </button>
 
-                    {/* Dropdown button */}
+                    {/* dropdown button */}
 
                     {/* {isTA && ( */}
                     <div className="relative inline-block text-left">
@@ -318,18 +332,18 @@ const UserDetails = () => {
                             </button>
                         </div>
 
-                        {/* Dropdown menu */}
+                        {/* dropdown menu */}
                         <div className={`origin-top-right absolute right-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none ${dropdownOpen ? "block" : "hidden"}`} role="menu" aria-orientation="vertical">
                             <div className="py-1" role="none">
                                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
                                     setBackgroundColor("pink");
                                     saveBackgroundColor("pink");
                                 }} role="menuitem">Pink</button>
-                               <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
+                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
                                     setBackgroundColor("blue");
                                     saveBackgroundColor("blue");
                                 }} role="menuitem">Blue</button>
-                               <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
+                                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => {
                                     setBackgroundColor("purple");
                                     saveBackgroundColor("purple");
                                 }} role="menuitem">Purple</button>
