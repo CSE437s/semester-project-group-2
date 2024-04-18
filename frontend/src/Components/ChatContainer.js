@@ -15,7 +15,6 @@ import { getCurrentUser} from "../UserUtils";
 // import { ChatBoxSender } from "./ChatBox";
 // import InputText from "./InputText";
 
-
 export default function ChatContainer(props) {
     const currentToken = localStorage.getItem("token");
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;;
@@ -57,8 +56,6 @@ export default function ChatContainer(props) {
         }
         return () => socketio.disconnect()
     }, [userId, name, currentToken, socketio]);
-
-  
  
     function sendChatToSocket(chat) {
         socketio.emit("chat", chat )
@@ -81,7 +78,6 @@ export default function ChatContainer(props) {
             }
         });
     }
-    
 
   return (
     <div className="container mx-auto px-4 py-8 bg-indigo-200 rounded-lg shadow-md rounded px-8 pt-6 pb-8 mb-4 bg-indigo-200 overflow-y-scroll" style={{width: props.width, height: props.height}}>

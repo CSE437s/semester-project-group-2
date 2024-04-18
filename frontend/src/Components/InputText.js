@@ -13,13 +13,13 @@ export default function InputText({ addMessage }) {
     return (
         <div className="flex justify-center items-center">
             <textarea
-                className="w-3/5 rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm focus:outline-none text-gray-700 py-2 px-4 block"
+                className="w-4/5 h-12 rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm focus:outline-none text-gray-700 py-2 px-4 block"
                 placeholder="Write something..."
                 value={message}
                 onChange={e => setMessage(e.target.value)}
             ></textarea>
             <button
-                className="ml-5 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                className="ml-2 bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
                 onClick={addAMessage}
             >
                 Enter
