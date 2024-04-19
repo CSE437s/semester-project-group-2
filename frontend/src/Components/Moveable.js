@@ -61,7 +61,7 @@ const Moveable = (props) => {
             } 
             else {
                 setSpecs({
-                    width: specs.width,
+                    width: specs.width, 
                     height: specs.height,
                     x: e.clientX  - moving.x, 
                     y: e.clientY - moving.y
