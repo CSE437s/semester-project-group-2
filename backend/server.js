@@ -1258,7 +1258,29 @@ app.post("/api/getCurrentStudent", (req, res) => {
                 else {
                     const student = studentsBeingHelped.get(id)
                     res.status(200).send({currentStudent: student.user})
+                    // studentsBeingHelped.delete(id)
                 }
+            }
+        }
+    })(req, res)
+})
+
+app.post("/api/removeCurrentStudent", (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            console.log(error)
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            if(studentsBeingHelped.has(req.body.TAid) === true) {
+                studentsBeingHelped.delete(req.body.TAid)
+                res.sendStatus(200)
+            }   
+            else {
+                res.sendStatus(500)
             }
         }
     })(req, res)

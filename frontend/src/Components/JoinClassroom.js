@@ -31,7 +31,7 @@ const JoinClassroom = () => {
                     return 
                 }
                 const user2 = getUser.data.user
-                if(user2._id === TAid || (newSettings.queueEnabled === false && newSettings.passwordEnabled === false)) {
+                if(user2._id === TAid || (user2.role === "instructor" && newSettings.instructorsAllowed === true) || (newSettings.queueEnabled === false && newSettings.passwordEnabled === false)) {
                     navigate(`/classrooms/${TAid}`)
                 }
                 else if(newSettings.queueEnabled === false) {

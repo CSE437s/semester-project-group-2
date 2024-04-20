@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { getCurrentUser, getNextStudentInLine, getQueue } from "../UserUtils"
+import { getCurrentUser, getNextStudentInLine, getQueue, removeCurrentStudent } from "../UserUtils"
 import { io } from "socket.io-client"
 
 

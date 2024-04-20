@@ -64,7 +64,7 @@ const Signup = () => {
                     <Link to="/home">
                         <div className="flex items-center">
                             <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2" />
-                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OH</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OFFICE HOURS</h1>
                         </div>
                     </Link>
                 </div>
@@ -72,7 +72,9 @@ const Signup = () => {
             <div className="border-0.5 border-gray-800 border-solid relative" >
             
                </div>
-            <div className="flex justify-center mt-6 p-10 pb-4 bg-indigo-50 ">
+               <h1 className="pt-5 text-2xl text-center font-bold text-indigo-900 font-mono">Create an Account</h1>
+
+            <div className="flex justify-center pt-5 p-10 pb-4 bg-indigo-50 ">
                 <form onSubmit={handleSignup} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-300">
                     <div className="mb-4">
                         <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="firstName">
@@ -156,7 +158,7 @@ const Signup = () => {
                 </form>
             </div>
             <div className="flex justify-center sm:flex-row flex-col text-center">
-                Already have an account? <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-800 ml-2 mr-2  md:text-base">Log in</Link>
+                Already have an account? <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-800 ml-2 mr-2  md:text-base">Sign in</Link>
             </div>
 
         </div>

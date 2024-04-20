@@ -42,7 +42,8 @@ const Header = (props) => {
                     <Link to="/home">
                         <div className="flex items-center">
                             <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2 pl-10" />
-                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OH</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OFFICE HOURS</h1> 
+                            {/* deeply sorry but the OH abbreviation was driving me crazy */}
                         </div>
                     </Link>
 

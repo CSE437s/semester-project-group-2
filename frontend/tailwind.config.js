@@ -9,7 +9,8 @@ module.exports = {
         "eraser": "url('../public/eraser.svg')",
         "clear": "url('../public/clear.svg')",
         "resize": "url('../public/resize.svg')",
-        "settings": "url('../public/settings.svg')"
+        "settings": "url('../public/settings.svg')",
+        "edit": "url('../public/edit_icon.png')"
       },
       borderWidth: {
         '0.5': '0.5px',
