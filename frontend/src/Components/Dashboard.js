@@ -121,6 +121,18 @@ const Dashboard = () => {
     });
   };
 
+  useEffect(() => {
+    getPendingInstructors().then(instructors => {
+      setPendingInstructors(instructors || []);
+      console.log(instructors)
+      setIsLoading(false);
+    }).catch(error => {
+      console.error('Failed to fetch instructors:', error);
+      setIsLoading(false);
+    });
+  }, []);
+
+
   const handleSelectInstructor = (userId) => {
     setSelectedInstructors(prev => {
       if (prev.includes(userId)) {
@@ -225,7 +237,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {
               ["TA", "instructor", "student"].map((role) => {
-                const coursesAsRole = userClasses[role];
+                const coursesAsRole = userClasses[role] || [];
                 return coursesAsRole.map((course) => (
                   <Link key={course._id} to={`/class/${course._id}`} className="">
                     <div className="p-4 bg-indigo-300 rounded-lg shadow-lg p-4 flex flex-col justify-between h-48 hover:bg-indigo-400">
@@ -244,7 +256,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {!isLoading && user.role === "instructor" && user.status === 'approved' ? (
+        {!isLoading && user.role === "instructor"  ? (
+          user.status === 'approved'?(
             <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-300 rounded-lg shadow-md">
               <label htmlFor="classCode" className="mr-2 font-bold mb-2">
                 Create A Class:
@@ -282,11 +295,11 @@ const Dashboard = () => {
 
             </form>
 
-          ) : <div className="text-center my-6">
+          ) : (<div className="text-center my-6">
           <p>Your instructor account is currently awaiting approval.</p>
           <p>You will be able to create classes once your account has been approved.</p>
           <p>Please check back later, or contact an administrator if you have any questions.</p>
-        </div>}
+        </div>)): null}
 
 
 
