@@ -27,13 +27,15 @@ const Signup = () => {
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        const s = role === "student" ? "approved" : "pending";
+        console.log(s)
         axios.post(url + "/api/signup", {
             "email": email,
             "password": password,
             "firstName": firstName,
             "lastName": lastName,
             "role": role,
-            "status": "approved" // TODO create approval system and remove hard coded value
+            "status": s
         }, {
             headers: {
                 "ngrok-skip-browser-warning": true
@@ -51,6 +53,7 @@ const Signup = () => {
             }
         }).catch(e => console.log(e))
     };
+
 
     // if (checkingAuth) {
     //     return <div>Loading...</div>;

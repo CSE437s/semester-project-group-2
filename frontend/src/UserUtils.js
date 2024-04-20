@@ -143,6 +143,49 @@ export function findUser(userId) {
     }).catch(e => null)
 }
 
+export function getPendingInstructors() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        return null;
+    }
+    return axios.post(url + "/api/pending", {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(res => {
+        if (res.data && res.data.users) {
+            return res.data.users;
+        }
+        return [];
+    }).catch(e => {
+        console.error(e);
+        return [];
+    });
+}
+
+export function approveInstructor(userId) {
+    const token = localStorage.getItem("token")
+    if (!token) {
+        return null
+    }
+    return axios.post(url + "/api/approve", {
+        userId: userId,
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(res => {
+        if (res.status === 200) {
+            return true
+        }
+        else {
+            return false
+        }
+    }).catch(e => false)
+}
+
 /**
  * get all of the hours objects associated with a user 
  * @param  userId 

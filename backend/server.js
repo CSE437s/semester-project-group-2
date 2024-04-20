@@ -294,6 +294,34 @@ app.post("/api/findUser", (req, res) => {
     })(req, res)
 })
 
+app.post("/api/pending", (req, res) => {
+   
+    userModel.find({status: "pending"}).then(users => {
+        if (users && users.length > 0) {
+            res.status(200).send({ users: users });
+        } else {
+            res.status(404).send({ message: "No pending instructors found" });
+        }
+    }).catch(e => res.status(500).send({ error: e }));
+}
+
+)
+
+app.post("/api/approve", (req, res) => {
+
+    const userId = req.body.userId;
+    userModel.findByIdAndUpdate(userId, { status: "approved" } )
+        .then(updatedUser => {
+            if (updatedUser) {
+                res.status(200).send({ message: "Instructor approved successfully", user: updatedUser });
+            } else {
+                res.status(404).send({ message: "User not found" });
+            }
+        }).catch(e => res.status(500).send({ error: e }))
+}
+
+)
+
 app.post("/api/userClasses", (req, res) => {
     passport.authenticate("jwt", { session: false }, (error, user) => {
         if (error) {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import LogoutButton from "./LogoutButton";
+import LogoutButton from "./LogoutButton";
 import { Link } from "react-router-dom";
-import { getCurrentUser, getEnrolledCourses, logout } from "../UserUtils"
+import { getCurrentUser, getEnrolledCourses, logout,getPendingInstructors, approveInstructor  } from "../UserUtils"
 import { createClass, joinClass } from "../ClassUtils"
 import Header from "./Header";
 
@@ -16,6 +16,9 @@ const Dashboard = () => {
   const [userClasses, setUserClasses] = useState([]);
   const [user, setUser] = useState(null)
   const currentToken = localStorage.getItem("token")
+  const [pendingInstructors, setPendingInstructors] = useState([]);
+  const [selectedInstructors, setSelectedInstructors] = useState([]);
+
   console.log(userClasses)
   useEffect(() => {
     if (!user) {
@@ -118,6 +121,34 @@ const Dashboard = () => {
     });
   };
 
+  const handleSelectInstructor = (userId) => {
+    setSelectedInstructors(prev => {
+      if (prev.includes(userId)) {
+        return prev.filter(id => id !== userId);
+      } else {
+        return [...prev, userId];
+      }
+    });
+  };
+  console.log("selectedInstructors")
+
+  console.log(selectedInstructors)
+
+  const handleApproveSelected = () => {
+  if (window.confirm("Are you sure you want to approve the selected instructors?")) {
+    console.log("selectedInstructors")
+    console.log(selectedInstructors)
+
+    Promise.all(selectedInstructors.map(userId => approveInstructor(userId)))
+      .then(results => {
+        console.log('All selected instructors approved:', results);
+        window.location.reload();
+      }).catch(error => {
+        console.error('Error approving instructors:', error);
+      });
+  }
+};
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -131,7 +162,57 @@ const Dashboard = () => {
     );
   }
 
+  if (!isLoading && user && pendingInstructors && user.role === 'admin') {
+    return (
+      <div className="font-mono bg-indigo-50 min-h-screen text-gray-800">
+        <header className="bg-indigo-50 py-5 shadow-md">
+          <div className="container mx-auto flex justify-between items-center px-10">
+            <div className="flex items-center">
+              <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-3" />
+              <h1 className="text-3xl font-bold text-gray-900">ONLINE OH</h1>
+            </div>
+            <LogoutButton />
+          </div>
+        </header>
 
+        <div className="container mx-auto mt-8 px-10">
+          <h1 className="text-2xl font-bold mb-6 text-center">Pending Instructors Approval</h1>
+          <div className="flex flex-wrap justify-center">
+            {pendingInstructors.length > 0 ? (
+              pendingInstructors.map(instructor => (
+                <div key={instructor._id} className="p-4 bg-white-100 border rounded m-4 w-64 shadow-md">
+                  <div className="flex flex-col">
+                    <span className="text-md font-bold mb-1">{instructor.firstName} {instructor.lastName}</span>
+                    <span className="text-sm text-gray-500">{instructor.email}</span>
+                    <label className="mt-2">
+                      <input
+                        type="checkbox"
+                        className="form-checkbox"
+                        checked={selectedInstructors.includes(instructor._id)}
+                        onChange={() => handleSelectInstructor(instructor._id)}
+                      />
+                    </label>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center w-full">No pending instructors to approve.</p>
+            )}
+          </div>
+          <div className="text-center mt-6">
+            <button
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded transition-colors duration-300"
+              onClick={handleApproveSelected}
+            >
+              Approve Selected
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoading && user && userClasses && user.role !== 'admin') {
   return (
     <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
       <Header user={user} showSetOfficeHours={false} />
@@ -163,45 +244,50 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {!isLoading && user.role === "instructor" ? (
-          <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-300 rounded-lg shadow-md mt-6">
-            <label htmlFor="classCode" className="mr-2 font-bold mb-2">
-              Create A Class:
-            </label>
-            <div className="flex flex-wrap">
-              <input
-                className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mr-2 mb-2"
-                type="text"
-                placeholder="CSE131"
-                value={className}
-                onChange={(e) => setClassName(e.target.value)}
-              />
-              <input
-                className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mr-2 mb-2"
-                type="text"
-                placeholder="Intro to Comp Sci"
-                value={classDescription}
-                onChange={(e) => setClassDescription(e.target.value)}
-              />
-              <input
-                id="classCode"
-                className="hover:bg-gray-100 bg-gray-50 border border-gray-300 p-2 rounded block mr-2 mb-2"
-                type="text"
-                placeholder="Join Code"
-                value={classCode}
-                onChange={(e) => setClassCode(e.target.value)}
-              />
-              <button
-                className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mb-2"
-                type="submit"
-              >
-                +
-              </button>
-            </div>
+        {!isLoading && user.role === "instructor" && user.status === 'approved' ? (
+            <form onSubmit={handleCreateClassSubmit} className="mb-6 flex flex-wrap items-center font-mono p-4 bg-indigo-300 rounded-lg shadow-md">
+              <label htmlFor="classCode" className="mr-2 font-bold mb-2">
+                Create A Class:
+              </label>
+              <div className="flex flex-wrap">
+                <input
+                  className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mr-2 mb-2"
+                  type="text"
+                  placeholder="Class Name"
+                  value={className}
+                  onChange={(e) => setClassName(e.target.value)}
+                />
+                <input
+                  className="hover:bg-gray-100 border border-gray-300 p-2 rounded block mr-2 mb-2"
+                  type="text"
+                  placeholder="Class Description"
+                  value={classDescription}
+                  onChange={(e) => setClassDescription(e.target.value)}
+                />
+                <input
+                  id="classCode"
+                  className="hover:bg-gray-100 bg-gray-50 border border-gray-300 p-2 rounded block mr-2 mb-2"
+                  type="text"
+                  placeholder="Class Code"
+                  value={classCode}
+                  onChange={(e) => setClassCode(e.target.value)}
+                />
+                <button
+                  className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mb-2"
+                  type="submit"
+                >
+                  +
+                </button>
+              </div>
 
-          </form>
+            </form>
 
-        ) : null}
+          ) : <div className="text-center my-6">
+          <p>Your instructor account is currently awaiting approval.</p>
+          <p>You will be able to create classes once your account has been approved.</p>
+          <p>Please check back later, or contact an administrator if you have any questions.</p>
+        </div>}
+
 
 
         {!isLoading && user.role === "student" ? (
@@ -237,6 +323,6 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
+}};
 
 export default Dashboard;
