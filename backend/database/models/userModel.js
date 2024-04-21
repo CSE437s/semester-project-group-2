@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    profilePicture: {
+      type: String,
+      required: false,
+      default: "http://res.cloudinary.com/dp1gbz22c/image/upload/v1713675474/uyebpvdnwrqarka6k9m1.png"
+    },
     password: {
       type: String, 
       required: true,

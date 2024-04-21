@@ -1,0 +1,41 @@
+input[type='file'] {
+    color: transparent;
+}
+
+#file-upload {
+    border-style: solid;
+    position: relative;
+    height: 50px;
+    width: 50px;
+}
+
+#file-upload input { 
+     /* https://dev.to/danireptor/how-to-style-and-customize-html-file-input-in-react-54fo#:~:text=By%20using%20techniques%20such%20as,feature%20in%20your%20React%20application. */
+    /* display: block; */
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+
+}
+
+#image:hover {
+    cursor: pointer;
+}
+
+#file-upload input:hover {
+    cursor: pointer;
+    
+}
+#file-upload:hover {
+    cursor: pointer;
+}
+#file-upload-button:hover{
+    cursor: pointer;
+}
+
+#file:hover {
+    cursor:pointer;
+}
