@@ -194,8 +194,8 @@ const UserDetails = () => {
 
 
             <div id="userDetailsContainer" className="font-mono">
-                <div className="bg-indigo-200 font-mono flex-row justify-center items-center container mx-auto mt-6 p-10 rounded-lg shadow-lg">
-                    <ProfilePicture />
+                <div className="bg-indigo-200 font-mono flex-row grid grid-cols-1 justify-center items-center container mx-auto mt-6 p-10 rounded-lg shadow-lg">
+                <span className="place-self-center pb-10"><ProfilePicture isOwner={true} userId={user._id}/></span>
                     <h1 className="text-3xl font-bold text-center mb-4 flex justify-center items-center gap-3">
 
                     <img src="/edit_icon.png" alt="Logo" className="h-5 w-auto cursor-pointer" onClick={handleEditIconClick} />

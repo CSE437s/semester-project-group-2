@@ -958,7 +958,7 @@ app.post("/api/sendProfilePicture", upload.single("file"), (req, res) => {
                       if (result) {
                           successCB(result)
                       } else {
-                          failureCB(error)
+                            return;
                       }
                     }
                   );
