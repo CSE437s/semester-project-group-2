@@ -26,7 +26,7 @@ const ProfilePage = () => {
             <div className="container mx-auto px-4 py-8">
                 {user && (
                     <div className="bg-indigo-200 font-mono grid grid-cols-1 container mx-auto mt-6 p-10 rounded-lg shadow-lg">
-                        <span className="place-self-center pb-10"><ProfilePicture isOwner={false} userId={user._id}/></span>
+                        <span className="place-self-center pb-10"><ProfilePicture height={100} width={100} isOwner={false} userId={user._id}/></span>
                         <h1 className="text-3xl font-bold text-center mb-4 overflow-hidden">{user.firstName} {user.lastName}</h1>
                         <div className="flex">
                             <div className="mr-4">

@@ -6,7 +6,6 @@ const ProfilePicture = (props) => {
   const [photoURL, setPhotoURL] = useState('');
   const form = useRef()
   useEffect(() => {
-    console.log(props.userId)
     findUser(props.userId).then(user => {
       if(photoURL !== user.profilePicture) {
         setPhotoURL(user.profilePicture)
@@ -17,7 +16,6 @@ const ProfilePicture = (props) => {
   }, [photoURL]);
  
   const replacePhoto = (e) => {
-    // if(e.target.files[0].t)
     if(!e.target.files[0]) { // user exited before selecting a file
       return; 
     }
@@ -36,24 +34,26 @@ const ProfilePicture = (props) => {
 
   return (
     <>
-      {props.isOwner === true && <div id="container" onClick={() => {
-            if(form.current) {
-              form.current.click()
-          }
-        }}
-        className={`${props.isOwner === true ? "hover:cursor-pointer" : ""} z-10  w-20 h-20 absolute`}>
-      </div>
-      }
-          <img alt="profile icon" onClick={() => {
+      {props.isOwner === true && <div id="container123" onClick={() => {
             if(props.isOwner === true && form.current) {
               form.current.click()
+            } 
+        }}
+        className={`${props.isOwner === true ? "hover:cursor-pointer" : ""} z-10  absolute`} style={{height: props.height, width: props.width}}>
+      </div>
+      }
+      {photoURL !== "" && <img alt="profile icon" onClick={() => {
+          if(props.isOwner === true && form.current) {
+            form.current.click()
           }
         }
-      } id="image" className={`${props.isOwner === true ? "hover:cursor-pointer" : ""} rounded-full w-20 h-20`} src={photoURL === "" ? "../../public/default-profile.svg" : photoURL} />
-      
-      <div id="file-upload" className='z-1'>
-        <input ref={form}  id="file" type="file" onChange={replacePhoto} />
-      </div>
+        } id={props.isOwner === true ? "image" : "nothing"} className={`${props.isOwner === true ? "hover:cursor-pointer" : ""} rounded-full`} style={{height: props.height, width: props.width}} src={photoURL} />
+      }
+      {props.isOwner === true &&
+        <div id="file-upload" className='z-1'>
+          <input ref={form}  id="file" type="file" onChange={replacePhoto} />
+        </div>
+      }
     </>
   );
 };

@@ -19,10 +19,10 @@ input[type='file'] {
     z-index: -1;
 }
 
-#container:hover + #image{
+#container123:hover + #image{
     opacity: 50%;
 }
-#container:hover {
+#container123:hover {
     background-size: 30px;
     background-repeat: no-repeat;
     background-position: center;
