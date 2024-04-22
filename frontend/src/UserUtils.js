@@ -143,12 +143,13 @@ export function findUser(userId) {
     }).catch(e => null)
 }
 
-export function getPendingInstructors() {
+export function getPendingInstructors(org) {
     const token = localStorage.getItem("token");
     if (!token) {
         return null;
     }
     return axios.post(url + "/api/pending", {
+        org : org,
         headers: {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true

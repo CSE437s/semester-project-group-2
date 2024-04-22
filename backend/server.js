@@ -120,7 +120,8 @@ passport.use("signup", new Strategy({
         const last = body.lastName
         const role = body.role
         const status = body.status
-        userModel.create({ "username": email, "email": email, "password": password, "firstName": first, "lastName": last, "role": role, "status": status }).then((user) => {
+        const org = body.org
+        userModel.create({ "username": email, "email": email, "password": password, "firstName": first, "lastName": last, "role": role, "status": status, "org": org  }).then((user) => {
             return callback(null, {
                 "message": "success",
                 "user": user
@@ -296,7 +297,7 @@ app.post("/api/findUser", (req, res) => {
 
 app.post("/api/pending", (req, res) => {
    
-    userModel.find({status: "pending"}).then(users => {
+    userModel.find({status: "pending",org: req.body.org}).then(users => {
         if (users && users.length > 0) {
             res.status(200).send({ users: users });
         } else {
@@ -306,6 +307,21 @@ app.post("/api/pending", (req, res) => {
 }
 
 )
+
+app.post("/api/organizations", (req, res) => {
+    userModel.aggregate([
+        { $match: { org: { $ne: null } } }, 
+        { $group: { _id: "$org" } }
+    ]).then(orgs => {
+        if (orgs && orgs.length > 0) {
+            const organizationNames = orgs.map(org => org._id);
+            res.status(200).send({ organizations: organizationNames });
+        } else {
+            res.status(404).send({ message: "No organizations found" });
+        }
+    }).catch(e => res.status(500).send({ error: e }));
+});
+
 
 app.post("/api/approve", (req, res) => {
 

@@ -122,15 +122,22 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    getPendingInstructors().then(instructors => {
-      setPendingInstructors(instructors || []);
-      console.log(instructors)
-      setIsLoading(false);
-    }).catch(error => {
-      console.error('Failed to fetch instructors:', error);
-      setIsLoading(false);
-    });
-  }, []);
+    if (user && user.org && user.role === "admin") {
+      console.log(user.org)
+      getPendingInstructors(user.org).then(instructors => {
+        setPendingInstructors(instructors || []);
+        console.log("instructors")
+        console.log(instructors);
+        setIsLoading(false);
+      }).catch(error => {
+        console.error('Failed to fetch instructors:', error);
+        setIsLoading(false);
+      });
+    } else {
+      console.log("User or user's organization is not available.");
+      setIsLoading(false); 
+    }
+  }, [user]);
 
 
   const handleSelectInstructor = (userId) => {
