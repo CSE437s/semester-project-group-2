@@ -35,7 +35,7 @@ const Classroom = () => {
                 setSettings(sett)
             }
             if (sett === null) {
-                navigate("/login")
+                // navigate("/login")
                 return
             }
             if (currentToken && !user) {
@@ -189,7 +189,7 @@ const Classroom = () => {
                                                 <div className="text-center absolute left-20 w-max">
                                                     <div className="text-center absolute left-20 w-max">
                                                         <div className="text-center absolute left-19 w-max">
-                                                            <h1 className="mt-3 ml-5 text-xl font-mono font-bold"> {TA ? TA.firstName + "'s Classroom" : "a classroom"}</h1>
+                                                            <h1 className="mt-3 ml-5 text-xl font-mono font-bold"> {TA ? TA.firstName + "'s Classroom" : ""}</h1>
                                                         </div>
                                                     </div>
                                                 </div>
