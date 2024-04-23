@@ -178,13 +178,13 @@ const Classroom = () => {
                         }
                         setEditMode(!editMode)
                     }}> {editMode === true ? "done" : "manage widgets"}</button>
-                    {editMode === true && <button className="bg-indigo-100 hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5" onClick={() => setElements([])} > remove all </button>}
+                    {editMode === true && <button className="bg-red-300 hover:bg-red-400 rounded-lg shadow-md p-2 my-2 mx-5" onClick={() => setElements([])} > remove all </button>}
                     <br></br>
                     {editMode === true ? <span className="">
 
 
                         <div className="absolute z-50">
-                            <select className="mx-5 z-10" name="components" id="select-components" onChange={(e) => {
+                            <select className="bg-indigo-200 hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5 mx-5 z-10" name="components" id="select-components" onChange={(e) => {
                                 setNewComponentName(e.target.value)
                             }}>
                                 <option value="whiteboard">Whiteboard</option>
