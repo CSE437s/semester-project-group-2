@@ -139,7 +139,7 @@ const Header = (props) => {
                         )}
                         {window.location.href.indexOf("me") < 0 && (
                             <button
-                                className="text-gray-800 font-bold py-2 mr-10 rounded hover:text-gray-700"
+                                className="text-gray-800 font-bold py-2 mr-10 rounded hover:text-gray-600"
                                 onClick={() => navigate("/me")}
                             >
                                 My Profile
