@@ -203,7 +203,10 @@ const Classroom = () => {
                     </> : <></>}
                 </div>
 
-                {isOwner === true && <span className="z-10 absolute right-0"><ClassroomSettings /></span>}
+                { isOwner === true && <span  className="z-10 absolute pt-5 pr-5 right-0"><ClassroomSettings onChange={async ()=>{
+                    const sett = await getClassroomSettings(TAid)
+                    setSettings(sett)
+                }} /></span>}
                 {isOwner ? <>
                     <button className={`${editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200"} hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
                         if (editMode === true) {
