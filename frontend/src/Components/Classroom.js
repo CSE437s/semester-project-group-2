@@ -5,6 +5,7 @@ import Header from "./Header";
 import Moveable from "./Moveable";
 import ClassroomSettings from "./ClassroomSettings";
 import Queue from "./Queue";
+import { findUser } from "../UserUtils";
 // thank u guy from reddit for chat tutorial https://www.youtube.com/watch?v=LD7q0ZgvDs8
 
 const Classroom = () => {
@@ -17,6 +18,7 @@ const Classroom = () => {
     const { TAid } = useParams();
     const currentToken = localStorage.getItem("token");
     const [isLoading, setIsLoading] = useState(true);
+    const [TA, setTA] = useState()
 
     const navigate = useNavigate()
 
@@ -59,6 +61,11 @@ const Classroom = () => {
                     return
                 }
                 setElements(components)
+            }
+            if (!TA) {
+                findUser(TAid).then(TAuser => {
+                    setTA(TAuser)
+                })
             }
         }
         getInfo()
@@ -170,6 +177,32 @@ const Classroom = () => {
         <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
             <Header user={user} />
             <div id="classroom">
+                <div className="mx-5 my-10">
+                    {!isOwner ? <>
+                    {/* don't look at this, was overcome by laziness */}
+                        <div className="text-center absolute top-20 left-20 w-max">
+                            <div className="text-center absolute top-2 left-20 w-max">
+                                <div className="text-center absolute left-20 w-max">
+                                    <div className="text-center absolute left-20 w-max">
+                                        <div className="text-center absolute left-20 w-max">
+                                            <div className="text-center absolute left-20 w-max">
+                                                <div className="text-center absolute left-20 w-max">
+                                                    <div className="text-center absolute left-20 w-max">
+                                                        <div className="text-center absolute left-19 w-max">
+                                                            <h1 className="mt-3 ml-5 text-xl font-mono font-bold"> {TA ? TA.firstName + "'s Classroom" : "a classroom"}</h1>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </> : <></>}
+                </div>
+
                 {isOwner === true && <span className="z-10 absolute right-0"><ClassroomSettings /></span>}
                 {isOwner ? <>
                     <button className={`${editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200"} hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
