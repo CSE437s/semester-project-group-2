@@ -177,33 +177,19 @@ const Classroom = () => {
         <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
             <Header user={user} />
             <div id="classroom">
-                <div className="mx-5 my-10">
-                    {!isOwner ? <>
+                
+            {!isOwner ? <>
                     {/* don't look at this, was overcome by laziness */}
-                        <div className="text-center absolute top-20 left-20 w-max">
-                            <div className="text-center absolute top-2 left-20 w-max">
-                                <div className="text-center absolute left-20 w-max">
-                                    <div className="text-center absolute left-20 w-max">
-                                        <div className="text-center absolute left-20 w-max">
-                                            <div className="text-center absolute left-20 w-max">
-                                                <div className="text-center absolute left-20 w-max">
-                                                    <div className="text-center absolute left-20 w-max">
-                                                        <div className="text-center absolute left-19 w-max">
-                                                            <h1 className="mt-3 ml-5 text-xl font-mono font-bold"> {TA ? TA.firstName + "'s Classroom" : ""}</h1>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div className="text-center absolute top-20 left-5 w-max">
+
+                        <div className="text-center absolute left-19 w-max">
+                            <h1 className="mt-6 ml-5 text-xl font-mono font-bold"> {TA ? TA.firstName + "'s Classroom" : "a classroom"}</h1>
                         </div>
+                    </div>
 
-                    </> : <></>}
-                </div>
+                </> : <></>}
 
-                { isOwner === true && <span  className="z-10 absolute pt-5 pr-5 right-0"><ClassroomSettings onChange={async ()=>{
+                { isOwner === true && <span  className="z-10 absolute pt-0 pr-4 right-0"><ClassroomSettings onChange={async ()=>{
                     const sett = await getClassroomSettings(TAid)
                     setSettings(sett)
                 }} /></span>}

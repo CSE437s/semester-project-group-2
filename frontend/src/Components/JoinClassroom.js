@@ -62,7 +62,7 @@ const JoinClassroom = () => {
         {user?._id !== TAid ?
             <div className="font-mono bg-indigo-50 h-dvh text-center">
                 <div className="flex justify-center p-10 pb-4">
-                    <div className="className=shadow-md rounded px-8 pt-8 pb-8 mb-4 w-full max-w-lg bg-indigo-300 flex flex-col">
+                    <div className="shadow-md rounded px-8 pt-8 pb-8 mb-4 w-full max-w-lg bg-indigo-300 flex flex-col">
                         You are currently waiting to join {TA ? TA.firstName + "'s classroom" : "a classroom"}. Refreshing will lose your place.
                         
                         <Queue />

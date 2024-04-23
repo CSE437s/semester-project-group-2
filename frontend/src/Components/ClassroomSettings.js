@@ -44,8 +44,8 @@ const ClassroomSettings = (props) => {
     return (<>
         {showForm === true ?
             <>
-                <button onClick={() => setShowForm(!showForm)} className="hover:animate-spin-short absolute right-10 bg-settings p-6 bg-no-repeat bg-cover m-2 mt-2"></button>
-                <form onSubmit={handleSettingsChange} className="mt-2 mr-6 pr-5 w-fit rounded-lg shadow-md rounded px-8 pt-6 pb-8 bg-indigo-300">
+                <button onClick={() => setShowForm(!showForm)} className="hover:animate-spin-short absolute right-0 bg-settings p-6 bg-no-repeat bg-cover mr-4 mt-1"></button>
+                <form onSubmit={handleSettingsChange} className="mt-2 mr-0 pr-10 w-fit rounded-lg shadow-md rounded px-8 pt-6 pb-8 bg-indigo-300">
                     <div className="mb-1">
                         <input id="queue" type="checkbox" checked={settings.queueEnabled === true} onChange={(e) => {
                             setSettings({ queueEnabled: e.target.checked, instructorsAllowed: settings.instructorsAllowed, passwordEnabled: settings.passwordEnabled, password: settings.password })
@@ -81,7 +81,7 @@ const ClassroomSettings = (props) => {
 
             </>
             :
-            <button onClick={() => setShowForm(!showForm)} value="clear" className="hover:animate-spin-short absolute right-10 bg-settings p-6 bg-no-repeat bg-cover m-2 mt-2"></button>
+            <button onClick={() => setShowForm(!showForm)} value="clear" className="hover:animate-spin-short absolute right-0 bg-settings p-6 bg-no-repeat bg-cover m-2 mt-0 mr-4"></button>
         }
 
     </>)
