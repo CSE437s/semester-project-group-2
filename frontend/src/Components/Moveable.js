@@ -25,20 +25,48 @@ const Moveable = (props) => {
                                             })
     const watch = (e) => {
         if(resizing.active === true) {
-            setSpecs({
-                width: specs.width + e.clientX > resizing.x ? (e.clientX - resizing.x) : (resizing.x - e.clientX), // allow for both growing and shrinking
-                height: specs.height + e.clientY > resizing.y ? (e.clientY - resizing.y) : (resizing.y - e.clientY),
-                x: specs.x,
-                y: specs.y
-            })
+            if(e.clientY + 30 > window.innerHeight) {
+                setSpecs({
+                    width: specs.width,
+                    height: specs.height,
+                    x: specs.x,
+                    y: specs.y
+                })
+            } 
+            else {
+                setSpecs({
+                    width: specs.width + e.clientX > resizing.x ? (e.clientX - resizing.x) : (resizing.x - e.clientX), // allow for both growing and shrinking
+                    height: specs.height + e.clientY > resizing.y ? (e.clientY - resizing.y) : (resizing.y - e.clientY),
+                    x: specs.x,
+                    y: specs.y
+                })
+            }
         }
         if(moving.active === true) {
-            setSpecs({
-                width: specs.width,
-                height: specs.height,
-                x: e.clientX  - moving.x, 
-                y: e.clientY - moving.y
-            })
+            if(e.clientY + specs.height + 40 > window.innerHeight) {
+                setSpecs({
+                    width: specs.width,
+                    height: specs.height,
+                    x: specs.x,
+                    y: window.innerHeight - specs.height - 50, //specs.y
+                })
+            } 
+            else if(e.clientY < 150) {
+                setSpecs({
+                    width: specs.width,
+                    height: specs.height,
+                    x: specs.x,
+                    y: 150, //specs.y
+                })
+            } 
+            else {
+                setSpecs({
+                    width: specs.width, 
+                    height: specs.height,
+                    x: e.clientX  - moving.x, 
+                    y: e.clientY - moving.y
+                })
+            }
         }
     }
     const stopWatching = () => {
@@ -83,7 +111,7 @@ const Moveable = (props) => {
         }
     })
  
-    return (<div id="container" className="w-screen h-screen">
+    return (<div id="container" className="w-100 h-100">
         <div id="MoveableComponent" style={{
             position: "absolute",
             top: specs.y,
