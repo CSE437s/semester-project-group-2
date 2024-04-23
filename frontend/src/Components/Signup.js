@@ -109,7 +109,8 @@ const Signup = () => {
 
 
     return (
-        <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
+    
+        <div className="font-mono bg-indigo-50 h-dvh text-gray-800 flex flex-col pb-6">
             <header className="bg-indigo-50 p-0 py-5">
                 <div className="container flex justify-center items-center max-w-full">
                     <Link to="/home">
@@ -125,7 +126,7 @@ const Signup = () => {
                </div>
                <h1 className="pt-5 text-2xl text-center font-bold text-indigo-900 font-mono">Create an Account</h1>
 
-            <div className="flex justify-center pt-5 p-10 pb-4 bg-indigo-50 ">
+            <div className="flex justify-center pt-5 p-10 pb-4 bg-indigo-50">
                 <form onSubmit={handleSignup} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-300">
                     <div className="mb-4">
                         <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="firstName">
@@ -249,11 +250,12 @@ const Signup = () => {
                     </button>
                 </form>
             </div>
-            <div className="flex justify-center sm:flex-row flex-col text-center">
-                Already have an account? <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-800 ml-2 mr-2  md:text-base">Sign in</Link>
+            <div className="flex justify-center sm:flex-row flex-col text-center bg-indigo-50 pb-10">
+                Already have an account? <Link to="/login" className="font-semibold bg-indigo-50 text-indigo-600 hover:text-indigo-800 ml-2 mr-2  md:text-base">Sign in</Link>
             </div>
 
         </div>
+  
     );
 };
 
