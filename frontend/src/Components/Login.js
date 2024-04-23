@@ -56,7 +56,7 @@ const Login = () => {
                     <Link to="/home">
                         <div className="flex items-center">
                             <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2" />
-                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OH</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OFFICE HOURS</h1>
                         </div>
                     </Link>
                 </div>
@@ -65,7 +65,8 @@ const Login = () => {
                
 
                </div>
-            <div className="flex justify-center mt-6 p-10 pb-4">
+            <h1 className="pt-10 text-2xl text-center font-bold text-indigo-900 font-mono">Welcome! Sign In</h1>
+            <div className="flex justify-center p-10 pb-4">
                 <form onSubmit={performLogin} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-300">
                     <div className="mb-4">
                         <label className="block text-gray-800 text-sm font-bold mb-2" htmlFor="email">
@@ -95,7 +96,7 @@ const Login = () => {
                         <input
                             className="bg-indigo-500 hover:bg-indigo-700 text-gray-50 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             type="submit"
-                            value="Login"
+                            value="Sign in"
                         />
                         <input
                             className="inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800"

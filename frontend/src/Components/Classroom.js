@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import { getCurrentUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent, getClassroomSettings, getCurrentStudent } from "../UserUtils";
+import { getCurrentUser, getAllUserHours, getClassroomComponents, setClassroomComponents, addClassroomComponent, getClassroomSettings, getCurrentStudent, removeCurrentStudent } from "../UserUtils";
 import Header from "./Header";
 import Moveable from "./Moveable";
 import ClassroomSettings from "./ClassroomSettings";
@@ -46,7 +46,9 @@ const Classroom = () => {
                 }
                 if(sett) {
                     if(sett.queueEnabled === true && u._id !== TAid && (student === null || u._id !== student._id)) {
-                        navigate(`/classrooms/waiting/${TAid}`)
+                        if(sett.instructorsAllowed === false && u.role === "instructor"){ // capture special case of instructors 
+                            navigate(`/classrooms/waiting/${TAid}`)
+                        }
                     }
                 }
             }
@@ -60,6 +62,14 @@ const Classroom = () => {
             }
         }
         getInfo()
+        return () => {
+            if(user?._id !== TAid && settings?.queueEnabled === true ) {
+                console.log("dismount moment")
+                removeCurrentStudent(TAid).then(result => {
+                    console.log(result)
+                })
+            }
+        }
         //eslint-disable-next-line
     }, [settings]) // rerun when settings are changed
 
@@ -160,18 +170,18 @@ const Classroom = () => {
         <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
             <Header user={user} />
             <div id="classroom">
-                { isOwner === true && <span  className="absolute pt-5 pr-5 right-0"><ClassroomSettings /></span>}
-                {isOwner? <>
+                { isOwner === true && <span  className="z-10 absolute pt-5 pr-5 right-0"><ClassroomSettings /></span>}
+                { isOwner? <>
                 <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
                     if(editMode === true) {
                         saveElements()
                     }
                     setEditMode(!editMode)
-                }}> { editMode === true ? "save changes" : "add widgets" }</button>
+                }}> { editMode === true ? "done" : "manage widgets" }</button>
+                { editMode === true && <button className="bg-indigo-100 hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5" onClick={()=> setElements([])} > remove all </button> }
                 <br></br>
-                { settings?.queueEnabled === true && <Queue /> }
                 {editMode === true ? <span className="">
-                        <select className="mx-3" name="components" id="select-components" onChange={(e)=>{
+                        <select className="mx-5" name="components" id="select-components" onChange={(e)=>{
                                 setNewComponentName(e.target.value)
                         }}>
                             <option value="whiteboard">Whiteboard</option>
@@ -181,11 +191,15 @@ const Classroom = () => {
                         </select>
                         <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit" onClick={()=>{
                             handleAdd(newComponentName)
-                        }}> add</button>
+                        }}> + add </button>
+                        <br />
                     </span> : <></> 
                 }</>
                 : <></>
                 }
+                <div className="mx-5 my-10">
+                    { settings?.queueEnabled === true && <Queue /> }
+                </div>
                 {
                     elements && 
                     elements.map((element) => {

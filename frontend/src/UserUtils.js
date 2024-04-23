@@ -776,3 +776,32 @@ export function testClassroomPassword(password, TAid) {
         return null
     })
 }
+
+
+/**
+ * Removes the student from the status that currently stores the student being helped 
+ * @param  TAid 
+ * @returns true if successful, false otherwise
+ */
+export function removeCurrentStudent(TAid) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    return axios.post(url + "/api/removeCurrentStudent", {
+        TAid: TAid
+    }, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 200) {
+            return true
+        }
+        return false
+    }).catch(e => {
+        console.log(e)
+        return false
+    })
+}

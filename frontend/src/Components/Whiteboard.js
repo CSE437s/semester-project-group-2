@@ -53,7 +53,8 @@ const Whiteboard = (props) => {
         })
     }
     const clear = () => {
-        context.reset()
+        context.fillStyle="white"
+        context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height)
         socket.emit("clearChildren")
     }
     const onConnect = () => {
@@ -105,7 +106,6 @@ const Whiteboard = (props) => {
             if(mouseDown === true) {
                 var x = e.offsetX  // get starting coordinates
                 var y = e.offsetY
-                console.log("!!", x, y)
                 if(x < 0 || x > props.width || y > props.height || y < 0) {
                     mouseDown = false
                     return
@@ -142,7 +142,8 @@ const Whiteboard = (props) => {
             })
         })
         socket.on("childClear", () => {
-            localContext.reset()
+            localContext.fillStyle="white"
+            localContext.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height)
         })
         socket.on("changeMyColor", (data)=> {
             localContext.strokeStyle = data.newColor
@@ -163,7 +164,7 @@ const Whiteboard = (props) => {
         // eslint-disable-next-line
     }, [context, props.height, props.width])
     return(<>
-        <div className="border-8 border-gray-300 rounded block w-fit h-fit">
+        <div className="border-8 border-gray-300 bg-white rounded block w-fit h-fit">
             <canvas id="canvas" ref={canvasRef} width={props.width} height={props.height}/>
             <button onClick={getChangeColor} value="red" className="border-2 rounded-full bg-red-600 p-3 m-2"> </button>
             <button onClick={getChangeColor} value="blue" className="border-2 rounded-full bg-blue-600 p-3 m-2"> </button>

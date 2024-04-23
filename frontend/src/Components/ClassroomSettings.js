@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { getClassroomSettings, setClassroomSettings } from "../UserUtils"
 
 const ClassroomSettings = () => {
-    const [settings, setSettings] = useState({queueEnabled: false, passwordEnabled: false, password: undefined})
+    const [settings, setSettings] = useState({queueEnabled: false, instructorsAllowed: true, passwordEnabled: false, password: undefined})
     const [originallyHadAPassword, setOriginallyHadAPassword] = useState(false)
     const [savedNewSettings, setSavedNewSettings] = useState(true)
     const [showForm, setShowForm] = useState(false)
@@ -29,6 +29,7 @@ const ClassroomSettings = () => {
         }
         const newSettings = {
             queueEnabled: settings.queueEnabled,
+            instructorsAllowed: settings.instructorsAllowed,
             passwordEnabled: settings.passwordEnabled,
             password: settings.passwordEnabled === true ? settings.password : undefined
         }
@@ -36,6 +37,7 @@ const ClassroomSettings = () => {
             if(result === true) {
                 alert("Settings changed successfully!")
                 setSavedNewSettings(true)
+                setShowForm(false)
             }
         })
     }
@@ -47,20 +49,27 @@ const ClassroomSettings = () => {
             <div>
                 <label htmlFor="queue">Enable Queue</label>
                 <input id="queue" type="checkbox" checked={settings.queueEnabled === true} onChange={(e)=>{
-                    setSettings({queueEnabled: e.target.checked, passwordEnabled: settings.passwordEnabled, password: settings.password})
+                    setSettings({queueEnabled: e.target.checked, instructorsAllowed: settings.instructorsAllowed, passwordEnabled: settings.passwordEnabled, password: settings.password})
+                    }
+                } className="ml-2 accent-indigo-700" />
+            </div>
+            <div>
+                <label htmlFor="queue">Allow Instructors In</label>
+                <input id="queue" type="checkbox" checked={settings.instructorsAllowed === true} onChange={(e)=>{
+                    setSettings({queueEnabled: settings.queueEnabled, instructorsAllowed: e.target.checked, passwordEnabled: settings.passwordEnabled, password: settings.password})
                     }
                 } className="ml-2 accent-indigo-700" />
             </div>
             <div>
                 <label htmlFor="password-protected">Password protected room</label>
                 <input id="password-protected" type="checkbox" checked={settings.passwordEnabled === true} onChange={(e)=>{
-                    setSettings({queueEnabled: settings.queueEnabled, passwordEnabled: e.target.checked, password: settings.password})
+                    setSettings({queueEnabled: settings.queueEnabled, instructorsAllowed: settings.instructorsAllowed, passwordEnabled: e.target.checked, password: settings.password})
                 }
                 } className="ml-2 accent-indigo-700" />
                 {settings.passwordEnabled === true && <div>
                     {originallyHadAPassword === true ? "Reset your room password:" : "Room Password:" }
-                    <input id="password" autoComplete="new-password" type="password" onChange={(e)=>
-                        setSettings({queueEnabled: settings.queueEnabled, passwordEnabled: settings.passwordEnabled, password: e.target.value})
+                    <input id="password" type="text" onChange={(e)=>
+                        setSettings({queueEnabled: settings.queueEnabled, instructorsAllowed: settings.instructorsAllowed, passwordEnabled: settings.passwordEnabled, password: e.target.value})
                         } className="ml-2 rounded focus:bg-slate-100 focus:border-0 p-1" />
                     </div>
                 }

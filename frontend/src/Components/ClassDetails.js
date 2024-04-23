@@ -390,7 +390,7 @@ const ClassDetails = () => {
                   {teachingAssistants
                     .map(ta => {
                       const taSchedule = taSchedules?.find(schedule => schedule?.userId === ta._id);
-                      const isOHNow = taSchedule && isCurrentlyOH(taSchedule.hours, new Date());
+                      const isOHNow = process.env.REACT_APP_DEBUGGING === "true" ? true : taSchedule && isCurrentlyOH(taSchedule.hours, new Date());
                       let formattedSchedule = [];
                       if (taSchedule && taSchedule.hours) {
                         formattedSchedule = formatSchedule(taSchedule.hours);
