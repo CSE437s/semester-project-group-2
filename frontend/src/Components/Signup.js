@@ -18,7 +18,7 @@ const Signup = () => {
     useEffect(() => {
         const fetchOrganizations = async () => {
             try {
-                const response = await axios.post(process.env.REACT_BACKEND_URL + '/api/organizations',
+                const response = await axios.post(process.env.REACT_APP_BACKEND_URL + '/api/organizations',
             {
                 headers:
                 {
