@@ -198,7 +198,7 @@ const Classroom = () => {
                 : <></>
                 }
                 <div className="mx-5 my-10">
-                    { settings?.queueEnabled === true && <Queue /> }
+                    { isOwner === true && settings?.queueEnabled === true && <Queue /> }
                 </div>
                 {
                     elements && 

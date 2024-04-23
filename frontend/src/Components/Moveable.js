@@ -143,7 +143,7 @@ const Moveable = (props) => {
                             <ChatContainer width={specs.width} height={specs.height} /> 
                             :
                             (props.component === "code" ? 
-                                <CodeEditor lang={props.lang} theme={props.theme} width={specs.width} height={specs.height} />
+                                <CodeEditor lang={props.lang} theme={props.theme} width={specs.width > 400 ? specs.width : 400} height={specs.height} />
                             :
                             <VideoCall width={specs.width} height={specs.height} />)
                 )

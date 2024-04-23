@@ -11,6 +11,7 @@ import 'ace-builds/src-noconflict/theme-terminal'
 import 'ace-builds/src-noconflict/theme-tomorrow'
 import 'ace-builds/src-noconflict/keybinding-emacs'
 import 'ace-builds/src-noconflict/keybinding-vim'
+import "ace-builds/src-noconflict/ext-language_tools"
 
 
 
@@ -46,7 +47,7 @@ const CodeEditor = (props) => {
         }
     })
     return (<>
-        <div className="flex p-2 bg-indigo-100">
+        <div className="flex p-2 bg-indigo-100 w-100">
             language:
             <form className="pr-5">
                 <select onChange={(e) => setLang(e.target.value)}>
@@ -77,7 +78,6 @@ const CodeEditor = (props) => {
             setOptions={{
                 useWorker: false,
                 enableBasicAutocompletion: true,
-                enableLiveAutocompletion: true,
                 enableSnippets: true
             }}
         />

@@ -37,7 +37,7 @@ const Header = (props) => {
 
     return (
         <div>
-            <header className="bg-indigo-50 p-0 py-5 z-10">
+            <header className="font-mono bg-indigo-50 p-0 py-5 z-10">
                 <div className="container flex justify-between items-center max-w-full">
                     <Link to="/home">
                         <div className="flex items-center">
