@@ -17,6 +17,16 @@ const hoursModel = require("./database/models/hoursModel")
 const JWT = require("jsonwebtoken")
 const sendEmail = require("./sendEmail")
 const cors = require('cors')
+const streamifier = require("streamifier")
+// import {v2 as cloudinary} from 'cloudinary';
+          
+const cloudinary = require("cloudinary").v2
+cloudinary.config({ 
+  cloud_name: process.env.CLOUD_NAME, 
+  api_key: process.env.IMAGE_API_KEY, 
+  api_secret: process.env.IMAGE_API_SECRET 
+});
+
 // setup multer for file upload
 var store = multer.diskStorage({
     destination: './uploadedFiles',
@@ -638,7 +648,6 @@ app.post("/api/changeRoleInClass", (req, res) => {
 })
 
 app.post("/api/updateUserName", (req, res) => {
-    console.log("we get to server.js");
     passport.authenticate("jwt", { session: false }, (error, user) => {
         if (error) {
             res.status(500).send({ error: error })
@@ -948,8 +957,65 @@ app.post("/api/updateUserBGColor", (req, res) => {
     })(req, res)
 })
 
-// serve profile pictures statically 
-app.use('/uploadedFiles', express.static(path.join(__dirname, '/uploadedFiles')))
+app.post("/api/sendProfilePicture", upload.single("file"), (req, res) => {
+    passport.authenticate("jwt", { session: false }, (error, user) => {
+        if (error) {
+            console.log(error)
+            res.status(500).send({ error: error })
+        }
+        else if (!user) {
+            res.status(401).send({ error: "invalid auth" })
+        }
+        else {
+            // lifted directly from https://cloudinary.com/blog/node_js_file_upload_to_a_local_server_or_to_the_cloud
+            const uploadFile = (successCB, failureCB) => {
+                const s = cloudinary.uploader.upload_stream(
+                    (error, result) => {
+                      if (result) {
+                          successCB(result)
+                      } else {
+                            return;
+                      }
+                    }
+                  );
+      
+                streamifier.createReadStream(req.file.buffer).pipe(s);
+            }
+            
+            uploadFile((result) => {
+                const url = result.url
+                userModel.findByIdAndUpdate(user._id, {
+                    $set: {
+                        profilePicture: url
+                    }
+                }).then(status => {
+                    console.log(status)
+                    if(status) {
+                        res.sendStatus(200)
+                    }
+                })
+            }, (error) => {
+                console.log(error)
+                res.sendStatus(500)
+            })
+             // https://console.cloudinary.com/pm/c-e009967695b73f6df068fb5d369f5b/getting-started
+        }
+    })(req, res)
+})
+
+// app.get("/api/getProfilePicture", (req, res) => {
+//     passport.authenticate("jwt", { session: false }, (error, user) => {
+//         if (error) {
+//             res.status(500).send({ error: error })
+//         }
+//         else if (!user) {
+//             res.status(401).send({ error: "invalid auth" })
+//         }
+//         else {
+            
+//         }
+//     })(req, res)
+// })
 
 
 // VIDEO CALLING URLS

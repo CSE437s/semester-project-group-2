@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, updateUserName, updateUserBio, updateUserBGColor } from "../UserUtils";
 import Header from "./Header";
 import { useRef } from "react";
+import ProfilePicture from "./ProfilePicture";
 
 const UserDetails = () => {
 
@@ -193,9 +194,8 @@ const UserDetails = () => {
 
 
             <div id="userDetailsContainer" className="font-mono">
-                {/* {user && user.photoURL ? <img src={user.photoURL.replace("backend/", api_url)} className="rounded-full mx-auto mb-4" alt="Profile" width="100px" /> : null} */}
-
-                <div className="bg-indigo-200 font-mono container mx-auto mt-6 p-10 rounded-lg shadow-lg">
+                <div className="bg-indigo-200 font-mono flex-row grid grid-cols-1 justify-center items-center container mx-auto mt-6 p-10 rounded-lg shadow-lg">
+                <span className="place-self-center pb-10"><ProfilePicture height={100} width={100} isOwner={true} userId={user._id}/></span>
                     <h1 className="text-3xl font-bold text-center mb-4 flex justify-center items-center gap-3">
 
                     <img src="/edit_icon.png" alt="Logo" className="h-5 w-auto cursor-pointer" onClick={handleEditIconClick} />

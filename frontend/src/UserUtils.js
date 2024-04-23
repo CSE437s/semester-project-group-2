@@ -805,3 +805,30 @@ export function removeCurrentStudent(TAid) {
         return false
     })
 }
+/**
+ * Sends new file to be uploaded to the backend
+ * @param file file object
+ * @returns true if successful, false otherwise
+ */
+export function sendNewPicture(file) {
+    const token = localStorage.getItem("token")
+    if(!token) {
+        return null
+    }
+    const data = new FormData()
+    data.append("file", file);
+    return axios.post(url + "/api/sendProfilePicture", data, {
+        headers: {
+            Authorization: "Bearer " + token,
+            "content-type": "multipart/form-data",
+            "ngrok-skip-browser-warning": true
+        }
+    }).then(result => {
+        if(result.status === 200) {
+            return true
+        }
+        return false
+    }).catch(e => {
+        return false
+    })
+}
