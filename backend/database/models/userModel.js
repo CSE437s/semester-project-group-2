@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     profilePicture: {
       type: String,
       required: false,
-      default: "https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTAxL3JtNjA5LXNvbGlkaWNvbi13LTAwMi1wLnBuZw.png"
+      default: "http://res.cloudinary.com/dp1gbz22c/image/upload/v1713911713/b4v8cfmik6pmswmyldja.png"
     },
     password: {
       type: String, 

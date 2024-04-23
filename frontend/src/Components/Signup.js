@@ -18,7 +18,13 @@ const Signup = () => {
     useEffect(() => {
         const fetchOrganizations = async () => {
             try {
-                const response = await axios.post('/api/organizations');
+                const response = await axios.post(process.env.REACT_BACKEND_URL + '/api/organizations',
+            {
+                headers:
+                {
+                    "ngrok-skip-browser-warning": true
+                }
+            });
                 setOrganizations(response.data.organizations);
                 if (response.data.organizations.length > 0) {
                     setSelectedOrg(response.data.organizations[0]);
