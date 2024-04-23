@@ -177,8 +177,8 @@ const Classroom = () => {
                             saveElements()
                         }
                         setEditMode(!editMode)
-                    }}> {editMode === true ? "done" : "manage widgets"}</button>
-                    {editMode === true && <button className="bg-red-300 hover:bg-red-400 rounded-lg shadow-md p-2 my-2 mx-5" onClick={() => setElements([])} > remove all </button>}
+                    }}> {editMode === true ? "Done" : "Manage Widgets"}</button>
+                    {editMode === true && <button className="bg-red-300 hover:bg-red-400 rounded-lg shadow-md p-2 my-2 mx-5" onClick={() => setElements([])} > Remove All </button>}
                     <br></br>
                     {editMode === true ? <span className="">
 
@@ -192,9 +192,9 @@ const Classroom = () => {
                                 <option value="chat">Text Chat</option>
                                 <option value="code">Code Editor</option>
                             </select>
-                            <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 mx-5 w-fit z-10" onClick={() => {
+                            <button className="hover:bg-indigo-300 rounded-lg shadow-md p-2 bg-indigo-200 my-2 w-fit z-10" onClick={() => {
                                 handleAdd(newComponentName)
-                            }}> + add </button>
+                            }}> + Add </button>
                         </div>
 
                         <br />

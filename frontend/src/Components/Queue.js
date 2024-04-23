@@ -151,7 +151,7 @@ const Queue = (props) => {
 
 
         <div className="bg-indigo-300 rounded-lg p-10 w-fit">
-            <div>
+            <div className="text-center">
                 Students Waiting: <span className="text-white">{queue ? queue.length : 0}</span>
                
                 {queue && <ol className="pl-10">
@@ -164,7 +164,7 @@ const Queue = (props) => {
                 }
                 
             </div>
-            <button className="bg-indigo-600 text-white px-5 py-2 mt-10 rounded-sm hover:bg-indigo-900" onClick={nextStudent}>help next student</button>
+            <button className="bg-indigo-600 text-white px-5 py-2 mt-10 rounded-sm hover:bg-indigo-900" onClick={nextStudent}>Help Next Student</button>
         </div>
     </>
     
