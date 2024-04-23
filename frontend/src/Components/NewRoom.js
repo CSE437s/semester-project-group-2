@@ -15,11 +15,14 @@ const NewRoom = (props) => {
     return (<>
     <JitsiMeeting
         roomName = { props.type + "-Room" + props.roomName }
-        configOverwrite = {{
-            subject: props.type,
-            hideConferenceSubject: false
-        }}
+        // configOverwrite = {{ jitsi broke this feature :) 
+        //     subject: props.type,
+        //     hideConferenceSubject: false
+        // }}
         lang = 'en'
+        userInfo = {{
+            displayName: props.firstName
+        }}
         getIFrameRef = { (iframeRef) => { 
             iframeRef.style.height = `${props.height}px`// props.height; 
             iframeRef.style.width = `${props.width}px`// props.width; 

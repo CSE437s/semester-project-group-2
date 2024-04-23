@@ -7,6 +7,7 @@ import axios from "axios"
 const VideoCall = (props) => {
     const [isOwner, setIsOwner] = useState(null)
     const [roomURL, setRoomURL] = useState("")
+    const [firstName, setFirstName] = useState("Guest")
     const [room, createRoom] = useState(undefined);
     const DEBUGGING = process.env.REACT_APP_DEBUGGING;
     const url = DEBUGGING === "true" ? process.env.REACT_APP_DEBUGGING_BACKEND_URL : process.env.REACT_APP_BACKEND_URL
@@ -21,6 +22,7 @@ const VideoCall = (props) => {
             getCurrentUser().then(u => {
                 const user = u.data.user
                 setIsOwner(user._id === TAid)
+                setFirstName(user.firstName)
                 if(user._id !== TAid) {
                     if(!roomURL) {
                         getNewUrl(TAid);
@@ -57,7 +59,7 @@ const VideoCall = (props) => {
 
     const handleSubmit = (e) => {
         const newRoomName = Math.random() * 10 + "." + Date.now();
-        createRoom(<NewRoom roomName={newRoomName} type={e.target.roomtype.value} height={props.height} width={props.width}/>);
+        createRoom(<NewRoom firstName={firstName} roomName={newRoomName} type={e.target.roomtype.value} height={props.height} width={props.width}/>);
     };
 
     return (<>
@@ -77,7 +79,7 @@ const VideoCall = (props) => {
                 </div>
             :
             roomURL ?     
-                <NewRoom roomName="asdf" type="asdf" URL={roomURL} height={props.height} width={props.width}/>
+                <NewRoom firstName={firstName} roomName="asdf" type="asdf" URL={roomURL} height={props.height} width={props.width}/>
                 :
                 <div className="rounded-lg shadow-md p-8 bg-indigo-200 my-10">! There is currently no one online.</div>
         }
