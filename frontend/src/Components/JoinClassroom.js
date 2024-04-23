@@ -8,41 +8,41 @@ const JoinClassroom = () => {
     const [TA, setTA] = useState()
     const [user, setUser] = useState()
     const [settings, setSettings] = useState()
-    const {TAid} = useParams()
+    const { TAid } = useParams()
 
     const navigate = useNavigate()
 
     useEffect(() => {
-        if(!TA) {
+        if (!TA) {
             findUser(TAid).then(TAuser => {
                 setTA(TAuser)
             })
         }
-        if(!user) {
+        if (!user) {
             getCurrentUser().then(userObject => {
                 const user = userObject.data.user
                 setUser(user)
             })
         }
-        if(!settings) {
+        if (!settings) {
             getClassroomSettings(TAid).then(async newSettings => {
                 const getUser = await getCurrentUser()
-                if(!getUser) {
-                    return 
+                if (!getUser) {
+                    return
                 }
                 const user2 = getUser.data.user
-                if(user2._id === TAid || (user2.role === "instructor" && newSettings.instructorsAllowed === true) || (newSettings.queueEnabled === false && newSettings.passwordEnabled === false)) {
+                if (user2._id === TAid || (user2.role === "instructor" && newSettings.instructorsAllowed === true) || (newSettings.queueEnabled === false && newSettings.passwordEnabled === false)) {
                     navigate(`/classrooms/${TAid}`)
                 }
-                else if(newSettings.queueEnabled === false) {
+                else if (newSettings.queueEnabled === false) {
                     const password = prompt("put the password in dweeb")
                     console.log(password, TAid)
-                    if(password) {
+                    if (password) {
                         testClassroomPassword(password, TAid).then(result => {
-                            if(result === true) {
+                            if (result === true) {
                                 navigate(`/classrooms/${TAid}`)
                             }
-                            else if(result === false) {
+                            else if (result === false) {
                                 alert("Wrong password. Please try again or contact your TA.")
                             }
                             else {
@@ -58,16 +58,25 @@ const JoinClassroom = () => {
     }, []) // only run the getters if the variables have changed 
     return (<>
         <Header />
-        {user?._id !== TAid ? 
-        <div className="px-10">
-        You are currently waiting to join { TA ? TA.firstName + "'s classroom" : "a classroom"}. Please wait here until redirected. Refreshing will lose your place in line. 
-        </div>
-        :
-        <div>
-        Here is your classroom waiting page. Queue information can be found below.
-        </div>
+
+        {user?._id !== TAid ?
+            <div className="font-mono bg-indigo-50 h-dvh text-center">
+                <div className="flex justify-center p-10 pb-4">
+                    <div className="className=shadow-md rounded px-8 pt-8 pb-8 mb-4 w-full max-w-lg bg-indigo-300 flex flex-col">
+                        You are currently waiting to join {TA ? TA.firstName + "'s classroom" : "a classroom"}. Refreshing will lose your place.
+                        
+                        <Queue />
+                        </div>
+                    
+                </div>
+            </div>
+
+            :
+            <div>
+                Here is your classroom waiting page. Queue information can be found below.
+            </div>
         }
-        <Queue />
+
     </>)
 }
 

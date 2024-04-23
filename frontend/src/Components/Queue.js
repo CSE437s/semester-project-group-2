@@ -143,10 +143,13 @@ const Queue = (props) => {
     <>
 
     {console.log(queue)}
-        {joined === true ? <div>You are {queueIndex + getSuffix(queueIndex)} in line </div> : <button onClick={joinQueue}>join queue</button> }
+    
+        {joined === true ? <div className="mt-4">You are {queueIndex + getSuffix(queueIndex)} in line </div> : <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mb-2 mt-4" onClick={joinQueue}>Join Queue</button> }
     </>
     :
     <>
+
+
         <div className="bg-indigo-300 rounded-lg p-10 w-fit">
             <div>
                 Students Waiting: <span className="text-white">{queue ? queue.length : 0}</span>
