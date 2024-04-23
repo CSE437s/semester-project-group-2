@@ -170,7 +170,7 @@ const Classroom = () => {
         <div className="font-mono bg-indigo-50 h-dvh text-gray-800">
             <Header user={user} />
             <div id="classroom">
-                { isOwner === true && <span  className="z-10 absolute pt-5 pr-5 right-0"><ClassroomSettings /></span>}
+                { isOwner === true && <span  className="z-10 absolute right-0"><ClassroomSettings /></span>}
                 { isOwner? <>
                 <button className={`${ editMode ? "bg-indigo-500 text-white hover:bg-indigo-700" : "bg-indigo-200" } hover:bg-indigo-300 rounded-lg shadow-md p-2 my-2 mx-5`} onClick={() => {
                     if(editMode === true) {
