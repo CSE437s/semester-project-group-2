@@ -28,28 +28,30 @@ const ResetPassword = () => {
         })
     }
     return (<>
-        <div className="font-mono">
-            <header className="bg-indigo-300 p-0 py-5">
+        <div className="font-mono bg-indigo-50 h-dvh">
+            <header className="bg-indigo-50 p-0 py-5">
                 <div className="container flex justify-center items-center max-w-full">
                     <Link to="/home">
                         <div className="flex items-center">
                             <img src="/logo.png" alt="Logo" className="h-12 w-auto mr-2" />
-                            <h1 className="text-3xl font-bold text-black font-mono">ONLINE OH</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 font-mono">ONLINE OFFICE HOURS</h1>
                         </div>
                     </Link>
                 </div>
             </header>
-        </div>
+            <div className="border-0.5 border-gray-800 border-solid relative" > </div>
 
-        <div className="flex justify-center mt-6 p-10 pb-4 font-mono">
-            <div className="mb-4">
-                <form onSubmit={onFormSubmit} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-200">
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-                    Enter your new password
-                </label>
-                    <input placeholder="New Password" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-6" type="password" name="newPassword" />
-                    <input type="submit" value="Submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
-                </form>
+            <div className="flex justify-center mt-6 p-10 pb-4 font-mono">
+                <div className="mb-4">
+                    <form onSubmit={onFormSubmit} className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg bg-indigo-300">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                            Enter your new password
+                        </label>
+                        <input placeholder="New Password" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" type="password" name="newPassword" />
+                        <input type="submit" value="Submit" className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
+                    </form>
+                </div>
+
             </div>
 
         </div>
