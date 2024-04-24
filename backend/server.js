@@ -684,14 +684,6 @@ app.post("/api/deleteClass", (req, res) => {
         } else {
             const classId = req.body.classId;
             hoursModel.deleteMany({ classId: classId })
-                .then(deletionResult => {
-                    if (deletionResult.deletedCount > 0) {
-                        res.status(200).send({ message: "Hours deleted successfully", deletedCount: deletionResult.deletedCount });
-                    } else {
-                        res.status(404).send({ message: "No hours found to delete" });
-                    }
-                })
-                .catch(e => res.status(500).send({ error: e.toString() }));
             // delete class first
             classModel.findByIdAndDelete(classId)
                 .then(async deletedClass => {
