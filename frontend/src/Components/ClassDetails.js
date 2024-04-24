@@ -244,7 +244,7 @@ const ClassDetails = () => {
 
 
   const handleScheduleSubmit = (classId, userId, newHours) => {
-    // window.location.reload();
+     window.location.reload();
   }
 
   useEffect(() => {

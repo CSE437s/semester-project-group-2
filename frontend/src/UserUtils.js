@@ -149,7 +149,7 @@ export function getPendingInstructors(org) {
         return null;
     }
     return axios.post(url + "/api/pending", {
-        org : org,
+        org: org,
         headers: {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true
@@ -228,11 +228,15 @@ export function getUserHoursForClass(userId, classId) {
     return getAllUserHours(userId)
         .then(hoursData => {
             console.log(`Received hours data:`, hoursData);
-            if (hoursData && hoursData.classId === classId) {
-                console.log(`Hours for class ${classId}:`, hoursData.hours);
-                return hoursData;
+            if (!Array.isArray(hoursData)) {
+                hoursData = [hoursData];
+            }
+            const matchingHours = hoursData.filter(entry => entry.classId === classId);
+            if (matchingHours.length > 0) {
+                console.log(`Hours for class ${classId}:`, matchingHours);
+                return matchingHours[0];
             } else {
-                console.log(`No hours found for class ${classId} or mismatch in class IDs`);
+                console.log(`No hours found for class ${classId}`);
                 return [];
             }
         })
@@ -465,7 +469,7 @@ export function getClassroomComponents(userId) {
     if (!token) {
         return { error: "no auth token available" }
     }
-    if(userId) {
+    if (userId) {
         return axios.post(url + "/api/getClassroomComponents", {
             userId: userId
         }, {
@@ -507,7 +511,7 @@ export function setClassroomComponents(newComponents) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 200) {
+        if (result.status === 200) {
             return true
         }
         return false
@@ -600,10 +604,10 @@ export function sendNewVideoURL(videoURL) {
  */
 export function getClassroomSettings(id) {
     const token = localStorage.getItem("token")
-    if(!token) {
-        return {error: "redirect to login"}
+    if (!token) {
+        return { error: "redirect to login" }
     }
-    if(id) {
+    if (id) {
         return axios.post(url + "/api/getClassroomSettings", {
             TAid: id
         }, {
@@ -612,7 +616,7 @@ export function getClassroomSettings(id) {
                 "ngrok-skip-browser-warning": true
             }
         }).then(result => {
-            if(result.status === 200) {
+            if (result.status === 200) {
                 return result.data.settings
             }
             return null
@@ -625,11 +629,11 @@ export function getClassroomSettings(id) {
                 "ngrok-skip-browser-warning": true
             }
         }).then(result => {
-            if(result.status === 200) {
+            if (result.status === 200) {
                 return result.data.settings
             }
             return null
-        }).catch(e => null) 
+        }).catch(e => null)
     }
 }
 /**
@@ -639,24 +643,24 @@ export function getClassroomSettings(id) {
  */
 export function getQueue(queueId) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/getQueue", {
         id: queueId
-    },{
+    }, {
         headers: {
             Authorization: "Bearer " + token,
             "ngrok-skip-browser-warning": true
         }
-        
+
     }).then(result => {
-        if(result.status === 200) {
+        if (result.status === 200) {
             return result.data.queue
         }
         return null
     }).catch(e => {
-        if(e.response.status === 404) {
+        if (e.response.status === 404) {
             return []
         }
         return null
@@ -672,18 +676,18 @@ export function getQueue(queueId) {
  */
 export function setClassroomSettings(newSettings) {
     const token = localStorage.getItem("token")
-    if(!token) {
-        return {error: "redirect to login"}
+    if (!token) {
+        return { error: "redirect to login" }
     }
     return axios.post(url + "/api/setClassroomSettings", {
         classroomSettings: newSettings
     }, {
-            headers: {
-                Authorization: "Bearer " + token,
-                "ngrok-skip-browser-warning": true
-            }
+        headers: {
+            Authorization: "Bearer " + token,
+            "ngrok-skip-browser-warning": true
+        }
     }).then(result => {
-        if(result.status === 201) {
+        if (result.status === 201) {
             return true
         }
         return false
@@ -697,7 +701,7 @@ export function setClassroomSettings(newSettings) {
  */
 export function getNextStudentInLine() {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.get(url + "/api/pullOffQueue", {
@@ -706,12 +710,12 @@ export function getNextStudentInLine() {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 200) {
-            return result.data 
+        if (result.status === 200) {
+            return result.data
         }
         return null
     }).catch(e => {
-        if(e.response.status === 404) {
+        if (e.response.status === 404) {
             console.log("no such student")
         }
         return null
@@ -724,7 +728,7 @@ export function getNextStudentInLine() {
  */
 export function getCurrentStudent(id) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/getCurrentStudent", {
@@ -735,12 +739,12 @@ export function getCurrentStudent(id) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 200) {
-            return result.data.currentStudent 
+        if (result.status === 200) {
+            return result.data.currentStudent
         }
         return null
     }).catch(e => {
-        if(e.response.status === 404) {
+        if (e.response.status === 404) {
             console.log("no such student")
         }
         return null
@@ -756,7 +760,7 @@ export function getCurrentStudent(id) {
  */
 export function testClassroomPassword(password, TAid) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/compareClassroomPassword", {
@@ -768,12 +772,12 @@ export function testClassroomPassword(password, TAid) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 200) {
+        if (result.status === 200) {
             return true
         }
         return null
     }).catch(e => {
-        if(e.response.status === 401) {
+        if (e.response.status === 401) {
             return false
         }
         return null
@@ -788,7 +792,7 @@ export function testClassroomPassword(password, TAid) {
  */
 export function removeCurrentStudent(TAid) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     return axios.post(url + "/api/removeCurrentStudent", {
@@ -799,7 +803,7 @@ export function removeCurrentStudent(TAid) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 200) {
+        if (result.status === 200) {
             return true
         }
         return false
@@ -815,7 +819,7 @@ export function removeCurrentStudent(TAid) {
  */
 export function sendNewPicture(file) {
     const token = localStorage.getItem("token")
-    if(!token) {
+    if (!token) {
         return null
     }
     const data = new FormData()
@@ -827,7 +831,7 @@ export function sendNewPicture(file) {
             "ngrok-skip-browser-warning": true
         }
     }).then(result => {
-        if(result.status === 200) {
+        if (result.status === 200) {
             return true
         }
         return false
