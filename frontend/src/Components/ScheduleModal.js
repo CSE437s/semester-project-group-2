@@ -32,8 +32,10 @@ const ScheduleModal = ({ onClose, userId, className, classId, onScheduleSubmit }
       });
   
       // Submit the selectedHoursArray to the backend
+      console.log(selectedHoursArray)
       addUserHours(userId, className, classId, selectedHoursArray)
         .then((response) => {
+          console.log(response)
           if (response) {
             onScheduleSubmit(classId, userId, selectedHoursArray);
             onClose();

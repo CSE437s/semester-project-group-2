@@ -273,7 +273,10 @@ export function addUserHours(userId, className, classId, hours) {
         else {
             return false
         }
-    }).catch(e => false)
+    }).catch(e => {
+        console.log(e)
+        return false
+    })
 }
 
 /**

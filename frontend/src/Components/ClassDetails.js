@@ -41,7 +41,6 @@ const ClassDetails = () => {
   };
 
   const toggleScheduleModal = () => {
-    console.log('Toggling Schedule Modal');
     setShowScheduleModal(!showScheduleModal);
   };
 
@@ -73,10 +72,8 @@ const ClassDetails = () => {
       })
     }
     getCurrentUser().then(user => {
-      console.log('Fetched user:', user);
       if (user) {
         setUser(user.data.user);
-        console.log('Set user:', user.data.user);
       }
     }).catch(e => console.log(e));
     //eslint-disable-next-line
@@ -110,13 +107,8 @@ const ClassDetails = () => {
             setTeachingAssistants(classObject.TAs);
             const taSchedulesPromises = classObject.TAs.map(ta =>
               getHoursByUserAndClass(ta._id, classObject._id));
-            console.log("taSchedulesPromises")
-            console.log(taSchedulesPromises)
             Promise.all(taSchedulesPromises).then(taSchedules => {
-              console.log("This is schedules")
-              console.log(taSchedules)
               setTASchedules(taSchedules);
-              console.log("taSchedul update ")
               if (classObject.instructorId) {
                 findUser(classObject.instructorId).then(instructor => {
                   if (instructor) {
@@ -252,7 +244,7 @@ const ClassDetails = () => {
 
 
   const handleScheduleSubmit = (classId, userId, newHours) => {
-    window.location.reload();
+    // window.location.reload();
   }
 
   useEffect(() => {
@@ -406,7 +398,7 @@ const ClassDetails = () => {
                             <h3 className="text-xl font-bold mb-4 hover:underline">{user?._id === _id ? <Link to={`/me`}>{"You!"}</Link> : <Link to={`/users/${_id}`}>{firstName} {lastName}</Link>}</h3>
                           </div>
                         </div>
-                        {hasScheduledHours ? (
+                        {hasScheduledHours === true ? (
                           <div className="text-center mb-4">
                             <p className="font-semibold">Office Hours:</p>
                             <div className="space-y-1">

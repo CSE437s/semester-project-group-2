@@ -506,10 +506,11 @@ app.post("/api/addHours", (req, res) => {
 
       hoursModel.findOneAndUpdate(searchCriteria, updateData, { new: true, upsert: true })
         .then(updatedDocument => {
+            console.log(updatedDocument)
           if(updatedDocument) {
             res.status(200).send({ message: "Office hours updated successfully.", updatedDocument });
           } else {
-            
+            console.log("fuck this")
             res.status(404).send({ message: "No matching document found to update." });
           }
         })
